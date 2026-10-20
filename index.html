@@ -29,9 +29,11 @@ canvas{position:absolute;left:0;top:0;width:100%;height:100%;display:block;touch
 #tip{position:absolute;left:8px;right:8px;top:62px;z-index:5;background:rgba(241,226,184,.97);color:var(--ink);border:3px solid var(--wood);border-radius:10px;padding:10px;box-shadow:0 3px 0 var(--dark);font-size:14px;line-height:1.4}
 .tipb{display:flex;gap:6px;margin-top:8px}.tipb button{border:2px solid var(--dark);border-radius:8px;background:var(--forest);color:#fff;padding:10px 12px;font-size:13px;cursor:pointer}#tipn{flex:1}
 #dock{display:flex;gap:6px;margin:4px}
-#found{height:48px;font-size:15px;padding:0 16px;border-radius:8px;border:2px solid var(--dark);background:linear-gradient(#e6bd5a,var(--gold));color:var(--dark);box-shadow:0 3px 0 var(--dark);cursor:pointer}
+#visit{height:48px;font-size:15px;padding:0 14px;min-width:72px;border-radius:8px;border:2px solid var(--dark);background:var(--forest);color:#fff;box-shadow:0 3px 0 var(--dark);cursor:pointer}
+#found:active,#visit:active{transform:translateY(3px);box-shadow:none}
+#found{height:48px;font-size:15px;padding:0 14px;min-width:72px;border-radius:8px;border:2px solid var(--dark);background:linear-gradient(#e6bd5a,var(--gold));color:var(--dark);box-shadow:0 3px 0 var(--dark);cursor:pointer}
 #grab{flex:1;height:48px;font-size:18px;border:2px solid var(--dark);border-radius:8px;background:var(--wood);color:var(--gold);cursor:pointer}
-body.pmin #panel{display:none}
+body.pmin #panel,#panel:empty{display:none}
 #panel{overscroll-behavior:contain;margin:0 4px 4px;padding:6px 8px;max-height:46dvh;overflow:auto;background:linear-gradient(var(--parch),#e6d29c)}
 input,textarea{width:100%;padding:6px;border:2px solid var(--leather);border-radius:6px;background:#fff8e1;min-height:38px;margin:2px 0}
 .btn{display:block;width:100%;margin:5px 0;padding:13px 10px;border-radius:8px;border:2px solid var(--dark);background:var(--forest);color:#fff;cursor:pointer;box-shadow:0 3px 0 var(--dark)}
@@ -70,7 +72,7 @@ li button{border:0;background:none;cursor:pointer;min-width:40px;min-height:40px
   <button class="ib" id="tp" aria-label="Conseil aléatoire">💡</button>
   <div id="tip" hidden><div id="tipt"></div><div class="tipb"><button id="tipg" hidden>📍 Voir</button><button id="tipn">🎲 Autre conseil</button><button id="tipx" aria-label="Fermer">✖</button></div></div>
   <div id="zb"><button class="ib" id="gr" aria-label="Afficher ou cacher la grille">▦</button><button class="ib" id="lb" aria-label="Liste des trouvailles">📋</button><button class="ib" id="fit" aria-label="Voir toutes mes cases">🎯</button><button class="ib" id="zi" aria-label="Zoomer">➕</button><button class="ib" id="zo" aria-label="Dézoomer">➖</button></div></div>
-<div id="dock"><button id="found">🍄 Trouvé ici !</button><button id="grab" aria-label="Réduire ou ouvrir la fiche">▾</button></div>
+<div id="dock"><button id="found" aria-label="Ajouter un cèpe">+1🍄</button><button id="visit" aria-label="Ajouter une visite">+1👣</button><button id="grab" aria-label="Réduire ou ouvrir la fiche">▾</button></div>
 <div id="panel" class="win"></div>
 <div id="menu"><div class="win"><h2 style="margin:0 0 8px">⚙️ Options</h2>
   <button class="btn gold" id="imp">📂 Importer un carnet (ancien ou nouveau, JSON)</button>
@@ -220,7 +222,7 @@ $('#zi').onclick = () => zoomAt(1.6); $('#zo').onclick = () => zoomAt(1 / 1.6);
     if (ptr.size === 1 && tap) { if (!tap.mv && Math.hypot(e.clientX - tap.x, e.clientY - tap.y) > 8) tap.mv = true; if (tap.mv) { V.cx -= dx * V.mpp; V.cy += dy * V.mpp; schedule(); } }
     else if (ptr.size === 2 && pinch) { const [a, b] = [...ptr.values()], d = dist(); zoomAt(d / pinch, (a.x + b.x) / 2, (a.y + b.y) / 2); pinch = d; } });
   const end = e => { if (!ptr.has(e.pointerId)) return; const solo = ptr.size === 1; ptr.delete(e.pointerId);
-    if (solo && e.type === 'pointerup' && tap && !tap.mv) { const r = cv.getBoundingClientRect(), k = idAt(V.cx + (e.clientX - r.left - r.width / 2) * V.mpp, V.cy - (e.clientY - r.top - r.height / 2) * V.mpp); select(k); if (rec(D.cells[k])) flyTo(k); }
+    if (solo && e.type === 'pointerup' && tap && !tap.mv) { const r = cv.getBoundingClientRect(), k = idAt(V.cx + (e.clientX - r.left - r.width / 2) * V.mpp, V.cy - (e.clientY - r.top - r.height / 2) * V.mpp); if (k === sel) { sel = null; collapse(); renderPanel(); draw(); } else { pick(k); if (rec(D.cells[k])) flyTo(k); } }
     if (!ptr.size) tap = null; pinch = 0; };
   addEventListener('pointerup', end); addEventListener('pointercancel', end);
   cv.addEventListener('wheel', e => { e.preventDefault(); zoomAt(e.deltaY < 0 ? 1.2 : 1 / 1.2, e.clientX, e.clientY); }, { passive: false });
@@ -255,16 +257,17 @@ $('#panel').addEventListener('change', async e => {
 /* ===== Fiche d'une case ===== */
 function select(k) { sel = k; document.body.classList.remove('pmin'); $('#grab').textContent = '▾'; renderPanel(); draw(); }
 const collapse = () => { document.body.classList.add('pmin'); $('#grab').textContent = '▴'; };
-$('#grab').onclick = () => { const m = document.body.classList.toggle('pmin'); $('#grab').textContent = m ? '▴' : '▾'; };
+function pick(k) { if (rec(D.cells[k])) select(k); else { sel = k; collapse(); draw(); } }      // une case vide se sélectionne sans ouvrir le carnet
+$('#grab').onclick = () => { const m = document.body.classList.toggle('pmin'); $('#grab').textContent = m ? '▴' : '▾'; if (!m) renderPanel(); };
 let ptab = 'wx';
 function setTab() { document.querySelectorAll('#panel [data-tab]').forEach(b => b.classList.toggle('on', b.dataset.tab === ptab)); document.querySelectorAll('#panel [data-pane]').forEach(x => x.classList.toggle('on', x.dataset.pane === ptab)); }
 function renderPanel() {
   const p = $('#panel');
-  if (!sel) { p.innerHTML = '<div class="hint">🧭 Touchez une case (≈ 50 m) pour l\'explorer, ou 🍄 « Trouvé ici ! » une fois sur place. Donnez un nom aux secteurs qui comptent : les cases n\'ont plus de numéro visible.' + (Object.keys(D.cells).length ? '' : '<br><br>Vous avez un ancien carnet ? ⚙️ Options → Importer.') + '</div>'; return; }
+  if (!sel) { p.innerHTML = ''; return; }
   const c = D.cells[sel] || blank(), [la, lo] = toLL(...ctr(sel)), tot = c.v.reduce((a, v) => a + v.w, 0);
   const hist = c.v.map((v, i) => [v, i]).sort((a, b) => b[0].d.localeCompare(a[0].d)).map(([v, i]) => `<li><span>📅 ${fmtD(v.d)} — 🍄 ${v.n} · ${v.e ? '≈' : ''}${Math.round(v.w)} g${v.t ? '<br><small>' + esc(v.t) + '</small>' : ''}</span><button data-act="del" data-i="${i}" aria-label="Supprimer">✖</button></li>`).join('');
   p.innerHTML = `<div style="display:flex;gap:6px;align-items:center"><input class="pname" data-f="name" placeholder="✏️ Nommer ce secteur…" value="${esc(c.name)}" style="flex:1;min-width:0">${rec(c) ? '<button class="ib" data-act="delcell" aria-label="Supprimer cette case" style="width:36px;height:36px;font-size:15px;flex:none;margin-bottom:4px">🗑️</button>' : ''}</div>
-    <div class="chips"><span>🍄 ${cnt(c)}</span><span>⚖️ ${fmtW(tot)}</span><span>📅 ${c.v.length} visite${c.v.length > 1 ? 's' : ''}</span></div>
+    <div class="chips"><span>🍄 ${cnt(c)}</span><span>⚖️ ${fmtW(tot)}</span><span>👣 ${c.v.length} visite${c.v.length > 1 ? 's' : ''}</span></div>
     <div id="wxb" class="wxb">🌦️ Météo…</div>
     <div class="acts"><button class="btn gold" data-act="quick" title="≈ ${D.avg} g">⚡ +1 cèpe</button><button class="btn" data-act="addtoggle">➕ Visite</button><a class="btn" target="_blank" rel="noopener" aria-label="Itinéraire à pied" href="https://www.google.com/maps/dir/?api=1&destination=${la.toFixed(6)},${lo.toFixed(6)}&travelmode=walking">🚶 À pied</a></div>
     
@@ -336,15 +339,22 @@ $('#panel').addEventListener('click', e => {
 function addFind(k) {
   const snap = JSON.stringify(D), c = D.cells[k] ||= blank(), t = today(), v = c.v.find(v => v.d === t && !v.t) || c.v.find(v => v.d === t);
   if (v) { v.n++; v.w += D.avg; } else c.v.push({ d: t, n: 1, w: D.avg, e: true, t: '' });
-  save(); sel = k; renderPanel(); collapse(); draw(); try { navigator.vibrate && navigator.vibrate(40); } catch (e) {}
+  save(); collapse(); draw(); try { navigator.vibrate && navigator.vibrate(40); } catch (e) {}
   toast('🍄 +1 · ' + c.v.filter(x => x.d === t).reduce((a, x) => a + x.n, 0) + ' aujourd\'hui sur cette case', () => { D = JSON.parse(snap); save(); draw(); renderPanel(); });
+}
+
+function addVisit(k) {
+  const snap = JSON.stringify(D), c = D.cells[k] ||= blank();
+  c.v.push({ d: today(), n: 0, w: 0, e: false, t: '' });
+  save(); collapse(); draw(); try { navigator.vibrate && navigator.vibrate(40); } catch (e) {}
+  toast('👣 +1 visite · ' + c.v.length + ' au total sur cette case', () => { D = JSON.parse(snap); save(); draw(); renderPanel(); });
 }
 
 /* ===== Position ===== */
 function onPos(p) {
   const [x, y] = toM(p.coords.latitude, p.coords.longitude); me = { x, y, acc: p.coords.accuracy }; const first = !hereK; hereK = idAt(x, y);
   if (first) { V.cx = x; V.cy = y; if (V.mpp > 4) V.mpp = 1.5; }
-  if (pending) { pending = false; addFind(hereK); } else if (first && !sel) select(hereK);
+  if (pending) { const p = pending; pending = false; p === 'visit' ? addVisit(hereK) : addFind(hereK); }
   schedule();
 }
 function startLoc() {
@@ -354,7 +364,9 @@ function startLoc() {
 }
 function stopLoc() { if (watch !== null) navigator.geolocation.clearWatch(watch); watch = null; hereK = null; me = null; pending = false; $('#loc').classList.remove('on'); schedule(); }
 $('#loc').onclick = () => watch === null ? startLoc() : (stopLoc(), toast('Localisation arrêtée'));
-$('#found').onclick = () => { if (hereK) return addFind(hereK); pending = true; if (watch === null) startLoc(); else toast('Position pas encore trouvée…'); };
+const askGps = kind => { pending = kind; if (watch === null) startLoc(); else toast('Position pas encore trouvée…'); };
+$('#found').onclick = () => { const k = sel || hereK; if (k) return addFind(k); askGps('find'); };
+$('#visit').onclick = () => { const k = sel || hereK; if (k) return addVisit(k); askGps('visit'); };
 
 /* ===== Menu, import / export, toast ===== */
 let tt; function toast(m, undo) { $('#tm').textContent = m; $('#tu').hidden = !undo; $('#tu').onclick = () => { undo && undo(); $('#toast').classList.remove('show'); }; $('#toast').classList.add('show'); clearTimeout(tt); tt = setTimeout(() => $('#toast').classList.remove('show'), undo ? 7000 : 3500); }
@@ -493,7 +505,7 @@ async function tipWx() {
 }
 const tipGens = [
   () => ({ t: rnd(KB) }), () => ({ t: rnd(KB) }), () => ({ t: rnd(KB) }),
-  () => infos().length ? null : { t: `🍄 Enregistrez votre première trouvaille avec « Trouvé ici ! » : l'appli pourra ensuite vous conseiller selon vos zones.` },
+  () => infos().length ? null : { t: `🍄 Enregistrez votre première trouvaille avec +1🍄 : l'appli pourra ensuite vous conseiller selon vos zones.` },
   () => { const a = infos().filter(x => x.n > 0).sort((x, y) => y.n - x.n)[0]; return a && { t: `🏆 ${cl(a.k, a.c)} est votre case la plus fructueuse : ${a.n} cèpe(s) en ${a.c.v.length} visite(s). Repassez-y après les prochaines pluies.`, k: a.k }; },
   () => { const a = infos().filter(x => x.last && dsince(x.last) < 8); if (!a.length) return null; const x = rnd(a), s = dsince(x.last); return { t: `⏳ ${cl(x.k, x.c)} a été récoltée ${s <= 0 ? `aujourd'hui` : 'il y a ' + s + ' j'} : laissez-lui encore ~${Math.max(1, 8 - s)} jour(s) pour se regarnir.`, k: x.k }; },
   () => { const a = infos().filter(x => x.n > 0 && x.last && dsince(x.last) >= 21); if (!a.length) return null; const x = rnd(a); return { t: `🔁 ${cl(x.k, x.c)} n'a plus été récoltée depuis ${dsince(x.last)} jours : un passage de contrôle pourrait payer.`, k: x.k }; },
@@ -512,7 +524,7 @@ async function nextTip() {
 }
 $('#tp').onclick = () => $('#tip').hidden ? nextTip() : closeTip();
 $('#tipn').onclick = nextTip; $('#tipx').onclick = closeTip;
-$('#tipg').onclick = () => { if (!tipK) return; const k = tipK; closeTip(); [V.cx, V.cy] = ctr(k); V.mpp = Math.min(V.mpp, 1.5); select(k); };
+$('#tipg').onclick = () => { if (!tipK) return; const k = tipK; closeTip(); flyTo(k); pick(k); };
 
 /* ===== Démarrage ===== */
 load();
