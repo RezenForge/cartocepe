@@ -25,6 +25,9 @@ canvas{position:absolute;left:0;top:0;width:100%;height:100%;display:block;touch
 #zb{position:absolute;right:8px;bottom:8px;display:flex;flex-direction:column;gap:6px}
 #zb .ib{opacity:1;box-shadow:0 3px 0 var(--dark),0 0 0 2px rgba(255,255,255,.4)}#zb .ib:active{box-shadow:0 0 0 2px rgba(255,255,255,.4)}
 #sc{position:absolute;left:8px;bottom:8px;color:#fff;font-size:12px;background:rgba(0,0,0,.65);padding:3px 8px;border-radius:6px}
+#tp{position:absolute;left:8px;top:8px;box-shadow:0 3px 0 var(--dark),0 0 0 2px rgba(255,255,255,.4)}
+#tip{position:absolute;left:8px;right:8px;top:62px;z-index:5;background:rgba(241,226,184,.97);color:var(--ink);border:3px solid var(--wood);border-radius:10px;padding:10px;box-shadow:0 3px 0 var(--dark);font-size:14px;line-height:1.4}
+.tipb{display:flex;gap:6px;margin-top:8px}.tipb button{border:2px solid var(--dark);border-radius:8px;background:var(--forest);color:#fff;padding:10px 12px;font-size:13px;cursor:pointer}#tipn{flex:1}
 #dock{display:flex;gap:6px;margin:4px}
 #found{height:48px;font-size:15px;padding:0 16px;border-radius:8px;border:2px solid var(--dark);background:linear-gradient(#e6bd5a,var(--gold));color:var(--dark);box-shadow:0 3px 0 var(--dark);cursor:pointer}
 #grab{flex:1;height:48px;font-size:18px;border:2px solid var(--dark);border-radius:8px;background:var(--wood);color:var(--gold);cursor:pointer}
@@ -64,6 +67,8 @@ li button{border:0;background:none;cursor:pointer;min-width:40px;min-height:40px
 <header class="bar win"><h1>🍄 Cartocèpe</h1>
   <button class="ib" id="loc" aria-label="Ma position">📍</button><button class="ib" id="mn" aria-label="Menu">☰</button></header>
 <div id="mapBox"><canvas id="cv"></canvas><div id="sc"></div>
+  <button class="ib" id="tp" aria-label="Conseil aléatoire">💡</button>
+  <div id="tip" hidden><div id="tipt"></div><div class="tipb"><button id="tipg" hidden>📍 Voir</button><button id="tipn">🎲 Autre conseil</button><button id="tipx" aria-label="Fermer">✖</button></div></div>
   <div id="zb"><button class="ib" id="gr" aria-label="Afficher ou cacher la grille">▦</button><button class="ib" id="lb" aria-label="Liste des trouvailles">📋</button><button class="ib" id="fit" aria-label="Voir toutes mes cases">🎯</button><button class="ib" id="zi" aria-label="Zoomer">➕</button><button class="ib" id="zo" aria-label="Dézoomer">➖</button></div></div>
 <div id="dock"><button id="found">🍄 Trouvé ici !</button><button id="grab" aria-label="Réduire ou ouvrir la fiche">▾</button></div>
 <div id="panel" class="win"></div>
@@ -429,6 +434,65 @@ async function scan() {      // télécharge les communes qui couvrent l'écran 
 const cmLabel = () => { $('#cmb').textContent = '🏘️ Limites des communes : ' + (commOn ? 'oui' : 'non'); };
 $('#cmb').onclick = () => { commOn = !commOn; try { localStorage.setItem('cartocepe-comm', commOn ? '1' : '0'); } catch (e) {} cmLabel(); if (commOn) scan(); schedule(); };
 $('#mn').addEventListener('click', cmLabel); cmLabel();
+
+/* ===== Conseils aléatoires (💡) : connaissances, vos zones, météo ===== */
+const KB = [
+  `🌳 Les cèpes vivent en association avec des arbres (chênes, hêtres, châtaigniers, épicéas, pins) : explorez les lisières, les clairières et le pied des vieux arbres.`,
+  `🌧️ La poussée se déclenche environ 7 à 12 jours après une bonne pluie (≈ 30 mm cumulés), à condition que les nuits restent douces.`,
+  `🌡️ Les nuits idéales sont entre 8 et 15 °C : trop chaud ou trop froid, la poussée ralentit. Le gel l'arrête net.`,
+  `🧭 Quand vous trouvez un cèpe, cherchez-en d'autres dans un rayon de 10 à 20 m : ils poussent souvent en groupe ou en arc de cercle.`,
+  `🔪 Coupez le pied au couteau, au ras du sol, et rebouchez le trou avec des feuilles pour préserver le mycélium.`,
+  `🧺 Préférez un panier ajouré à un sac plastique : les cèpes respirent et évitent de se ramollir.`,
+  `🔍 Sous le chapeau d'un cèpe, on voit des pores (pas de lamelles), blancs puis jaune-vert. Méfiez-vous des bolets à pied rouge ou qui bleuissent fortement à la coupe. Au moindre doute, faites vérifier par un pharmacien ou une société de mycologie.`,
+  `🍂 Écartez délicatement feuilles et mousse : les jeunes cèpes se cachent souvent à moitié sous la litière.`,
+  `🐛 Coupez un cèpe en deux sur place : si le pied est déjà plein de larves, laissez-le, il ne vaut plus la peine.`,
+  `☀️ En été chaud, privilégiez les versants nord et les sous-bois frais ; en automne frais, les versants sud, plus doux, sont souvent meilleurs.`,
+  `📏 Les cèpes jeunes et fermes sont les meilleurs : chapeau bombé, pied dodu, chair ferme et sans trace de larves.`,
+  `📝 Notez chaque sortie, même les bredouilles : avec les années, vos dates et vos secteurs gagnants se dessinent.`,
+  `🥶 Après une nuit de gel, inutile de forcer : attendez le redoux et quelques jours pour que la poussée reparte.`,
+  `⛰️ Le cèpe apprécie les sols bien drainés : évitez les fonds de vallon détrempés et cherchez plutôt les pentes douces.`
+];
+const rnd = a => a[Math.floor(Math.random() * a.length)];
+const dsince = d => Math.round((new Date(today() + 'T00:00') - new Date(d + 'T00:00')) / 864e5);
+const cl = (k, c) => c && c.name ? `« ${c.name} »` : 'la case ' + toLL(...ctr(k)).map(x => x.toFixed(3)).join(', ');
+const infos = () => Object.entries(D.cells).filter(([k, c]) => rec(c)).map(([k, c]) => ({ k, c, n: cnt(c), last: c.v.filter(v => v.n > 0).reduce((a, v) => v.d > a ? v.d : a, '') }));
+async function tipWx() {
+  const best = infos().filter(x => x.n > 0).sort((a, b) => b.n - a.n)[0], k = sel || hereK || best?.k || idAt(V.cx, V.cy), c = D.cells[k], [la, lo] = toLL(...ctr(k));
+  const d = await Promise.race([wxFor(la, lo), new Promise((_, r) => setTimeout(r, 6000))]);
+  const last = (c?.v || []).filter(v => v.n > 0).reduce((a, v) => v.d > a ? v.d : a, ''), s = wxScores(d, last), t0 = s[0], b = s.reduce((a, x) => x.score > a.score ? x : a);
+  const past = d.precipitation_sum.slice(0, 14).reduce((a, v) => a + (v ?? 0), 0), tn = d.temperature_2m_min.slice(7, 14).reduce((a, v) => a + (v ?? 0), 0) / 7;
+  const w = rec(c) ? cl(k, c) : 'ce secteur', day = x => new Date(x + 'T00:00').toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric' }), o = [`📊 Indice du jour pour ${w} : ${t0.score}/100, avec ${Math.round(past)} mm de pluie ces 14 derniers jours.`];
+  if (t0.score >= 50) o.push(`🌟 Conditions favorables aujourd'hui pour ${w} (indice ${t0.score}/100) : bonne sortie en vue !`);
+  if (b.score >= 30 && b !== t0) o.push(`🎯 Meilleur jour à venir pour ${w} : ${day(b.date)} (indice ${b.score}/100).`);
+  if (b.score < 30) o.push(`😴 Rien de vraiment favorable cette semaine pour ${w} (meilleur indice : ${b.score}). Attendez la prochaine pluie.`);
+  if (past < 10) o.push(`☀️ Seulement ${Math.round(past)} mm de pluie en 14 jours : le sol est sec, il faut environ 30 mm pour relancer la poussée.`);
+  if (past >= 40) o.push(`🌧️ ${Math.round(past)} mm de pluie en 14 jours : de quoi déclencher une belle poussée, comptez 7 à 12 jours après les averses.`);
+  if (tn < 3) o.push(`🥶 Nuits très fraîches (${tn.toFixed(1)} °C en moyenne) : la poussée ralentit, et le gel l'arrêterait.`);
+  if (tn > 16) o.push(`🌡️ Nuits chaudes (${tn.toFixed(1)} °C en moyenne) : les cèpes préfèrent 8 à 15 °C la nuit.`);
+  return { t: rnd(o) };
+}
+const tipGens = [
+  () => ({ t: rnd(KB) }), () => ({ t: rnd(KB) }), () => ({ t: rnd(KB) }),
+  () => infos().length ? null : { t: `🍄 Enregistrez votre première trouvaille avec « Trouvé ici ! » : l'appli pourra ensuite vous conseiller selon vos zones.` },
+  () => { const a = infos().filter(x => x.n > 0).sort((x, y) => y.n - x.n)[0]; return a && { t: `🏆 ${cl(a.k, a.c)} est votre case la plus fructueuse : ${a.n} cèpe(s) en ${a.c.v.length} visite(s). Repassez-y après les prochaines pluies.`, k: a.k }; },
+  () => { const a = infos().filter(x => x.last && dsince(x.last) < 8); if (!a.length) return null; const x = rnd(a), s = dsince(x.last); return { t: `⏳ ${cl(x.k, x.c)} a été récoltée ${s <= 0 ? `aujourd'hui` : 'il y a ' + s + ' j'} : laissez-lui encore ~${Math.max(1, 8 - s)} jour(s) pour se regarnir.`, k: x.k }; },
+  () => { const a = infos().filter(x => x.n > 0 && x.last && dsince(x.last) >= 21); if (!a.length) return null; const x = rnd(a); return { t: `🔁 ${cl(x.k, x.c)} n'a plus été récoltée depuis ${dsince(x.last)} jours : un passage de contrôle pourrait payer.`, k: x.k }; },
+  () => { const m = {}, vs = infos().flatMap(x => x.c.v).filter(v => v.n > 0); if (vs.length < 2) return null; vs.forEach(v => { const k = +v.d.slice(5, 7) - 1; m[k] = (m[k] || 0) + v.n; }); const b = Object.entries(m).sort((x, y) => y[1] - x[1])[0]; return { t: `📅 Vos plus belles récoltes tombent en ${new Date(2000, +b[0], 1).toLocaleDateString('fr-FR', { month: 'long' })} (${b[1]} cèpes) : c'est votre période à surveiller.` }; },
+  () => { const vs = infos().flatMap(x => x.c.v).filter(v => v.n > 0 && !v.e), n = vs.reduce((a, v) => a + v.n, 0); if (n < 3) return null; const avg = vs.reduce((a, v) => a + v.w, 0) / n; return Math.abs(avg - D.avg) / D.avg > .25 ? { t: `⚖️ Vos cèpes pesés font ${Math.round(avg)} g en moyenne, contre ${D.avg} g réglés dans le menu : ajustez « Poids moyen » pour des estimations plus justes.` } : null; },
+  () => { const a = infos().filter(x => x.n >= 2); if (!a.length) return null; const x = rnd(a), [i, j] = x.k.split(',').map(Number), e = []; for (let di = -1; di <= 1; di++) for (let dj = -1; dj <= 1; dj++) { const k = (i + di) + ',' + (j + dj); if ((di || dj) && !rec(D.cells[k])) e.push(k); } return e.length ? { t: `🧭 Autour de ${cl(x.k, x.c)}, ${e.length} case(s) voisine(s) sont encore vierges : les cèpes poussent souvent en groupe, explorez-les.`, k: rnd(e) } : null; },
+  tipWx, tipWx
+];
+let lastTip = '', tipBusy = false, tipK = null;
+const closeTip = () => { $('#tip').hidden = true; $('#tp').classList.remove('on'); };
+async function nextTip() {
+  if (tipBusy) return; tipBusy = true; $('#tip').hidden = false; $('#tp').classList.add('on'); $('#tipt').textContent = '💡 Je cherche un bon conseil…'; $('#tipg').hidden = true;
+  let tip = null;
+  for (const gen of [...tipGens].sort(() => Math.random() - .5)) { try { const r = await gen(); if (r && r.t !== lastTip) { tip = r; break; } } catch (e) {} }
+  tip ||= { t: rnd(KB) }; lastTip = tip.t; tipK = tip.k || null; $('#tipt').textContent = tip.t; $('#tipg').hidden = !tipK; tipBusy = false;
+}
+$('#tp').onclick = () => $('#tip').hidden ? nextTip() : closeTip();
+$('#tipn').onclick = nextTip; $('#tipx').onclick = closeTip;
+$('#tipg').onclick = () => { if (!tipK) return; const k = tipK; closeTip(); [V.cx, V.cy] = ctr(k); V.mpp = Math.min(V.mpp, 1.5); select(k); };
 
 /* ===== Démarrage ===== */
 load();
