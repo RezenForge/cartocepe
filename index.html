@@ -86,6 +86,7 @@ li button{border:0;background:none;cursor:pointer;min-width:40px;min-height:40px
   <button class="btn" id="exp">💾 Exporter (JSON)</button>
   <button class="btn" id="avg">⚖️ Poids moyen d'un cèpe</button>
   <button class="btn" id="cmb"></button>
+  <button class="btn" id="fob"></button>
   <button class="btn" id="fs"></button>
   <button class="btn" id="dl">📥 Enregistrer la zone affichée (hors connexion)</button>
   <div class="hint" id="info"></div>
@@ -173,6 +174,28 @@ const tileImg = (z, x, y) => {
       else { t.src = TURL(z, x, y); fetch(TURL(z, x, y), { mode: 'cors' }).then(r => r.ok ? r.blob() : null).then(b => b && tput(k, b)).catch(() => {}); } }); }
   return t;
 };
+const FURL = (z, x, y) => `https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=IGNF_MASQUE-FORET.2021-2023&STYLE=normal&FORMAT=image/png&TILEMATRIXSET=PM&TILEMATRIX=${z}&TILEROW=${y}&TILECOL=${x}`;
+const ftiles = new Map(); let forOn = (() => { try { return localStorage.getItem('cartocepe-forest') !== '0'; } catch (e) { return true; } })();
+const ftile = (z, x, y) => { const k = z + '/' + x + '/' + y; let t = ftiles.get(k);
+  if (!t) { t = { c: null, px: null }; ftiles.set(k, t); if (ftiles.size > 300) ftiles.delete(ftiles.keys().next().value);
+    t.p = new Promise(res => {
+      const done = (im, cors) => { try { const c = document.createElement('canvas'); c.width = c.height = 256; const q = c.getContext('2d'); q.drawImage(im, 0, 0, 256, 256);
+        if (cors) { try { t.px = q.getImageData(0, 0, 256, 256).data; } catch (e) {} }
+        q.globalCompositeOperation = 'source-in'; q.fillStyle = '#2fd14a'; q.fillRect(0, 0, 256, 256); t.c = c; schedule(); } catch (e) {} res(t); };
+      const a = new Image(); a.crossOrigin = 'anonymous'; a.onload = () => done(a, true);
+      a.onerror = () => { const b = new Image(); b.onload = () => done(b, false); b.onerror = () => res(t); b.src = FURL(z, x, y); };   // repli sans CORS : affichage seul
+      a.src = FURL(z, x, y); }); }
+  return t; };
+/* Part de forêt d'une case (0 à 1) : 9 points échantillonnés dans le masque forêt (tuile zoom 17). 0 si indisponible. */
+async function forestFrac(k) {
+  try { const [x, y] = ctr(k), z = 17, span = 256 * 156543.03392 / 2 ** z, h = CS / 3, pts = [];
+    for (const dx of [-h, 0, h]) for (const dy of [-h, 0, h]) { const u = (x + dx + O) / span, v = (O - (y + dy)) / span, tx = Math.floor(u), ty = Math.floor(v); pts.push([tx, ty, Math.min(255, Math.floor((u - tx) * 256)), Math.min(255, Math.floor((v - ty) * 256))]); }
+    const keys = [...new Set(pts.map(p => p[0] + ',' + p[1]))];
+    const ts = await Promise.race([Promise.all(keys.map(q => { const [a, b] = q.split(',').map(Number); return ftile(z, a, b).p.then(t => [q, t]); })), new Promise(r => setTimeout(() => r(null), 4000))]);
+    if (!ts) return 0; const M = new Map(ts); let m = 0;
+    for (const p of pts) { const t = M.get(p[0] + ',' + p[1]); if (!t || !t.px) return 0; if (t.px[(p[3] * 256 + p[2]) * 4 + 3] > 100) m++; }
+    return m / pts.length; } catch (e) { return 0; }
+}
 const schedule = () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; draw(); }); };
 function draw() {
   const dpr = devicePixelRatio || 1, W = cv.clientWidth, H = cv.clientHeight; if (!W) return;
@@ -185,6 +208,12 @@ function draw() {
     for (let tx = Math.max(0, Math.floor((x0 + O) / span)); tx <= Math.min(lim, Math.floor((x1 + O) / span)); tx++) {
       const im = tileImg(Z, tx, ty); if (im.complete && im.naturalWidth) g.drawImage(im, sx(tx * span - O), sy(O - ty * span), ts + .6, ts + .6);
     }
+  if (forOn && Z >= 11) { const fz = Math.min(Z, 17), sh = Z - fz, n = 2 ** sh; g.globalAlpha = .3;
+    for (let ty = Math.max(0, Math.floor((O - y1) / span)); ty <= Math.min(lim, Math.floor((O - y0) / span)); ty++)
+      for (let tx = Math.max(0, Math.floor((x0 + O) / span)); tx <= Math.min(lim, Math.floor((x1 + O) / span)); tx++) {
+        const fx = tx >> sh, fy = ty >> sh, t = ftile(fz, fx, fy);
+        if (t.c) g.drawImage(t.c, (tx - (fx << sh)) * 256 / n, (ty - (fy << sh)) * 256 / n, 256 / n, 256 / n, sx(tx * span - O), sy(O - ty * span), ts + .6, ts + .6); }
+    g.globalAlpha = 1; }
   if (commOn) drawComm(0, sx, sy, W, x0, x1, y0, y1, mpp);
   const px = CS / mpp, i0 =Math.floor(x0 / CS), i1 = Math.floor(x1 / CS), j0 = Math.floor(y0 / CS), j1 = Math.floor(y1 / CS);
   if (gridOn && px >= 12 && (i1 - i0) * (j1 - j0) < 4000) {
@@ -282,13 +311,16 @@ function pick(k) { if (rec(D.cells[k])) select(k); else { sel = k; collapse(); d
 $('#grab').onclick = () => { const m = document.body.classList.toggle('pmin'); $('#grab').textContent = m ? '▴' : '▾'; if (!m) renderPanel(); };
 let ptab = 'wx';
 function setTab() { document.querySelectorAll('#panel [data-tab]').forEach(b => b.classList.toggle('on', b.dataset.tab === ptab)); document.querySelectorAll('#panel [data-pane]').forEach(x => x.classList.toggle('on', x.dataset.pane === ptab)); }
+let editI = null;
 function renderPanel() {
+  editI = null;
   const p = $('#panel');
   if (!sel) { p.innerHTML = ''; return; }
   const c = D.cells[sel] || blank(), [la, lo] = toLL(...ctr(sel)), tot = c.v.reduce((a, v) => a + v.w, 0);
-  const hist = c.v.map((v, i) => [v, i]).sort((a, b) => b[0].d.localeCompare(a[0].d)).map(([v, i]) => `<li><span>📅 ${fmtD(v.d)} — 🍄 ${v.n} · ${v.e ? '≈' : ''}${Math.round(v.w)} g${v.t ? '<br><small>' + esc(v.t) + '</small>' : ''}</span><button data-act="del" data-i="${i}" aria-label="Supprimer">✖</button></li>`).join('');
+  const hist = c.v.map((v, i) => [v, i]).sort((a, b) => b[0].d.localeCompare(a[0].d)).map(([v, i]) => `<li><span>📅 ${fmtD(v.d)} — 🍄 ${v.n} · ${v.e ? '≈' : ''}${Math.round(v.w)} g${v.t ? '<br><small>' + esc(v.t) + '</small>' : ''}</span><button data-act="edit" data-i="${i}" aria-label="Modifier">✏️</button><button data-act="del" data-i="${i}" aria-label="Supprimer">✖</button></li>`).join('');
   p.innerHTML = `<div style="display:flex;gap:6px;align-items:center"><input class="pname" data-f="name" placeholder="✏️ Nommer ce secteur…" value="${esc(c.name)}" style="flex:1;min-width:0">${rec(c) ? '<button class="ib" data-act="delcell" aria-label="Supprimer cette case" style="width:36px;height:36px;font-size:15px;flex:none;margin-bottom:4px">🗑️</button>' : ''}</div>
     <div class="chips"><span>🍄 ${cnt(c)}</span><span>⚖️ ${fmtW(tot)}</span><span>👣 ${c.v.length} visite${c.v.length > 1 ? 's' : ''}</span></div>
+    <div id="fty" class="wxb">🌲 Type de forêt…</div>
     <div id="wxb" class="wxb">🌦️ Météo…</div>
     <div class="acts"><button class="btn gold" data-act="quick" title="≈ ${D.avg} g">⚡ +1 cèpe</button><button class="btn" data-act="addtoggle">➕ Visite</button><a class="btn" target="_blank" rel="noopener" aria-label="Itinéraire à pied" href="https://www.google.com/maps/dir/?api=1&destination=${la.toFixed(6)},${lo.toFixed(6)}&travelmode=walking">🚶 À pied</a></div>
     
@@ -300,7 +332,27 @@ function renderPanel() {
     <div class="tp" data-pane="hs"><ul>${hist || '<li class="hint">Aucune visite.</li>'}</ul></div>
     <div class="tp" data-pane="nt"><textarea data-f="note" placeholder="Notes : pentes, essences, indices…">${esc(c.note)}</textarea>
       <div class="hint" style="padding:2px 0">📍 ${la.toFixed(5)}, ${lo.toFixed(5)}</div></div>`;
-  setTab(); showWx(sel); loadGal(sel);
+  setTab(); showWx(sel); showFt(sel); loadGal(sel);
+}
+/* ===== Type de forêt (BD Forêt v2 de l'IGN, service WFS gratuit) : polygone au centre de la case ===== */
+const ftCache = new Map();
+async function forestType(k) {
+  if (ftCache.has(k)) return ftCache.get(k);
+  const [x, y] = ctr(k), r = 4, bb = [x - r, y - r, x + r, y + r].map(v => v.toFixed(1)).join(',');
+  const res = await fetch(`https://data.geopf.fr/wfs/ows?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=${encodeURIComponent('LANDCOVER.FORESTINVENTORY.V2:formation_vegetale')}&OUTPUTFORMAT=${encodeURIComponent('application/json')}&COUNT=1&BBOX=${bb},EPSG:3857`);
+  if (!res.ok) throw new Error('wfs'); const j = await res.json(), pr = (j.features && j.features[0] && j.features[0].properties) || null;
+  ftCache.set(k, pr); return pr;
+}
+async function showFt(k) {
+  const put = h => { if (sel === k && $('#fty')) $('#fty').innerHTML = h; };
+  try {
+    const pr = await forestType(k); if (!pr) return put('🌲 Pas de forêt répertoriée ici (BD Forêt IGN)');
+    const g = n => { const key = Object.keys(pr).find(x => x.toLowerCase() === n); return key && pr[key] != null ? String(pr[key]) : ''; };
+    const tfv = g('tfv') || g('tfv_g11') || g('code_tfv') || 'Forêt', ess = g('essence'), low = (tfv + ' ' + ess).toLowerCase();
+    const ic = /conif|pin|épicéa|sapin|mélèze/.test(low) ? (/feuill|chêne|hêtre|châtaign/.test(low) ? '🌲🌳' : '🌲') : '🌳';
+    const bad = /peuplerai|robinier|sans couvert|lande|ligneu|verger|vigne/.test(low), good = /chêne|hêtre|châtaign|épicéa|pin|sapin|mélèze|feuillus|conifères|mixte/.test(low);
+    put(`${ic} <b>${esc(tfv)}</b>${ess && !low.startsWith(ess.toLowerCase()) && !tfv.toLowerCase().includes(ess.toLowerCase()) ? ' · ' + esc(ess) : ''}<br><small>${bad ? '⚠️ Peuplement peu propice aux cèpes' : good ? '🍄 Essence généralement associée au cèpe' : 'Essence à vérifier sur le terrain'} · source IGN, indicatif</small>`);
+  } catch (e) { put('🌲 Type de forêt indisponible (connexion ?)'); }
 }
 /* ===== Météo : indice « bon jour pour aller voir » (Open-Meteo, gratuit, sans clé) =====
    Série = 14 jours passés + aujourd'hui + 7 jours de prévision (index 0..21).
@@ -309,38 +361,43 @@ function renderPanel() {
 const wxCache = new Map();
 async function wxFor(la, lo) {
   const k = la.toFixed(2) + ',' + lo.toFixed(2), c = wxCache.get(k); if (c && Date.now() - c.t < 36e5) return c.d;
-  const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${la.toFixed(3)}&longitude=${lo.toFixed(3)}&daily=precipitation_sum,temperature_2m_min,temperature_2m_max&past_days=14&forecast_days=8&timezone=auto`);
-  if (!r.ok) throw new Error('wx'); const d = (await r.json()).daily; wxCache.set(k, { t: Date.now(), d }); return d;
+  const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${la.toFixed(3)}&longitude=${lo.toFixed(3)}&daily=precipitation_sum,temperature_2m_min,temperature_2m_max,et0_fao_evapotranspiration&past_days=24&forecast_days=8&timezone=auto`);
+  if (!r.ok) throw new Error('wx'); const j = await r.json(), d = j.daily; d.elev = j.elevation; wxCache.set(k, { t: Date.now(), d }); return d;
 }
 /* Repousse : après une récolte, la case a besoin d'environ 8 jours pour se regarnir.
    Facteur 0,1 le jour même → 1 au bout de 8 jours (linéaire). `last` = date de la dernière visite avec cèpes. */
+const wxOff = d => d.precipitation_sum.length - 8;   // index d'aujourd'hui (8 jours de prévision à la fin)
 const regrow = (date, last) => { if (!last) return 1; const n = Math.round((new Date(date + 'T00:00') - new Date(last + 'T00:00')) / 864e5); return n >= 8 ? 1 : Math.max(.1, .1 + .9 * n / 8); };
-function wxScores(d, last) {
+function wxScores(d, last, ff = 0) {   // ff = part de forêt de la case (0-1) : sous le couvert, moins d'évaporation, réserve d'eau plus durable, chaleur atténuée
+  const kE = .15 * (1 - .5 * ff), kO = .5 + .3 * ff;
   const P = d.precipitation_sum.map(v => v ?? 0), Tn = d.temperature_2m_min.map(v => v ?? 8), Tx = d.temperature_2m_max.map(v => v ?? 18);
   const sum = (a, i, j) => { let s = 0; for (let x = i; x <= j; x++) s += a[x]; return s; }, mean = (a, i, j) => sum(a, i, j) / (j - i + 1);
+  const E = d.et0_fao_evapotranspiration ? d.et0_fao_evapotranspiration.map(v => v ?? 0) : P.map(() => 0), elev = d.elev || 0;
   const season = [.05, .05, .05, .05, .4, .7, 1, 1, 1, 1, 1, .3];
+  if (elev >= 1000) { season[4] = .1; season[9] = .5; season[10] = .1; } else if (elev >= 600) { season[9] = .8; season[10] = .3; }   // en altitude la saison s'arrête plus tôt
   const out = [];
-  for (let i = 14; i < P.length; i++) {
-    const rain = Math.min(1, sum(P, i - 12, i - 4) / 30), tn = mean(Tn, i - 6, i), tx = mean(Tx, i - 6, i), fr = Math.min(...Tn.slice(i - 3, i + 1));
+  for (let i = wxOff(d); i < P.length; i++) {
+    const tn = mean(Tn, i - 6, i), lag = tn >= 12 ? 0 : tn >= 8 ? 1 : 2, a = i - 12 - lag, b = i - 4 - lag, wr = sum(P, a, b) + kO * sum(P, a - 8, a - 1);   // la pluie plus ancienne compte pour moitié (réserve d'eau du sol)
+    const rain = Math.min(1, Math.max(0, wr - kE * (sum(E, a, b) + kO * sum(E, a - 8, a - 1))) / 25) * (wr > 120 ? .85 : 1), tx = mean(Tx, i - 6, i) - 3 * ff, fr = Math.min(...Tn.slice(i - 3, i + 1));
     const tS = tn <= 3 ? 0 : tn < 8 ? (tn - 3) / 5 : tn <= 15 ? 1 : tn < 20 ? (20 - tn) / 5 : 0;
     const hot = tx <= 24 ? 1 : Math.max(0, 1 - (tx - 24) / 8), frost = fr < 0 ? .25 : fr < 2 ? .7 : 1;
     const m = new Date(d.time[i] + 'T00:00').getMonth();
     const rg = regrow(d.time[i], last), base = 100 * rain * tS * hot * frost * season[m];
-    out.push({ date: d.time[i], p: P[i], rg, base: Math.round(base), score: Math.round(base * rg) });
+    out.push({ date: d.time[i], p: P[i], rg, base: Math.round(base), score: Math.round(base * rg), f: { ff, wr, net: Math.max(0, wr - kE * (sum(E, a, b) + kO * sum(E, a - 8, a - 1))), rain, tn, tS, hot, frost, sea: season[m] } });
   }
   return out;
 }
 async function showWx(k) {
   const put = (h, b) => { if (sel !== k) return; if ($('#wx')) $('#wx').innerHTML = h; if ($('#wxb')) $('#wxb').innerHTML = b; };
   try {
-    const [la, lo] = toLL(...ctr(k)), d = await wxFor(la, lo), last = (D.cells[k]?.v || []).filter(v => v.n > 0).reduce((a, v) => v.d > a ? v.d : a, ''), s = wxScores(d, last);
+    const [la, lo] = toLL(...ctr(k)), d = await wxFor(la, lo), last = (D.cells[k]?.v || []).filter(v => v.n > 0).reduce((a, v) => v.d > a ? v.d : a, ''), ff = await forestFrac(k), s = wxScores(d, last, ff);
     const since = last ? Math.round((new Date(today() + 'T00:00') - new Date(last + 'T00:00')) / 864e5) : 99;
-    const past = d.precipitation_sum.slice(0, 14).reduce((a, v) => a + (v ?? 0), 0), tn7 = d.temperature_2m_min.slice(7, 14).reduce((a, v) => a + (v ?? 0), 0) / 7;
+    const past = d.precipitation_sum.slice(wxOff(d) - 14, wxOff(d)).reduce((a, v) => a + (v ?? 0), 0), tn7 = d.temperature_2m_min.slice(wxOff(d) - 7, wxOff(d)).reduce((a, v) => a + (v ?? 0), 0) / 7;
     const best = s.reduce((a, b) => b.score > a.score ? b : a), day = x => new Date(x + 'T00:00').toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric' });
     const lab = v => v >= 70 ? '🌟 Excellent' : v >= 50 ? '🟢 Bon' : v >= 30 ? '🟠 Moyen' : '🔴 Faible';
     const ago2 = since <= 0 ? "aujourd'hui" : since === 1 ? 'hier' : 'il y a ' + since + ' j';
     put(`<div class="wxg">${s.map((x, i) => `<div class="wxd${x === best && x.score >= 30 ? ' best' : ''}" style="background:hsl(${Math.round(x.score * 1.2)},70%,62%)"><small>${i ? new Date(x.date + 'T00:00').toLocaleDateString('fr-FR', { weekday: 'narrow' }) + ' ' + x.date.slice(8) : 'auj.'}</small><b>${x.score}</b><small>${x.p >= 1 ? '🌧' + Math.round(x.p) : '☀'}${x.rg < .8 ? '⏳' : ''}</small></div>`).join('')}</div>
-      <details class="wxi"><summary>ℹ️ Comment lire l'indice</summary><div class="wxn">Note de 0 à 100 par jour : pluie des 2 semaines avant le jour + nuits fraîches + gel + saison. ⏳ = la case est encore en repousse après une récolte (~8 j). Pluie 14 j passés : ${Math.round(past)} mm · nuits moy. 7 j : ${tn7.toFixed(1)} °C.</div></details>`,
+      <details class="wxi"><summary>ℹ️ Comment lire l'indice</summary><div class="wxn">Note de 0 à 100 par jour : pluie utile (pluie moins évaporation) tombée 4 à 14 jours avant (plus tôt si les nuits sont fraîches, la pousse est alors plus lente) + nuits fraîches + chaleur + gel + saison (raccourcie en altitude). ⏳ = la case est encore en repousse après une récolte (~8 j). Pluie 14 j passés : ${Math.round(past)} mm · nuits moy. 7 j : ${tn7.toFixed(1)} °C.<br><b>Détail du jour :</b> ${(f => f ? `pluie pondérée ${Math.round(f.wr)} mm, utile ${Math.round(f.net)} mm → ${Math.round(f.rain * 100)} % · nuits ${f.tn.toFixed(1)} °C → ${Math.round(f.tS * 100)} % · chaleur ${Math.round(f.hot * 100)} % · gel ${Math.round(f.frost * 100)} % · saison ${Math.round(f.sea * 100)} % · repousse ${Math.round(s[0].rg * 100)} %${f.ff > 0 ? ` · 🌲 forêt ${Math.round(f.ff * 100)} % (sol plus humide)` : ''}` : '')(s[0].f)}</div></details>`,
       (best.score >= 30 ? `🎯 <b>${day(best.date)}</b> · ${lab(best.score)} (${best.score})` : '😴 Aucun jour favorable cette semaine') + (since <= 8 ? `<br>⏳ Dernière récolte ${ago2} : repousse en cours` : ''));
   } catch (e) { put('<div class="hint">🌦️ Météo indisponible (connexion ?)</div>', '🌦️ Météo indisponible'); }
 }
@@ -352,10 +409,15 @@ $('#panel').addEventListener('click', e => {
   const b = e.target.closest('[data-act]'); if (!b || !sel) return; const a = b.dataset.act, c = D.cells[sel] ||= blank();
   if (a === 'delcell') { const snap = JSON.stringify(D), k = sel; delete D.cells[k]; sel = null; save(); renderPanel(); draw(); return toast('Case supprimée', () => { restoreSnap(snap); sel = k; save(); draw(); renderPanel(); }); }
   if (a === 'quick') return addFind(sel);
-  if (a === 'addtoggle') { const f = $('#addv'); f.classList.toggle('on'); if (f.classList.contains('on')) $('#vn').focus(); return; }
+  if (a === 'addtoggle') { const f = $('#addv'); if (editI !== null) { renderPanel(); return $('#addv').classList.add('on'); } f.classList.toggle('on'); if (f.classList.contains('on')) $('#vn').focus(); return; }
+  if (a === 'edit') { const v = c.v[+b.dataset.i]; if (!v) return; editI = +b.dataset.i; const f = $('#addv'); f.classList.add('on');
+    $('#vd').value = v.d; $('#vn').value = v.n; $('#vw').value = v.e ? '' : Math.round(v.w); $('#vt').value = v.t || '';
+    f.querySelector('[data-act=add]').textContent = '✔ Mettre à jour la visite'; f.scrollIntoView({ block: 'nearest' }); $('#vd').focus(); return; }
   if (a === 'del') { const snap = JSON.stringify(D); c.v.splice(+b.dataset.i, 1); save(); draw(); renderPanel(); return toast('Visite supprimée', () => { restoreSnap(snap); save(); draw(); renderPanel(); }); }
   if (a === 'add') { const d = $('#vd').value || today(); if (d > today()) return toast('La date est dans le futur'); const n = Math.max(0, Math.round(+$('#vn').value || 0)), w = $('#vw').value;
-    c.v.push({ d, n, w: w !== '' ? Math.max(0, +w) : n * D.avg, e: w === '', t: $('#vt').value.trim() }); save(); draw(); renderPanel(); collapse(); toast('Visite ajoutée 🍄'); }
+    const nv = { d, n, w: w !== '' ? Math.max(0, +w) : n * D.avg, e: w === '', t: $('#vt').value.trim() };
+    if (editI !== null && c.v[editI]) { const snap = JSON.stringify(D); c.v[editI] = nv; save(); draw(); renderPanel(); return toast('Visite modifiée ✏️', () => { restoreSnap(snap); save(); draw(); renderPanel(); }); }
+    c.v.push(nv); save(); draw(); renderPanel(); collapse(); toast('Visite ajoutée 🍄'); }
 });
 function addFind(k) {
   const snap = JSON.stringify(D), c = D.cells[k] ||= blank(), t = today(), v = c.v.find(v => v.d === t && !v.t) || c.v.find(v => v.d === t);
@@ -473,6 +535,8 @@ async function scan() {      // télécharge les communes qui couvrent l'écran 
   } finally { scanning = false; }
 }
 const cmLabel = () => { $('#cmb').textContent = '🏘️ Limites des communes : ' + (commOn ? 'oui' : 'non'); };
+const foLabel = () => $('#fob').textContent = forOn ? '🌲 Forêts en vert : activé' : '🌲 Forêts en vert : désactivé';
+$('#fob').onclick = () => { forOn = !forOn; try { localStorage.setItem('cartocepe-forest', forOn ? '1' : '0'); } catch (e) {} foLabel(); schedule(); }; foLabel();
 $('#cmb').onclick = () => { commOn = !commOn; try { localStorage.setItem('cartocepe-comm', commOn ? '1' : '0'); } catch (e) {} cmLabel(); if (commOn) scan(); schedule(); };
 $('#mn').addEventListener('click', cmLabel); cmLabel();
 
@@ -512,8 +576,8 @@ const infos = () => Object.entries(D.cells).filter(([k, c]) => rec(c)).map(([k, 
 async function tipWx() {
   const best = infos().filter(x => x.n > 0).sort((a, b) => b.n - a.n)[0], k = sel || hereK || best?.k || idAt(V.cx, V.cy), c = D.cells[k], [la, lo] = toLL(...ctr(k));
   const d = await Promise.race([wxFor(la, lo), new Promise((_, r) => setTimeout(r, 6000))]);
-  const last = (c?.v || []).filter(v => v.n > 0).reduce((a, v) => v.d > a ? v.d : a, ''), s = wxScores(d, last), t0 = s[0], b = s.reduce((a, x) => x.score > a.score ? x : a);
-  const past = d.precipitation_sum.slice(0, 14).reduce((a, v) => a + (v ?? 0), 0), tn = d.temperature_2m_min.slice(7, 14).reduce((a, v) => a + (v ?? 0), 0) / 7;
+  const last = (c?.v || []).filter(v => v.n > 0).reduce((a, v) => v.d > a ? v.d : a, ''), s = wxScores(d, last, await forestFrac(k)), t0 = s[0], b = s.reduce((a, x) => x.score > a.score ? x : a);
+  const past = d.precipitation_sum.slice(wxOff(d) - 14, wxOff(d)).reduce((a, v) => a + (v ?? 0), 0), tn = d.temperature_2m_min.slice(wxOff(d) - 7, wxOff(d)).reduce((a, v) => a + (v ?? 0), 0) / 7;
   const w = rec(c) ? cl(k, c) : 'ce secteur', day = x => new Date(x + 'T00:00').toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric' }), o = [`📊 Indice du jour pour ${w} : ${t0.score}/100, avec ${Math.round(past)} mm de pluie ces 14 derniers jours.`];
   if (t0.score >= 50) o.push(`🌟 Conditions favorables aujourd'hui pour ${w} (indice ${t0.score}/100) : bonne sortie en vue !`);
   if (b.score >= 30 && b !== t0) o.push(`🎯 Meilleur jour à venir pour ${w} : ${day(b.date)} (indice ${b.score}/100).`);
