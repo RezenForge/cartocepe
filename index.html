@@ -44,6 +44,8 @@ li button{border:0;background:none;cursor:pointer}
 #addv{display:none;margin-bottom:4px}#addv.on{display:grid}
 .ptab{display:flex;gap:4px;margin:4px 0 6px}.ptab button{flex:1;padding:7px 2px;font-size:12px;border:2px solid var(--dark);border-radius:8px;background:#e6d29c;cursor:pointer}.ptab button.on{background:var(--forest);color:#fff}
 .tp{display:none}.tp.on{display:block}.tp textarea{min-height:90px}.wxi{margin-top:6px;font-size:11px}.wxi summary{cursor:pointer;color:var(--leather)}
+.gal{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:4px}.gal img,.gal .ph0{width:100%;aspect-ratio:1;object-fit:cover;border:2px solid var(--leather);border-radius:6px;cursor:pointer;background:#e6d29c;display:flex;align-items:center;justify-content:center}
+#pv{position:fixed;inset:0;background:rgba(0,0,0,.92);display:none;flex-direction:column;z-index:40;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}#pv.open{display:flex}.pvb{display:flex;justify-content:flex-end;gap:8px;padding:8px}#pvi{flex:1;min-height:0;width:100%;object-fit:contain}
 #lst .win{display:flex;flex-direction:column;max-height:82dvh}
 .lhd{display:flex;align-items:center;gap:8px;margin-bottom:8px}.lhd h2{flex:1;margin:0;font-size:15px}.lhd .ib{width:34px;height:34px;font-size:13px;flex:none}
 .seg{display:flex;gap:4px;margin-bottom:6px}.seg button{flex:1;padding:7px 4px;font-size:12px;border:2px solid var(--dark);border-radius:8px;background:#e6d29c;cursor:pointer}.seg button.on{background:var(--forest);color:#fff}
@@ -74,6 +76,7 @@ li button{border:0;background:none;cursor:pointer}
   <div class="seg"><button data-s="recent" class="on">🕒 Récentes</button><button data-s="best">🏆 Fructueuses</button></div>
   <input id="lq" type="search" placeholder="🔎 Rechercher un secteur…">
   <ul id="ll"></ul></div></div>
+<div id="pv"><div class="pvb"><button class="ib" id="pvd" aria-label="Supprimer la photo">🗑️</button><button class="ib" id="pvx" aria-label="Fermer">✖</button></div><img id="pvi" alt="Photo"></div>
 <div id="toast"><span id="tm"></span><button id="tu" hidden>Annuler</button></div>
 <script>
 /* ===== Grille mondiale : chaque case = 50 m réels à 46° de latitude ; son identifiant « i,j » est caché ===== */
@@ -85,16 +88,17 @@ const toM = (lat, lng) => [R * lng * Math.PI / 180, R * Math.log(Math.tan(Math.P
 const toLL = (x, y) => [(2 * Math.atan(Math.exp(y / R)) - Math.PI / 2) * 180 / Math.PI, x / R * 180 / Math.PI];
 const idAt = (x, y) => Math.floor(x / CS) + ',' + Math.floor(y / CS);
 const ctr = k => { const [i, j] = k.split(',').map(Number); return [(i + .5) * CS, (j + .5) * CS]; };
-const blank = () => ({ name: '', note: '', v: [] }), rec = c => c && (c.v.length || c.name || c.note);
+const blank = () => ({ name: '', note: '', ph: [], v: [] }), rec = c => c && (c.v.length || c.name || c.note || (c.ph && c.ph.length));
 const cnt = c => c ? c.v.reduce((a, v) => a + v.n, 0) : 0;
 let D = { cells: {}, avg: 150 }, sel = null, hereK = null, me = null, watch = null, pending = false, V = { cx: 0, cy: 0, mpp: 1500 };
 
 /* ===== Sauvegarde ===== */
 function save() { try { localStorage.setItem(KEY, JSON.stringify(D)); } catch (e) { toast('Stockage plein : exportez vos données'); } }
-function clean(c) { return { name: String(c?.name || ''), note: String(c?.note || ''), v: (Array.isArray(c?.v) ? c.v : []).filter(v => v && /^\d{4}-\d\d-\d\d$/.test(v.d)).map(v => ({ d: v.d, n: Math.max(0, Math.round(+v.n || 0)), w: Math.max(0, +v.w || 0), e: !!v.e, t: String(v.t || '') })) }; }
+function clean(c) { return { name: String(c?.name || ''), note: String(c?.note || ''), ph: (Array.isArray(c?.ph) ? c.ph : []).filter(p => p && /^[\w-]+$/.test(String(p.id))).map(p => ({ id: String(p.id), d: /^\d{4}-\d\d-\d\d$/.test(p.d) ? p.d : '' })), v: (Array.isArray(c?.v) ? c.v : []).filter(v => v && /^\d{4}-\d\d-\d\d$/.test(v.d)).map(v => ({ d: v.d, n: Math.max(0, Math.round(+v.n || 0)), w: Math.max(0, +v.w || 0), e: !!v.e, t: String(v.t || '') })) }; }
 function mergeCell(k, c) {      // fusionne sans doublon (importer deux fois le même fichier ne double rien)
   c = clean(c); const a = D.cells[k] ||= blank(), sig = v => [v.d, v.n, Math.round(v.w), v.t].join('|'), have = new Set(a.v.map(sig));
   c.v.forEach(v => { if (!have.has(sig(v))) a.v.push(v); });
+  c.ph.forEach(p => { if (!a.ph.some(x => x.id === p.id)) a.ph.push(p); });
   if (c.name && !a.name.split(' / ').includes(c.name)) a.name = a.name ? a.name + ' / ' + c.name : c.name;
   if (c.note && !a.note.includes(c.note)) a.note = a.note ? a.note + '\n' + c.note : c.note;
 }
@@ -123,7 +127,8 @@ function importData(d) {
   let msg;
   if (d && Array.isArray(d.maps)) { const r = fromOld(d.maps); msg = `${r.n} case(s) converties` + (r.merged ? `, ${r.merged} fusionnée(s) avec une voisine` : '') + (r.skipped ? ` · ${r.skipped} carte(s) sans coordonnées ignorée(s)` : ''); }
   else if (d && d.cells && d.geo) { const r = fromOld([d]); msg = r.n + ' case(s) converties'; }
-  else if (d && d.cells && d.grid === 50) { Object.entries(d.cells).forEach(([k, c]) => mergeCell(k, c)); msg = 'Carnet importé'; }
+  else if (d && d.cells && d.grid === 50) { Object.entries(d.cells).forEach(([k, c]) => mergeCell(k, c)); msg = 'Carnet importé';
+    if (d.photos && typeof d.photos === 'object') Promise.all(Object.entries(d.photos).filter(([id, u]) => /^[\w-]+$/.test(id) && typeof u === 'string' && u.startsWith('data:image/')).map(([id, u]) => pPut(id, u).catch(() => {}))).then(() => renderPanel()); }
   else return toast('Fichier non reconnu');
   save(); fitData(); draw(); renderPanel(); toast('📂 ' + msg);
 }
@@ -205,6 +210,31 @@ $('#zi').onclick = () => zoomAt(1.6); $('#zo').onclick = () => zoomAt(1 / 1.6);
   addEventListener('resize', schedule);
   if (window.ResizeObserver) new ResizeObserver(() => draw()).observe($('#mapBox')); }
 
+/* ===== Photos : réduites (1280 px max) et stockées dans IndexedDB ; la case ne garde que leur identifiant ===== */
+const idb = new Promise(res => { try { const r = indexedDB.open('cartocepe-photos', 1); r.onupgradeneeded = () => r.result.createObjectStore('p'); r.onsuccess = () => res(r.result); r.onerror = () => res(null); } catch (e) { res(null); } });
+const pdb = async (mode, fn) => { const db = await idb; if (!db) throw new Error('idb'); return new Promise((res, rej) => { const t = db.transaction('p', mode), r = fn(t.objectStore('p')); t.oncomplete = () => res(r.result); t.onerror = t.onabort = () => rej(t.error); }); };
+const pPut = (id, u) => pdb('readwrite', s => s.put(u, id)), pGet = id => pdb('readonly', s => s.get(id)), pDel = id => pdb('readwrite', s => s.delete(id));
+function shrink(f) { return new Promise((res, rej) => { const u = URL.createObjectURL(f), im = new Image(); im.onload = () => { const s = Math.min(1, 1280 / Math.max(im.width, im.height)), c = document.createElement('canvas'); c.width = Math.round(im.width * s); c.height = Math.round(im.height * s); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); URL.revokeObjectURL(u); res(c.toDataURL('image/jpeg', .72)); }; im.onerror = () => { URL.revokeObjectURL(u); rej(new Error('img')); }; im.src = u; }); }
+async function loadGal(k) {
+  const el = $('#gal'); if (!el) return; const c = D.cells[k];
+  if (!c || !c.ph.length) { el.innerHTML = '<div class="hint" style="grid-column:1/-1">Aucune photo.</div>'; return; }
+  el.innerHTML = '';
+  for (const p of c.ph) { let u = null; try { u = await pGet(p.id); } catch (e) {} if (sel !== k || !$('#gal')) return;
+    if (u) { const im = document.createElement('img'); im.src = u; im.alt = 'Photo'; im.dataset.id = p.id; el.appendChild(im); } else { const d = document.createElement('div'); d.className = 'ph0'; d.textContent = '🖼️?'; el.appendChild(d); } }
+}
+let pvId = null;
+const closePh = () => { $('#pv').classList.remove('open'); $('#pvi').removeAttribute('src'); pvId = null; };
+$('#pvx').onclick = closePh;
+$('#pvd').onclick = () => { const k = sel, id = pvId, c = k && D.cells[k], i = c ? c.ph.findIndex(p => p.id === id) : -1; if (i < 0) return closePh();
+  const snap = JSON.stringify(D); c.ph.splice(i, 1); save(); closePh(); draw(); renderPanel();
+  setTimeout(() => { if (!D.cells[k]?.ph.some(p => p.id === id)) pDel(id).catch(() => {}); }, 8000);
+  toast('Photo supprimée', () => { D = JSON.parse(snap); save(); draw(); renderPanel(); }); };
+$('#panel').addEventListener('change', async e => {
+  if (e.target.id !== 'phf') return; const files = [...e.target.files]; e.target.value = ''; if (!files.length || !sel) return; const k = sel; let n = 0;
+  for (const f of files) { try { const url = await shrink(f), id = Date.now().toString(36) + Math.random().toString(36).slice(2, 7); await pPut(id, url); (D.cells[k] ||= blank()).ph.push({ id, d: today() }); n++; } catch (x) { toast('Photo impossible à enregistrer'); } }
+  if (n) { save(); draw(); if (sel === k) { ptab = 'ph'; renderPanel(); } toast('📷 ' + n + ' photo' + (n > 1 ? 's ajoutées' : ' ajoutée')); }
+});
+
 /* ===== Fiche d'une case ===== */
 function select(k) { sel = k; document.body.classList.remove('pmin'); $('#grab').textContent = '▾'; renderPanel(); draw(); }
 const collapse = () => { document.body.classList.add('pmin'); $('#grab').textContent = '▴'; };
@@ -216,18 +246,19 @@ function renderPanel() {
   if (!sel) { p.innerHTML = '<div class="hint">🧭 Touchez une case (≈ 50 m) pour l\'explorer, ou 🍄 « Trouvé ici ! » une fois sur place. Donnez un nom aux secteurs qui comptent : les cases n\'ont plus de numéro visible.' + (Object.keys(D.cells).length ? '' : '<br><br>Vous avez un ancien carnet ? ☰ Menu → Importer.') + '</div>'; return; }
   const c = D.cells[sel] || blank(), [la, lo] = toLL(...ctr(sel)), tot = c.v.reduce((a, v) => a + v.w, 0);
   const hist = c.v.map((v, i) => [v, i]).sort((a, b) => b[0].d.localeCompare(a[0].d)).map(([v, i]) => `<li><span>📅 ${fmtD(v.d)} — 🍄 ${v.n} · ${v.e ? '≈' : ''}${Math.round(v.w)} g${v.t ? '<br><small>' + esc(v.t) + '</small>' : ''}</span><button data-act="del" data-i="${i}" aria-label="Supprimer">✖</button></li>`).join('');
-  p.innerHTML = `<input class="pname" data-f="name" placeholder="✏️ Nommer ce secteur…" value="${esc(c.name)}">
+  p.innerHTML = `<div style="display:flex;gap:6px;align-items:center"><input class="pname" data-f="name" placeholder="✏️ Nommer ce secteur…" value="${esc(c.name)}" style="flex:1;min-width:0">${rec(c) ? '<button class="ib" data-act="delcell" aria-label="Supprimer cette case" style="width:36px;height:36px;font-size:15px;flex:none;margin-bottom:4px">🗑️</button>' : ''}</div>
     <div class="chips"><span>🍄 ${cnt(c)}</span><span>⚖️ ${fmtW(tot)}</span><span>📅 ${c.v.length} visite${c.v.length > 1 ? 's' : ''}</span></div>
     <div id="wxb" class="wxb">🌦️ Météo…</div>
     <div class="acts"><button class="btn gold" data-act="quick">⚡ +1 cèpe <small>≈ ${D.avg} g</small></button><button class="btn" data-act="addtoggle">➕ Visite…</button></div>
     <div id="addv" class="row"><input type="date" id="vd" max="${today()}" value="${today()}"><input type="number" id="vn" min="0" placeholder="Cèpes" inputmode="numeric"><input type="number" id="vw" min="0" placeholder="Poids g" inputmode="numeric">
       <input class="full" id="vt" placeholder="Note de visite (facultatif)"><button class="btn gold full" data-act="add">✔ Enregistrer la visite</button></div>
-    <div class="ptab"><button data-tab="wx">🌦️ Météo</button><button data-tab="hs">📜 Visites</button><button data-tab="nt">📝 Notes${c.note ? ' •' : ''}</button></div>
+    <div class="ptab"><button data-tab="wx">🌦️ Météo</button><button data-tab="hs">📜 Visites</button><button data-tab="ph">📷 Photos${c.ph.length ? ' •' : ''}</button><button data-tab="nt">📝 Notes${c.note ? ' •' : ''}</button></div>
     <div class="tp" data-pane="wx"><div id="wx"><div class="hint">Chargement…</div></div></div>
+    <div class="tp" data-pane="ph"><label class="btn gold" style="text-align:center"><input type="file" accept="image/*" id="phf" multiple hidden>📷 Ajouter une photo</label><div class="gal" id="gal"></div></div>
     <div class="tp" data-pane="hs"><ul>${hist || '<li class="hint">Aucune visite.</li>'}</ul></div>
     <div class="tp" data-pane="nt"><textarea data-f="note" placeholder="Notes : pentes, essences, indices…">${esc(c.note)}</textarea>
       <div class="hint" style="padding:2px 0">📍 ${la.toFixed(5)}, ${lo.toFixed(5)} · <a href="https://www.google.com/maps/dir/?api=1&destination=${la.toFixed(6)},${lo.toFixed(6)}" target="_blank" rel="noopener">🧭 Itinéraire</a></div></div>`;
-  setTab(); showWx(sel);
+  setTab(); showWx(sel); loadGal(sel);
 }
 /* ===== Météo : indice « bon jour pour aller voir » (Open-Meteo, gratuit, sans clé) =====
    Série = 14 jours passés + aujourd'hui + 7 jours de prévision (index 0..21).
@@ -274,8 +305,10 @@ async function showWx(k) {
 
 $('#panel').addEventListener('input', e => { const f = e.target.dataset.f; if (!f || !sel) return; (D.cells[sel] ||= blank())[f] = e.target.value; save(); draw(); });
 $('#panel').addEventListener('click', e => {
+  const gi = e.target.closest('#gal img'); if (gi) { pvId = gi.dataset.id; $('#pvi').src = gi.src; $('#pv').classList.add('open'); return; }
   const t = e.target.closest('[data-tab]'); if (t) { ptab = t.dataset.tab; return setTab(); }
   const b = e.target.closest('[data-act]'); if (!b || !sel) return; const a = b.dataset.act, c = D.cells[sel] ||= blank();
+  if (a === 'delcell') { const snap = JSON.stringify(D), k = sel; delete D.cells[k]; sel = null; save(); renderPanel(); draw(); return toast('Case supprimée', () => { D = JSON.parse(snap); sel = k; save(); draw(); renderPanel(); }); }
   if (a === 'quick') return addFind(sel);
   if (a === 'addtoggle') { const f = $('#addv'); f.classList.toggle('on'); if (f.classList.contains('on')) $('#vn').focus(); return; }
   if (a === 'del') { const snap = JSON.stringify(D); c.v.splice(+b.dataset.i, 1); save(); draw(); renderPanel(); return toast('Visite supprimée', () => { D = JSON.parse(snap); save(); draw(); renderPanel(); }); }
@@ -311,7 +344,7 @@ $('#mn').onclick = () => { $('#info').textContent = Object.values(D.cells).filte
 $('#mc').onclick = () => $('#menu').classList.remove('open'); $('#menu').onclick = e => { if (e.target.id === 'menu') $('#menu').classList.remove('open'); };
 $('#imp').onclick = () => $('#fi').click();
 $('#fi').onchange = e => { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { try { importData(JSON.parse(r.result)); $('#menu').classList.remove('open'); } catch (x) { toast('Fichier illisible'); } }; r.readAsText(f); e.target.value = ''; };
-$('#exp').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify({ app: 'carnet-cepes', version: 4, grid: 50, avg: D.avg, cells: D.cells })], { type: 'application/json' })); a.download = 'carnet-cepes-' + today() + '.json'; a.click(); toast('💾 Exporté'); };
+$('#exp').onclick = async () => { const photos = {}; for (const c of Object.values(D.cells)) for (const p of c.ph) { try { const u = await pGet(p.id); if (u) photos[p.id] = u; } catch (e) {} } const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify({ app: 'carnet-cepes', version: 4, grid: 50, avg: D.avg, cells: D.cells, photos })], { type: 'application/json' })); a.download = 'carnet-cepes-' + today() + '.json'; a.click(); toast('💾 Exporté'); };
 $('#avg').onclick = () => { const v = prompt('Poids moyen estimé d\'un cèpe (g)', D.avg); if (v && +v > 9) { D.avg = Math.round(+v); save(); renderPanel(); } };
 
 /* ===== Liste des cases avec trouvailles ===== */
