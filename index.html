@@ -65,18 +65,19 @@ li button{border:0;background:none;cursor:pointer;min-width:40px;min-height:40px
 #toast.show{display:flex}#toast button{border:2px solid var(--gold);background:none;color:var(--gold);border-radius:6px;padding:8px 12px}
 </style></head><body>
 <header class="bar win"><h1>🍄 Cartocèpe</h1>
-  <button class="ib" id="loc" aria-label="Ma position">📍</button><button class="ib" id="mn" aria-label="Menu">☰</button></header>
+  <button class="ib" id="loc" aria-label="Ma position">📍</button><button class="ib" id="mn" aria-label="Options">⚙️</button></header>
 <div id="mapBox"><canvas id="cv"></canvas><div id="sc"></div>
   <button class="ib" id="tp" aria-label="Conseil aléatoire">💡</button>
   <div id="tip" hidden><div id="tipt"></div><div class="tipb"><button id="tipg" hidden>📍 Voir</button><button id="tipn">🎲 Autre conseil</button><button id="tipx" aria-label="Fermer">✖</button></div></div>
   <div id="zb"><button class="ib" id="gr" aria-label="Afficher ou cacher la grille">▦</button><button class="ib" id="lb" aria-label="Liste des trouvailles">📋</button><button class="ib" id="fit" aria-label="Voir toutes mes cases">🎯</button><button class="ib" id="zi" aria-label="Zoomer">➕</button><button class="ib" id="zo" aria-label="Dézoomer">➖</button></div></div>
 <div id="dock"><button id="found">🍄 Trouvé ici !</button><button id="grab" aria-label="Réduire ou ouvrir la fiche">▾</button></div>
 <div id="panel" class="win"></div>
-<div id="menu"><div class="win"><h2 style="margin:0 0 8px">☰ Menu</h2>
+<div id="menu"><div class="win"><h2 style="margin:0 0 8px">⚙️ Options</h2>
   <button class="btn gold" id="imp">📂 Importer un carnet (ancien ou nouveau, JSON)</button>
   <button class="btn" id="exp">💾 Exporter (JSON)</button>
   <button class="btn" id="avg">⚖️ Poids moyen d'un cèpe</button>
   <button class="btn" id="cmb"></button>
+  <button class="btn" id="fs"></button>
   <div class="hint" id="info"></div>
   <button class="btn" id="rf">🔄 Actualiser l'application</button>
   <button class="btn" id="mc">Fermer</button><input type="file" id="fi" accept=".json,application/json" hidden></div></div>
@@ -259,7 +260,7 @@ let ptab = 'wx';
 function setTab() { document.querySelectorAll('#panel [data-tab]').forEach(b => b.classList.toggle('on', b.dataset.tab === ptab)); document.querySelectorAll('#panel [data-pane]').forEach(x => x.classList.toggle('on', x.dataset.pane === ptab)); }
 function renderPanel() {
   const p = $('#panel');
-  if (!sel) { p.innerHTML = '<div class="hint">🧭 Touchez une case (≈ 50 m) pour l\'explorer, ou 🍄 « Trouvé ici ! » une fois sur place. Donnez un nom aux secteurs qui comptent : les cases n\'ont plus de numéro visible.' + (Object.keys(D.cells).length ? '' : '<br><br>Vous avez un ancien carnet ? ☰ Menu → Importer.') + '</div>'; return; }
+  if (!sel) { p.innerHTML = '<div class="hint">🧭 Touchez une case (≈ 50 m) pour l\'explorer, ou 🍄 « Trouvé ici ! » une fois sur place. Donnez un nom aux secteurs qui comptent : les cases n\'ont plus de numéro visible.' + (Object.keys(D.cells).length ? '' : '<br><br>Vous avez un ancien carnet ? ⚙️ Options → Importer.') + '</div>'; return; }
   const c = D.cells[sel] || blank(), [la, lo] = toLL(...ctr(sel)), tot = c.v.reduce((a, v) => a + v.w, 0);
   const hist = c.v.map((v, i) => [v, i]).sort((a, b) => b[0].d.localeCompare(a[0].d)).map(([v, i]) => `<li><span>📅 ${fmtD(v.d)} — 🍄 ${v.n} · ${v.e ? '≈' : ''}${Math.round(v.w)} g${v.t ? '<br><small>' + esc(v.t) + '</small>' : ''}</span><button data-act="del" data-i="${i}" aria-label="Supprimer">✖</button></li>`).join('');
   p.innerHTML = `<div style="display:flex;gap:6px;align-items:center"><input class="pname" data-f="name" placeholder="✏️ Nommer ce secteur…" value="${esc(c.name)}" style="flex:1;min-width:0">${rec(c) ? '<button class="ib" data-act="delcell" aria-label="Supprimer cette case" style="width:36px;height:36px;font-size:15px;flex:none;margin-bottom:4px">🗑️</button>' : ''}</div>
@@ -442,6 +443,18 @@ const cmLabel = () => { $('#cmb').textContent = '🏘️ Limites des communes : 
 $('#cmb').onclick = () => { commOn = !commOn; try { localStorage.setItem('cartocepe-comm', commOn ? '1' : '0'); } catch (e) {} cmLabel(); if (commOn) scan(); schedule(); };
 $('#mn').addEventListener('click', cmLabel); cmLabel();
 
+/* ===== Plein écran (activé par défaut ; le navigateur exige un premier toucher pour l'accorder) ===== */
+let fsOn = (() => { try { return localStorage.getItem('cartocepe-full') !== '0'; } catch (e) { return true; } })();
+const fsEl = document.documentElement, fsCan = !!(fsEl.requestFullscreen || fsEl.webkitRequestFullscreen);
+const inFs = () => !!(document.fullscreenElement || document.webkitFullscreenElement);
+const enterFs = () => { try { return Promise.resolve((fsEl.requestFullscreen || fsEl.webkitRequestFullscreen).call(fsEl, { navigationUI: 'hide' })); } catch (e) { return Promise.reject(e); } };
+const exitFs = () => { try { const r = (document.exitFullscreen || document.webkitExitFullscreen).call(document); r && r.catch && r.catch(() => {}); } catch (e) {} };
+const fsLabel = () => { $('#fs').textContent = '⛶ Plein écran : ' + (fsOn ? 'oui' : 'non') + (fsCan ? '' : ' (non pris en charge ici)'); };
+$('#fs').onclick = () => { fsOn = !fsOn; try { localStorage.setItem('cartocepe-full', fsOn ? '1' : '0'); } catch (e) {} fsLabel();
+  if (fsOn) { if (!fsCan) toast(`Plein écran indisponible ici : ajoutez la page à l'écran d'accueil`); else if (!inFs()) enterFs().catch(() => toast('Plein écran refusé par le navigateur')); } else if (inFs()) exitFs(); };
+$('#mn').addEventListener('click', fsLabel); fsLabel();
+document.addEventListener('click', () => { if (fsOn && fsCan && !inFs()) enterFs().catch(() => {}); }, { once: true });
+
 /* ===== Conseils aléatoires (💡) : connaissances, vos zones, météo ===== */
 const KB = [
   `🌳 Les cèpes vivent en association avec des arbres (chênes, hêtres, châtaigniers, épicéas, pins) : explorez les lisières, les clairières et le pied des vieux arbres.`,
@@ -485,7 +498,7 @@ const tipGens = [
   () => { const a = infos().filter(x => x.last && dsince(x.last) < 8); if (!a.length) return null; const x = rnd(a), s = dsince(x.last); return { t: `⏳ ${cl(x.k, x.c)} a été récoltée ${s <= 0 ? `aujourd'hui` : 'il y a ' + s + ' j'} : laissez-lui encore ~${Math.max(1, 8 - s)} jour(s) pour se regarnir.`, k: x.k }; },
   () => { const a = infos().filter(x => x.n > 0 && x.last && dsince(x.last) >= 21); if (!a.length) return null; const x = rnd(a); return { t: `🔁 ${cl(x.k, x.c)} n'a plus été récoltée depuis ${dsince(x.last)} jours : un passage de contrôle pourrait payer.`, k: x.k }; },
   () => { const m = {}, vs = infos().flatMap(x => x.c.v).filter(v => v.n > 0); if (vs.length < 2) return null; vs.forEach(v => { const k = +v.d.slice(5, 7) - 1; m[k] = (m[k] || 0) + v.n; }); const b = Object.entries(m).sort((x, y) => y[1] - x[1])[0]; return { t: `📅 Vos plus belles récoltes tombent en ${new Date(2000, +b[0], 1).toLocaleDateString('fr-FR', { month: 'long' })} (${b[1]} cèpes) : c'est votre période à surveiller.` }; },
-  () => { const vs = infos().flatMap(x => x.c.v).filter(v => v.n > 0 && !v.e), n = vs.reduce((a, v) => a + v.n, 0); if (n < 3) return null; const avg = vs.reduce((a, v) => a + v.w, 0) / n; return Math.abs(avg - D.avg) / D.avg > .25 ? { t: `⚖️ Vos cèpes pesés font ${Math.round(avg)} g en moyenne, contre ${D.avg} g réglés dans le menu : ajustez « Poids moyen » pour des estimations plus justes.` } : null; },
+  () => { const vs = infos().flatMap(x => x.c.v).filter(v => v.n > 0 && !v.e), n = vs.reduce((a, v) => a + v.n, 0); if (n < 3) return null; const avg = vs.reduce((a, v) => a + v.w, 0) / n; return Math.abs(avg - D.avg) / D.avg > .25 ? { t: `⚖️ Vos cèpes pesés font ${Math.round(avg)} g en moyenne, contre ${D.avg} g réglés dans les options : ajustez « Poids moyen » pour des estimations plus justes.` } : null; },
   () => { const a = infos().filter(x => x.n >= 2); if (!a.length) return null; const x = rnd(a), [i, j] = x.k.split(',').map(Number), e = []; for (let di = -1; di <= 1; di++) for (let dj = -1; dj <= 1; dj++) { const k = (i + di) + ',' + (j + dj); if ((di || dj) && !rec(D.cells[k])) e.push(k); } return e.length ? { t: `🧭 Autour de ${cl(x.k, x.c)}, ${e.length} case(s) voisine(s) sont encore vierges : les cèpes poussent souvent en groupe, explorez-les.`, k: rnd(e) } : null; },
   tipWx, tipWx
 ];
