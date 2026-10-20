@@ -88,6 +88,8 @@ li button{border:0;background:none;cursor:pointer;min-width:40px;min-height:40px
   <button class="btn" id="avg">⚖️ Poids moyen d'un cèpe</button>
   <button class="btn" id="cmb"></button>
   <button class="btn" id="fob"></button>
+  <button class="btn" id="rob"></button>
+  <div class="hint" style="padding:0 6px 4px;font-size:11px">Routes forestières : © contributeurs OpenStreetMap</div>
   <button class="btn" id="fs"></button>
   <button class="btn" id="dl">📥 Enregistrer la zone affichée (hors connexion)</button>
   <button class="btn gold" id="dl20">📥 Zone de 20 km autour du centre (tous les zooms)</button>
@@ -234,6 +236,7 @@ function draw() {
         const fx = tx >> sh, fy = ty >> sh, t = ftile(fz, fx, fy);
         if (t.c) g.drawImage(t.c, (tx - (fx << sh)) * 256 / n, (ty - (fy << sh)) * 256 / n, 256 / n, 256 / n, sx(tx * span - O), sy(O - ty * span), ts + .6, ts + .6); }
     g.globalAlpha = 1; }
+  drawRoads(sx, sy, W, H, x0, x1, y0, y1, mpp, Z, dpr);
   if (hmOn) { if (hm && hm.img) { g.save(); g.imageSmoothingEnabled = true; g.globalAlpha = .42; g.drawImage(hm.img, sx(hm.bb[0]), sy(hm.bb[3]), (hm.bb[2] - hm.bb[0]) / mpp, (hm.bb[3] - hm.bb[1]) / mpp); g.restore(); }
     if (!hmBusy && !hmPend && (!hm || x0 < hm.bb[0] || x1 > hm.bb[2] || y0 < hm.bb[1] || y1 > hm.bb[3] || Math.abs(Math.log2(mpp / hm.mpp)) > 1)) { hmPend = true; setTimeout(() => { hmPend = false; if (hmOn) hmLoad(); }, Math.max(500, 3000 - (Date.now() - hmT))); } }
   if (commOn) drawComm(0, sx, sy, W, x0, x1, y0, y1, mpp);
@@ -810,6 +813,57 @@ $('#dlm').onclick = async e => { if (e.target.id === 'dlm' || e.target.id === 'd
   try { const est = await navigator.storage.estimate(), free = est.quota - est.usage, need = list.length * DLK * 1024;
     if (free < need * 1.3 && !confirm(`Espace libre estimé : ${Math.round(free / 1048576)} Mo, besoin ≈ ${fmtMo(list.length)}. Continuer quand même ?`)) return; } catch (e) {}
   dlTiles(list, 'Zone 20 km'); };
+
+/* ===== Routes forestières : pistes OpenStreetMap (highway=track), en transparence, uniquement dans les forêts (masque IGN) ===== */
+let roOn = (() => { try { return localStorage.getItem('cartocepe-roads') !== '0'; } catch (e) { return true; } })();
+const rdbP = new Promise(res => { try { const r = indexedDB.open('cartocepe-roads', 1); r.onupgradeneeded = () => r.result.createObjectStore('r'); r.onsuccess = () => res(r.result); r.onerror = () => res(null); } catch (e) { res(null); } });
+const rget = async k => { const db = await rdbP; if (!db) return null; return new Promise(res => { try { const q = db.transaction('r').objectStore('r').get(k); q.onsuccess = () => res(q.result || null); q.onerror = () => res(null); } catch (e) { res(null); } }); };
+const rput = async (k, v) => { const db = await rdbP; if (!db) return; try { db.transaction('r', 'readwrite').objectStore('r').put(v, k); } catch (e) {} };
+const RSPAN = 256 * 156543.03392 / 2 ** 14, rtiles = new Map(), ROV = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter'];
+let rQ = [], rBusy = 0, rErrT = 0, rcv = null, mcv = null;
+async function rFetch(tx, ty) {      // pistes d'une tuile zoom 14 → lignes aplaties [x, y, x, y…] en mètres Mercator
+  const [s, w] = toLL(tx * RSPAN - O, O - (ty + 1) * RSPAN), [n, e] = toLL((tx + 1) * RSPAN - O, O - ty * RSPAN);
+  const q = `[out:json][timeout:25];way["highway"="track"](${s.toFixed(5)},${w.toFixed(5)},${n.toFixed(5)},${e.toFixed(5)});out geom;`; let err;
+  for (const u of ROV) { try { const r = await fetch(u, { method: 'POST', body: 'data=' + encodeURIComponent(q), headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }); if (!r.ok) throw new Error(r.status);
+      return ((await r.json()).elements || []).filter(el => el.geometry && el.geometry.length > 1).map(el => el.geometry.flatMap(p => { const [x, y] = toM(p.lat, p.lon); return [+x.toFixed(1), +y.toFixed(1)]; })); } catch (e2) { err = e2; } }
+  throw err;
+}
+function rTile(tx, ty) {
+  const k = tx + '/' + ty; let t = rtiles.get(k);
+  if (!t) { t = { w: null }; rtiles.set(k, t);
+    rget(k).then(c => { if (c && c.w) { t.w = c.w; schedule(); if (Date.now() - c.t < 7.8e9) return; }      // en cache : on le garde 90 jours
+      rQ.push([k, tx, ty, t]); while (rQ.length > 12) rtiles.delete(rQ.shift()[0]); rPump(); }); }
+  return t;
+}
+async function rPump() {
+  if (rBusy >= 2 || !rQ.length) return; rBusy++; const [k, tx, ty, t] = rQ.shift();
+  try { const w = await rFetch(tx, ty); t.w = w; rput(k, { w, t: Date.now() }); schedule(); }
+  catch (e) { if (!t.w) { if (Date.now() - rErrT > 20000) { rErrT = Date.now(); toast('Routes forestières indisponibles (connexion ?)'); } setTimeout(() => { if (rtiles.get(k) === t) rtiles.delete(k); }, 30000); } }
+  rBusy--; setTimeout(rPump, 600);
+}
+function drawRoads(sx, sy, W, H, x0, x1, y0, y1, mpp, Z, dpr) {
+  if (!roOn || mpp > 8) return;
+  const tl = [];
+  for (let ty = Math.max(0, Math.floor((O - y1) / RSPAN)); ty <= Math.floor((O - y0) / RSPAN); ty++) for (let tx = Math.max(0, Math.floor((x0 + O) / RSPAN)); tx <= Math.floor((x1 + O) / RSPAN); tx++) tl.push(rTile(tx, ty));
+  if (!tl.some(t => t.w)) return;
+  rcv ||= document.createElement('canvas'); mcv ||= document.createElement('canvas');
+  for (const c of [rcv, mcv]) if (c.width !== cv.width || c.height !== cv.height) { c.width = cv.width; c.height = cv.height; }
+  const r = rcv.getContext('2d'), m = mcv.getContext('2d'), path = new Path2D();
+  tl.forEach(t => t.w && t.w.forEach(a => { for (let i = 0; i < a.length; i += 2) i ? path.lineTo(sx(a[i]), sy(a[i + 1])) : path.moveTo(sx(a[0]), sy(a[1])); }));
+  r.setTransform(dpr, 0, 0, dpr, 0, 0); r.clearRect(0, 0, W, H); r.lineCap = r.lineJoin = 'round';
+  r.lineWidth = 4.4; r.strokeStyle = 'rgba(0,0,0,.4)'; r.stroke(path); r.lineWidth = 2.2; r.strokeStyle = '#f4f1e8'; r.stroke(path);
+  /* masque : on ne garde les routes que là où le masque forêt IGN est présent (tuile non disponible = pas de découpe) */
+  m.setTransform(dpr, 0, 0, dpr, 0, 0); m.clearRect(0, 0, W, H); m.fillStyle = '#000';
+  const fz = Math.min(Z, 17), ms = 256 * 156543.03392 / 2 ** fz, mz = ms / mpp + .6;
+  for (let fy = Math.max(0, Math.floor((O - y1) / ms)); fy <= Math.floor((O - y0) / ms); fy++) for (let fx = Math.max(0, Math.floor((x0 + O) / ms)); fx <= Math.floor((x1 + O) / ms); fx++) {
+    const t = ftile(fz, fx, fy); if (!t.hk) { t.hk = 1; t.p.then(() => { t.settled = true; schedule(); }); }
+    const dx = sx(fx * ms - O), dy = sy(O - fy * ms);
+    if (t.c) m.drawImage(t.c, dx, dy, mz, mz); else if (t.settled) m.fillRect(dx, dy, mz, mz); }
+  r.setTransform(1, 0, 0, 1, 0, 0); r.globalCompositeOperation = 'destination-in'; r.drawImage(mcv, 0, 0); r.globalCompositeOperation = 'source-over';
+  g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = .6; g.drawImage(rcv, 0, 0); g.restore();
+}
+const roLabel = () => { $('#rob').textContent = roOn ? '🛤️ Routes forestières : affichées' : '🛤️ Routes forestières : masquées'; };
+$('#rob').onclick = () => { roOn = !roOn; try { localStorage.setItem('cartocepe-roads', roOn ? '1' : '0'); } catch (e) {} roLabel(); schedule(); if (roOn && V.mpp > 8) toast('🛤️ Zoomez pour voir les routes forestières'); }; roLabel();
 
 /* ===== Démarrage ===== */
 load();
