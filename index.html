@@ -30,6 +30,9 @@ canvas{position:absolute;left:0;top:0;width:100%;height:100%;display:block;touch
 .tipb{display:flex;gap:6px;margin-top:8px}.tipb button{border:2px solid var(--dark);border-radius:8px;background:var(--forest);color:#fff;padding:10px 12px;font-size:13px;cursor:pointer}#tipn{flex:1}
 #home{flex:none;position:relative;height:30px;margin:0 4px 4px;border:3px solid var(--wood);border-radius:10px;background:linear-gradient(var(--leather),var(--wood));box-shadow:0 0 0 2px var(--dark);pointer-events:none}
 #home::after{content:'';position:absolute;left:50%;top:50%;width:90px;height:5px;margin:-2.5px 0 0 -45px;border-radius:3px;background:rgba(0,0,0,.35)}
+#pm{position:absolute;left:8px;right:8px;bottom:62px;z-index:5;background:rgba(241,226,184,.97);color:var(--ink);border:3px solid var(--wood);border-radius:10px;padding:8px;box-shadow:0 3px 0 var(--dark);font-size:13px;line-height:1.35}
+#pm:not([hidden])~#tip{bottom:178px}
+.pmb{display:flex;gap:6px;margin-top:6px}.pmb button{height:44px;min-width:44px;border:2px solid var(--dark);border-radius:8px;background:var(--forest);color:#fff;font-size:18px;box-shadow:0 2px 0 var(--dark);cursor:pointer}.pmb button[hidden]{display:none}#pmp{flex:1;background:var(--gold);color:var(--dark);font-size:15px}
 #dock{display:flex;gap:6px;margin:4px}
 #visit{height:48px;font-size:15px;padding:0 14px;min-width:72px;border-radius:8px;border:2px solid var(--dark);background:var(--forest);color:#fff;box-shadow:0 3px 0 var(--dark);cursor:pointer}
 #found:active,#visit:active{transform:translateY(3px);box-shadow:none}
@@ -72,8 +75,9 @@ li button{border:0;background:none;cursor:pointer;min-width:40px;min-height:40px
   <button class="ib" id="loc" aria-label="Ma position">📍</button><button class="ib" id="mn" aria-label="Options">⚙️</button></header>
 <div id="mapBox"><canvas id="cv"></canvas><div id="sc"></div>
   
+  <div id="pm" hidden><div id="pmt"></div><div class="pmb"><button id="pmp">📍 Point</button><button id="pmu" aria-label="Annuler le dernier point">↩️</button><button id="pme" aria-label="Terminer le chemin">✔</button><button id="pmd" hidden aria-label="Supprimer le chemin">🗑️</button><button id="pmx" aria-label="Quitter le mode chemins">✖</button></div></div>
   <div id="tip" hidden><div id="tipt"></div><div class="tipb"><button id="tipg" hidden>📍 Voir</button><button id="tipn">🎲 Autre conseil</button><button id="tipx" aria-label="Fermer">✖</button></div></div>
-  <div id="zb"><button class="ib" id="tp" aria-label="Conseil aléatoire">💡</button><button class="ib" id="gr" aria-label="Afficher ou cacher la grille">▦</button><button class="ib" id="lb" aria-label="Liste des trouvailles">📋</button><button class="ib" id="fit" aria-label="Voir toutes mes cases">🎯</button><button class="ib" id="zo" aria-label="Dézoomer">➖</button><button class="ib" id="zi" aria-label="Zoomer">➕</button></div></div>
+  <div id="zb"><button class="ib" id="tp" aria-label="Conseil aléatoire">💡</button><button class="ib" id="gr" aria-label="Afficher ou cacher la grille">▦</button><button class="ib" id="pt" aria-label="Cartographier les chemins">🥾</button><button class="ib" id="lb" aria-label="Liste des trouvailles">📋</button><button class="ib" id="fit" aria-label="Voir toutes mes cases">🎯</button><button class="ib" id="zo" aria-label="Dézoomer">➖</button><button class="ib" id="zi" aria-label="Zoomer">➕</button></div></div>
 <div id="dock"><button id="found" aria-label="Ajouter un cèpe">+1🍄</button><button id="visit" aria-label="Ajouter une visite">+1👣</button><button id="grab" aria-label="Réduire ou ouvrir la fiche">▾</button></div>
 <div id="panel" class="win"></div>
 <div id="home" aria-hidden="true"></div>
@@ -105,7 +109,7 @@ const idAt = (x, y) => Math.floor(x / CS) + ',' + Math.floor(y / CS);
 const ctr = k => { const [i, j] = k.split(',').map(Number); return [(i + .5) * CS, (j + .5) * CS]; };
 const blank = () => ({ name: '', note: '', ph: [], v: [] }), rec = c => c && (c.v.length || c.name || c.note || (c.ph && c.ph.length));
 const cnt = c => c ? c.v.reduce((a, v) => a + v.n, 0) : 0;
-let D = { cells: {}, avg: 150 }, sel = null, hereK = null, me = null, watch = null, pending = false, V = { cx: 0, cy: 0, mpp: 1500 };
+let D = { cells: {}, avg: 150, paths: [] }, sel = null, hereK = null, me = null, watch = null, pending = false, V = { cx: 0, cy: 0, mpp: 1500 }, P = { on: false, cur: null, start: null, sel: null };
 
 /* ===== Sauvegarde ===== */
 function save() { try { localStorage.setItem(KEY, JSON.stringify(D)); } catch (e) { toast('Stockage plein : exportez vos données'); } }
@@ -117,8 +121,10 @@ function mergeCell(k, c) {      // fusionne sans doublon (importer deux fois le 
   if (c.name && !a.name.split(' / ').includes(c.name)) a.name = a.name ? a.name + ' / ' + c.name : c.name;
   if (c.note && !a.note.includes(c.note)) a.note = a.note ? a.note + '\n' + c.note : c.note;
 }
+const cleanPaths = a => (Array.isArray(a) ? a : []).filter(p => p && /^[\w-]+$/.test(String(p.id)) && Array.isArray(p.pts)).map(p => ({ id: String(p.id), pts: p.pts.filter(q => Array.isArray(q) && isFinite(q[0]) && isFinite(q[1])).map(q => [+q[0], +q[1]]) })).filter(p => p.pts.length >= 2);
+function mergePaths(a) { const have = new Set((D.paths ||= []).map(p => p.id)); cleanPaths(a).forEach(p => { if (!have.has(p.id)) D.paths.push(p); }); }
 function load() {
-  try { const d = JSON.parse(localStorage.getItem(KEY) || 'null'); if (d && d.cells) { D = { cells: {}, avg: d.avg || 150 }; Object.entries(d.cells).forEach(([k, c]) => /^-?\d+,-?\d+$/.test(k) && (D.cells[k] = clean(c))); } } catch (e) {}
+  try { const d = JSON.parse(localStorage.getItem(KEY) || 'null'); if (d && d.cells) { D = { cells: {}, avg: d.avg || 150, paths: cleanPaths(d.paths) }; Object.entries(d.cells).forEach(([k, c]) => /^-?\d+,-?\d+$/.test(k) && (D.cells[k] = clean(c))); } } catch (e) {}
 }
 
 /* ===== Conversion des anciennes cartes (grille 10×14 posée sur une image satellite) ===== */
@@ -142,7 +148,7 @@ function importData(d) {
   let msg;
   if (d && Array.isArray(d.maps)) { const r = fromOld(d.maps); msg = `${r.n} case(s) converties` + (r.merged ? `, ${r.merged} fusionnée(s) avec une voisine` : '') + (r.skipped ? ` · ${r.skipped} carte(s) sans coordonnées ignorée(s)` : ''); }
   else if (d && d.cells && d.geo) { const r = fromOld([d]); msg = r.n + ' case(s) converties'; }
-  else if (d && d.cells && d.grid === 50) { Object.entries(d.cells).forEach(([k, c]) => mergeCell(k, c)); msg = 'Carnet importé';
+  else if (d && d.cells && d.grid === 50) { Object.entries(d.cells).forEach(([k, c]) => mergeCell(k, c)); mergePaths(d.paths); msg = 'Carnet importé';
     if (d.photos && typeof d.photos === 'object') Promise.all(Object.entries(d.photos).filter(([id, u]) => /^[\w-]+$/.test(id) && typeof u === 'string' && u.startsWith('data:image/')).map(([id, u]) => pPut(id, u).catch(() => {}))).then(() => renderPanel()); }
   else return toast('Fichier non reconnu');
   save(); fitData(); draw(); renderPanel(); toast('📂 ' + msg);
@@ -190,6 +196,7 @@ function draw() {
       if (n) { g.strokeText(n, x + px / 2, y + px * .72); g.fillText(n, x + px / 2, y + px * .72); }
       if (c.name && px >= 60) { g.font = '700 11px monospace'; const t = c.name.length > 14 ? c.name.slice(0, 13) + '…' : c.name; g.strokeText(t, x + px / 2, y + px - 9); g.fillText(t, x + px / 2, y + px - 9); } }
   });
+  drawPaths(sx, sy);
   if (commOn) drawComm(1, sx, sy, W, x0, x1, y0, y1, mpp);
   const box = (k, col, w) => { const [i, j] = k.split(',').map(Number); g.strokeStyle = col; g.lineWidth = w; g.strokeRect(sx(i * CS) + w / 2, sy((j + 1) * CS) + w / 2, px - w, px - w); };
   if (hereK) { box(hereK, '#0b2a4a', 5); box(hereK, '#4aa3ff', 3); } if (sel) { box(sel, '#3b2412', 5); box(sel, '#d4a94a', 3); }
@@ -225,7 +232,7 @@ $('#zi').onclick = () => zoomAt(1.6); $('#zo').onclick = () => zoomAt(1 / 1.6);
     if (ptr.size === 1 && tap) { if (!tap.mv && Math.hypot(e.clientX - tap.x, e.clientY - tap.y) > 8) tap.mv = true; if (tap.mv) { V.cx -= dx * V.mpp; V.cy += dy * V.mpp; schedule(); } }
     else if (ptr.size === 2 && pinch) { const [a, b] = [...ptr.values()], d = dist(); zoomAt(d / pinch, (a.x + b.x) / 2, (a.y + b.y) / 2); pinch = d; } });
   const end = e => { if (!ptr.has(e.pointerId)) return; const solo = ptr.size === 1; ptr.delete(e.pointerId);
-    if (solo && e.type === 'pointerup' && tap && !tap.mv) { const r = cv.getBoundingClientRect(), k = idAt(V.cx + (e.clientX - r.left - r.width / 2) * V.mpp, V.cy - (e.clientY - r.top - r.height / 2) * V.mpp); if (k === sel) { sel = null; collapse(); renderPanel(); draw(); } else { pick(k); if (rec(D.cells[k])) flyTo(k); } }
+    if (solo && e.type === 'pointerup' && tap && !tap.mv) { const r = cv.getBoundingClientRect(), k = idAt(V.cx + (e.clientX - r.left - r.width / 2) * V.mpp, V.cy - (e.clientY - r.top - r.height / 2) * V.mpp); if (P.on) pathTap(e.clientX - r.left, e.clientY - r.top); else if (k === sel) { sel = null; collapse(); renderPanel(); draw(); } else { pick(k); if (rec(D.cells[k])) flyTo(k); } }
     if (!ptr.size) tap = null; pinch = 0; };
   addEventListener('pointerup', end); addEventListener('pointercancel', end);
   cv.addEventListener('wheel', e => { e.preventDefault(); zoomAt(e.deltaY < 0 ? 1.2 : 1 / 1.2, e.clientX, e.clientY); }, { passive: false });
@@ -354,7 +361,7 @@ function addVisit(k) {
 }
 
 /* ===== Position ===== */
-function onPos(p) {
+function onPos(p) { setTimeout(() => P.on && pmUpdate(), 0);
   const [x, y] = toM(p.coords.latitude, p.coords.longitude); me = { x, y, acc: p.coords.accuracy }; const first = !hereK; hereK = idAt(x, y);
   if (first) { V.cx = x; V.cy = y; if (V.mpp > 4) V.mpp = 1.5; }
   if (pending) { const p = pending; pending = false; p === 'visit' ? addVisit(hereK) : addFind(hereK); }
@@ -379,7 +386,7 @@ $('#rf').onclick = async () => { toast('🔄 Actualisation…'); try { if (navig
 $('#mc').onclick = () => $('#menu').classList.remove('open'); $('#menu').onclick = e => { if (e.target.id === 'menu') $('#menu').classList.remove('open'); };
 $('#imp').onclick = () => $('#fi').click();
 $('#fi').onchange = e => { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { try { importData(JSON.parse(r.result)); $('#menu').classList.remove('open'); } catch (x) { toast('Fichier illisible'); } }; r.readAsText(f); e.target.value = ''; };
-$('#exp').onclick = async () => { const photos = {}; for (const c of Object.values(D.cells)) for (const p of c.ph) { try { const u = await pGet(p.id); if (u) photos[p.id] = u; } catch (e) {} } const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify({ app: 'carnet-cepes', version: 4, grid: 50, avg: D.avg, cells: D.cells, photos })], { type: 'application/json' })); a.download = 'carnet-cepes-' + today() + '.json'; a.click(); toast('💾 Exporté'); };
+$('#exp').onclick = async () => { const photos = {}; for (const c of Object.values(D.cells)) for (const p of c.ph) { try { const u = await pGet(p.id); if (u) photos[p.id] = u; } catch (e) {} } const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify({ app: 'carnet-cepes', version: 4, grid: 50, avg: D.avg, cells: D.cells, paths: D.paths || [], photos })], { type: 'application/json' })); a.download = 'carnet-cepes-' + today() + '.json'; a.click(); toast('💾 Exporté'); };
 $('#avg').onclick = () => { const v = prompt('Poids moyen estimé d\'un cèpe (g)', D.avg); if (v && +v > 9) { D.avg = Math.round(+v); save(); renderPanel(); } };
 
 /* ===== Liste des cases avec trouvailles ===== */
@@ -528,6 +535,55 @@ async function nextTip() {
 $('#tp').onclick = () => $('#tip').hidden ? nextTip() : closeTip();
 $('#tipn').onclick = nextTip; $('#tipx').onclick = closeTip;
 $('#tipg').onclick = () => { if (!tipK) return; const k = tipK; closeTip(); flyTo(k); pick(k); };
+
+/* ===== Chemins : lignes posées point par point avec le GPS (coordonnées en mètres Mercator) ===== */
+function drawPaths(sx, sy) {
+  const ps = D.paths || []; if (!ps.length && !P.start) return;
+  g.save(); g.lineCap = 'round'; g.lineJoin = 'round';
+  const trace = p => { g.beginPath(); p.pts.forEach(([x, y], i) => i ? g.lineTo(sx(x), sy(y)) : g.moveTo(sx(x), sy(y))); g.stroke(); };
+  ps.forEach(p => { g.lineWidth = 7; g.strokeStyle = 'rgba(0,0,0,.25)'; trace(p); g.lineWidth = 4; g.strokeStyle = p.id === P.sel ? 'rgba(255,255,255,.8)' : 'rgba(255,190,60,.7)'; trace(p); });
+  ps.forEach(p => p.pts.forEach(([x, y], i) => { const e = i === 0 || i === p.pts.length - 1; g.beginPath(); g.arc(sx(x), sy(y), e ? 4.5 : 3, 0, 7); g.fillStyle = p.id === P.sel ? 'rgba(255,255,255,.85)' : 'rgba(255,190,60,.8)'; g.fill(); g.lineWidth = 1.5; g.strokeStyle = 'rgba(59,36,18,.7)'; g.stroke(); }));
+  if (P.start) { const x = sx(P.start[0]), y = sy(P.start[1]); g.beginPath(); g.arc(x, y, 10, 0, 7); g.lineWidth = 3; g.strokeStyle = 'rgba(255,255,255,.9)'; g.stroke(); g.beginPath(); g.arc(x, y, 5, 0, 7); g.fillStyle = 'rgba(255,120,40,.9)'; g.fill(); }
+  g.restore();
+}
+function pmUpdate() {
+  const n = (D.paths || []).length, gps = me ? ' · GPS ±' + Math.round(me.acc) + ' m' : ' · GPS en attente';
+  $('#pmt').textContent = (P.cur ? `🥾 Chemin en cours : ${P.cur.pts.length} points. Marchez, puis 📍 Point (virage ou fin), ✔ pour finir.` : P.start ? `📍 Départ posé. Marchez en ligne droite, puis 📍 Point.` : `🥾 ${n} chemin(s). 📍 Point pose un départ ; touchez une ligne pour repartir de son bout.`) + gps;
+  $('#pmd').hidden = !P.sel; $('#pt').classList.toggle('on', P.on); $('#pm').hidden = !P.on;
+}
+function addPathPt() {
+  if (!me) { toast('Position GPS introuvable : patientez un instant'); if (watch === null) startLoc(); return; }
+  const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]), last = P.cur ? P.cur.pts[P.cur.pts.length - 1] : P.start;
+  let pt = [me.x, me.y], bd = 10;      // s'aimante sur un point existant à moins de 10 m (carrefours)
+  (D.paths || []).forEach(p => p.pts.forEach(q => { if (last && q[0] === last[0] && q[1] === last[1]) return; const d = dist(q, pt); if (d < bd) { bd = d; pt = q; } }));
+  if (last && dist(last, pt) < 2.5) return toast(`Déplacez-vous avant d'ajouter un point`);
+  const q = [+pt[0].toFixed(1), +pt[1].toFixed(1)], acc = ' (±' + Math.round(me.acc) + ' m)';
+  if (P.cur) { P.cur.pts.push(q); toast('📍 Point ' + P.cur.pts.length + acc); }
+  else if (P.start) { P.cur = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), pts: [P.start, q] }; (D.paths ||= []).push(P.cur); P.start = null; P.sel = null; toast('🥾 Chemin tracé' + acc); }
+  else { P.start = q; toast('📍 Départ posé' + acc + ' : marchez, puis rappuyez'); }
+  save(); pmUpdate(); draw();
+}
+function undoPathPt() {
+  if (P.cur) { if (P.cur.pts.length > 2) P.cur.pts.pop(); else { const c = P.cur; D.paths = D.paths.filter(p => p !== c); P.start = c.pts[0]; P.cur = null; } }
+  else if (P.start) P.start = null; else return toast('Rien à annuler');
+  save(); pmUpdate(); draw();
+}
+function finishPath() { if (!P.cur && !P.start) return toast('Aucun chemin en cours'); P.cur = null; P.start = null; P.sel = null; pmUpdate(); draw(); toast('✔ Chemin terminé'); }
+function delPath() {
+  if (!P.sel) return; const snap = JSON.stringify(D), id = P.sel; D.paths = D.paths.filter(p => p.id !== id); if (P.cur && P.cur.id === id) P.cur = null; P.sel = null; P.start = null;
+  save(); pmUpdate(); draw(); toast('Chemin supprimé', () => { D = JSON.parse(snap); save(); draw(); renderPanel(); pmUpdate(); });
+}
+function pathTap(px, py) {      // toucher une ligne : la sélectionne et pose le départ sur son sommet le plus proche
+  const W = cv.clientWidth, H = cv.clientHeight, sx = x => (x - V.cx) / V.mpp + W / 2, sy = y => H / 2 - (y - V.cy) / V.mpp;
+  let best = null, bd = 22;
+  (D.paths || []).forEach(p => { for (let i = 1; i < p.pts.length; i++) { const ax = sx(p.pts[i - 1][0]), ay = sy(p.pts[i - 1][1]), dx = sx(p.pts[i][0]) - ax, dy = sy(p.pts[i][1]) - ay, l2 = dx * dx + dy * dy, t = l2 ? Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / l2)) : 0, d = Math.hypot(px - (ax + t * dx), py - (ay + t * dy)); if (d < bd) { bd = d; best = p; } } });
+  if (!best) { P.sel = null; pmUpdate(); draw(); return; }
+  let v = best.pts[0], vd = Infinity; best.pts.forEach(q => { const d = Math.hypot(sx(q[0]) - px, sy(q[1]) - py); if (d < vd) { vd = d; v = q; } });
+  P.sel = best.id; P.cur = null; P.start = [v[0], v[1]]; pmUpdate(); draw(); toast('📍 Départ posé sur ce chemin : marchez, puis 📍 Point');
+}
+$('#pt').onclick = () => { P.on = !P.on; if (P.on) { if (watch === null) startLoc(); } else { P.cur = null; P.start = null; P.sel = null; } pmUpdate(); draw(); };
+$('#pmp').onclick = addPathPt; $('#pmu').onclick = undoPathPt; $('#pme').onclick = finishPath; $('#pmd').onclick = delPath; $('#pmx').onclick = () => $('#pt').click();
+pmUpdate();
 
 /* ===== Démarrage ===== */
 load();
