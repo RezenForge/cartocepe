@@ -11,70 +11,104 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;margin:0}
 body{display:flex;flex-direction:column;height:100dvh;background:#1f3320;color:var(--ink);font:700 14px "Courier New",ui-monospace,monospace;overflow:hidden;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
-button,input,textarea{font:inherit;color:inherit}
+button,input,textarea{font:inherit;color:inherit;touch-action:manipulation}
+input,textarea{font-size:16px}
+button{-webkit-user-select:none;user-select:none}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 .win{border:3px solid var(--wood);border-radius:10px;box-shadow:0 0 0 2px var(--dark),0 4px 0 var(--dark)}
 .bar{display:flex;align-items:center;gap:6px;margin:4px;padding:4px 8px;background:linear-gradient(var(--leather),var(--wood))}
 .bar h1{flex:1;margin:0;font-size:14px;color:var(--gold);text-shadow:2px 2px 0 var(--dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ib{width:42px;height:42px;border-radius:8px;border:2px solid var(--dark);background:var(--forest);font-size:18px;box-shadow:0 3px 0 var(--dark);padding:0;cursor:pointer}
+.ib{width:44px;height:44px;border-radius:8px;border:2px solid var(--dark);background:var(--forest);font-size:20px;box-shadow:0 3px 0 var(--dark);padding:0;cursor:pointer}
 .ib:active{transform:translateY(3px);box-shadow:none}.ib.on{background:var(--gold)}
 #mapBox{flex:1;min-height:0;position:relative;margin:0 4px;border:3px solid #d9c48b;border-radius:6px;overflow:hidden}
 canvas{position:absolute;left:0;top:0;width:100%;height:100%;display:block;touch-action:none}
-#zb{position:absolute;right:8px;bottom:8px;display:flex;flex-direction:column;gap:6px}
-#zb .ib{opacity:.92}
-#sc{position:absolute;left:8px;bottom:8px;color:#fff;font-size:11px;background:rgba(0,0,0,.5);padding:2px 6px;border-radius:6px}
+#zb{position:absolute;left:8px;right:8px;bottom:8px;display:flex;justify-content:space-between;gap:6px}
+#zb .ib{flex:1 1 0;width:auto;min-width:0;max-width:56px;opacity:1;box-shadow:0 3px 0 var(--dark),0 0 0 2px rgba(255,255,255,.4)}#zb .ib:active{box-shadow:0 0 0 2px rgba(255,255,255,.4)}
+#sc{position:absolute;left:8px;top:8px;color:#fff;font-size:12px;background:rgba(0,0,0,.65);padding:3px 8px;border-radius:6px}
+
+#tip{position:absolute;left:8px;right:8px;bottom:62px;z-index:5;background:rgba(241,226,184,.97);color:var(--ink);border:3px solid var(--wood);border-radius:10px;padding:10px;box-shadow:0 3px 0 var(--dark);font-size:14px;line-height:1.4}
+.tipb{display:flex;gap:6px;margin-top:8px}.tipb button{border:2px solid var(--dark);border-radius:8px;background:var(--forest);color:#fff;padding:10px 12px;font-size:13px;cursor:pointer}#tipn{flex:1}
+#home{flex:none;position:relative;height:30px;margin:0 4px 4px;border:3px solid var(--wood);border-radius:10px;background:linear-gradient(var(--leather),var(--wood));box-shadow:0 0 0 2px var(--dark);pointer-events:none}
+#home::after{content:'';position:absolute;left:50%;top:50%;width:90px;height:5px;margin:-2.5px 0 0 -45px;border-radius:3px;background:rgba(0,0,0,.35)}
+#pm{position:absolute;left:8px;right:8px;bottom:62px;z-index:5;background:rgba(241,226,184,.97);color:var(--ink);border:3px solid var(--wood);border-radius:10px;padding:8px;box-shadow:0 3px 0 var(--dark);font-size:13px;line-height:1.35}
+#pm:not([hidden])~#tip{bottom:178px}
+.pmb{display:flex;gap:6px;margin-top:6px}.pmb button{height:44px;min-width:44px;border:2px solid var(--dark);border-radius:8px;background:var(--forest);color:#fff;font-size:18px;box-shadow:0 2px 0 var(--dark);cursor:pointer}.pmb button[hidden]{display:none}#pmp{flex:1;background:var(--gold);color:var(--dark);font-size:15px}
 #dock{display:flex;gap:6px;margin:4px}
-#found{height:42px;padding:0 14px;border-radius:8px;border:2px solid var(--dark);background:linear-gradient(#e6bd5a,var(--gold));color:var(--dark);box-shadow:0 3px 0 var(--dark);cursor:pointer}
-#grab{flex:1;height:42px;border:2px solid var(--dark);border-radius:8px;background:var(--wood);color:var(--gold);cursor:pointer}
-body.pmin #panel{display:none}
-#panel{margin:0 4px 4px;padding:8px;max-height:42dvh;overflow:auto;background:linear-gradient(var(--parch),#e6d29c)}
+#visit{height:48px;font-size:15px;padding:0 14px;min-width:72px;border-radius:8px;border:2px solid var(--dark);background:var(--forest);color:#fff;box-shadow:0 3px 0 var(--dark);cursor:pointer}
+#found:active,#visit:active{transform:translateY(3px);box-shadow:none}
+#found{height:48px;font-size:15px;padding:0 14px;min-width:72px;border-radius:8px;border:2px solid var(--dark);background:linear-gradient(#e6bd5a,var(--gold));color:var(--dark);box-shadow:0 3px 0 var(--dark);cursor:pointer}
+#grab{flex:1;height:48px;font-size:18px;border:2px solid var(--dark);border-radius:8px;background:var(--wood);color:var(--gold);cursor:pointer}
+body.pmin #panel,#panel:empty{display:none}
+#panel{overscroll-behavior:contain;margin:0 4px 4px;padding:6px 8px;max-height:46dvh;overflow:auto;background:linear-gradient(var(--parch),#e6d29c)}
 input,textarea{width:100%;padding:6px;border:2px solid var(--leather);border-radius:6px;background:#fff8e1;min-height:38px;margin:2px 0}
-.btn{display:block;width:100%;margin:5px 0;padding:10px;border-radius:8px;border:2px solid var(--dark);background:var(--forest);color:#fff;cursor:pointer;box-shadow:0 3px 0 var(--dark)}
+.btn{display:block;width:100%;margin:5px 0;padding:13px 10px;border-radius:8px;border:2px solid var(--dark);background:var(--forest);color:#fff;cursor:pointer;box-shadow:0 3px 0 var(--dark)}
 .btn.gold{background:var(--gold);color:var(--dark)}
-.hint{font-weight:400;color:var(--leather);padding:6px}
+.hint{font-weight:400;color:var(--wood);padding:6px;font-size:13px;line-height:1.4}
 .row{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:5px}.row .full{grid-column:1/-1}
-ul{list-style:none;margin:6px 0;padding:0;font-size:12px}li{display:flex;justify-content:space-between;gap:6px;padding:4px 0;border-bottom:1px dashed var(--leather)}
-li button{border:0;background:none;cursor:pointer}
+ul{list-style:none;margin:6px 0;padding:0;font-size:13px}li{display:flex;justify-content:space-between;gap:6px;padding:6px 0;border-bottom:1px dashed var(--leather)}
+li button{border:0;background:none;cursor:pointer;min-width:40px;min-height:40px;font-size:15px}
 #wx{margin:4px 0}.wxg{display:grid;grid-template-columns:repeat(8,1fr);gap:3px}
 .wxd{border:2px solid var(--dark);border-radius:6px;text-align:center;padding:3px 0;color:#1b1b1b;line-height:1.15}
-.wxd.best{border-color:#fff;box-shadow:0 0 0 2px var(--gold)}.wxd small{display:block;font-size:9px;font-weight:400}.wxd b{font-size:15px;display:block}
-.wxs{font-size:12px;margin:5px 0 2px}.wxn{font-size:10px;font-weight:400;color:var(--leather)}
-.pname{font-size:15px;font-weight:700;background:transparent;border:0;border-bottom:2px dashed var(--leather);border-radius:0;min-height:34px;margin:0 0 4px;padding:4px 2px}
-.chips{display:flex;gap:6px;flex-wrap:wrap;margin:2px 0 4px}.chips span{background:#fff8e1;border:2px solid var(--leather);border-radius:999px;padding:1px 9px;font-size:12px}
-.wxb{font-size:12px;margin:2px 0 4px;line-height:1.35}.acts{display:grid;grid-template-columns:1.4fr 1fr;gap:6px}.acts .btn{margin:4px 0;padding:9px 6px}.acts small{font-weight:400}
+.wxd.best{border-color:#fff;box-shadow:0 0 0 2px var(--gold)}.wxd small{display:block;font-size:10px;font-weight:400}.wxd b{font-size:15px;display:block}
+.wxs{font-size:12px;margin:5px 0 2px}.wxn{font-size:11px;font-weight:400;color:var(--wood)}
+.pname{font-size:16px;font-weight:700;background:transparent;border:0;border-bottom:2px dashed var(--leather);border-radius:0;min-height:34px;margin:0 0 4px;padding:4px 2px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 2px}.chips span{background:#fff8e1;border:2px solid var(--leather);border-radius:999px;padding:3px 10px;font-size:13px}
+.wxb{font-size:13px;margin:2px 0 4px;line-height:1.4}.acts{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:5px}.acts .btn{margin:3px 0;padding:11px 4px;font-size:13px;text-align:center;text-decoration:none}.acts small{font-weight:400}
 #addv{display:none;margin-bottom:4px}#addv.on{display:grid}
-.ptab{display:flex;gap:4px;margin:4px 0 6px}.ptab button{flex:1;padding:7px 2px;font-size:12px;border:2px solid var(--dark);border-radius:8px;background:#e6d29c;cursor:pointer}.ptab button.on{background:var(--forest);color:#fff}
-.tp{display:none}.tp.on{display:block}.tp textarea{min-height:90px}.wxi{margin-top:6px;font-size:11px}.wxi summary{cursor:pointer;color:var(--leather)}
+.ptab{display:flex;gap:4px;margin:4px 0}.ptab button{flex:1;padding:10px 2px;font-size:12px;border:2px solid var(--dark);border-radius:8px;background:#e6d29c;cursor:pointer}.ptab button.on{background:var(--forest);color:#fff}
+.tp{display:none}.tp.on{display:block}.tp textarea{min-height:72px}.wxi{margin-top:6px;font-size:11px}.wxi summary{cursor:pointer;color:var(--leather)}
+.gal{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:4px}.gal img,.gal .ph0{width:100%;aspect-ratio:1;object-fit:cover;border:2px solid var(--leather);border-radius:6px;cursor:pointer;background:#e6d29c;display:flex;align-items:center;justify-content:center}
+#pv{position:fixed;inset:0;background:rgba(0,0,0,.92);display:none;flex-direction:column;z-index:40;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}#pv.open{display:flex}.pvb{display:flex;justify-content:flex-end;gap:8px;padding:8px}#pvi{flex:1;min-height:0;width:100%;object-fit:contain}
 #lst .win{display:flex;flex-direction:column;max-height:82dvh}
 .lhd{display:flex;align-items:center;gap:8px;margin-bottom:8px}.lhd h2{flex:1;margin:0;font-size:15px}.lhd .ib{width:34px;height:34px;font-size:13px;flex:none}
-.seg{display:flex;gap:4px;margin-bottom:6px}.seg button{flex:1;padding:7px 4px;font-size:12px;border:2px solid var(--dark);border-radius:8px;background:#e6d29c;cursor:pointer}.seg button.on{background:var(--forest);color:#fff}
-#lq{margin:0 0 6px;min-height:34px;font-size:13px}
-#ll{flex:1;min-height:0;overflow:auto;margin:0}
-#ll li{cursor:pointer;padding:8px 8px;margin-bottom:5px;border:2px solid var(--leather);border-radius:8px;background:#fff8e1;font-size:12px;align-items:center}
+.seg{display:flex;gap:4px;margin-bottom:6px}.seg button{flex:1;padding:10px 4px;font-size:13px;border:2px solid var(--dark);border-radius:8px;background:#e6d29c;cursor:pointer}.seg button.on{background:var(--forest);color:#fff}
+#lq{margin:0 0 6px;min-height:40px;font-size:16px}
+#ll{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;margin:0}
+#ll li{cursor:pointer;padding:10px;margin-bottom:6px;border:2px solid var(--leather);border-radius:8px;background:#fff8e1;font-size:13px;align-items:center}
 #ll li:active{background:var(--gold)}#ll .bd{text-align:right;white-space:nowrap}#ll small{font-weight:400}
-#menu,#lst{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:12px;z-index:20}
-#menu.open,#lst.open{display:flex}#menu .win,#lst .win{width:100%;max-width:420px;padding:14px;background:linear-gradient(var(--parch),#e6d29c)}
-#toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);max-width:92vw;background:var(--dark);color:var(--parch);padding:8px 12px;border-radius:10px;z-index:30;display:none;gap:10px;align-items:center}
-#toast.show{display:flex}#toast button{border:2px solid var(--gold);background:none;color:var(--gold);border-radius:6px;padding:3px 8px}
+#menu,#lst,#dlm{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:12px;z-index:20}
+#menu.open,#lst.open,#dlm.open{display:flex}#menu .win,#dlm .win{max-height:92dvh;overflow:auto}#menu .win,#lst .win,#dlm .win{width:100%;max-width:420px;padding:14px;background:linear-gradient(var(--parch),#e6d29c)}
+#toast{position:fixed;left:50%;bottom:calc(136px + env(safe-area-inset-bottom));transform:translateX(-50%);max-width:92vw;background:var(--dark);color:var(--parch);padding:8px 12px;border-radius:10px;z-index:30;display:none;gap:10px;align-items:center}
+#dlp{position:fixed;left:50%;bottom:calc(136px + env(safe-area-inset-bottom));transform:translateX(-50%);width:min(92vw,380px);background:var(--dark);color:var(--parch);padding:8px 12px;border-radius:10px;z-index:31;display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}#dlp[hidden]{display:none}#dlt{flex:1;font-size:12px}#dlb{flex-basis:100%;order:3;height:6px;background:rgba(255,255,255,.2);border-radius:3px;overflow:hidden}#dlbi{display:block;height:100%;width:0;background:var(--gold)}#dlp button{border:2px solid var(--gold);background:none;color:var(--gold);border-radius:6px;padding:8px 12px;min-height:40px}
+#toast.show{display:flex}#toast button{border:2px solid var(--gold);background:none;color:var(--gold);border-radius:6px;padding:8px 12px}
 </style></head><body>
 <header class="bar win"><h1>🍄 Cartocèpe</h1>
-  <button class="ib" id="loc" aria-label="Ma position">📍</button><button class="ib" id="mn" aria-label="Menu">☰</button></header>
-<div id="mapBox"><canvas id="cv"></canvas><div id="sc"></div>
-  <div id="zb"><button class="ib" id="gr" aria-label="Afficher ou cacher la grille">▦</button><button class="ib" id="lb" aria-label="Liste des trouvailles">📋</button><button class="ib" id="fit" aria-label="Voir toutes mes cases">🎯</button><button class="ib" id="zi" aria-label="Zoomer">➕</button><button class="ib" id="zo" aria-label="Dézoomer">➖</button></div></div>
-<div id="dock"><button id="found">🍄 Trouvé ici !</button><button id="grab" aria-label="Réduire ou ouvrir la fiche">▾</button></div>
+  <button class="ib" id="loc" aria-label="Ma position">📍</button><button class="ib" id="mn" aria-label="Options">⚙️</button></header>
+<div id="mapBox"><canvas id="cv"></canvas><div id="sc"></div><div id="hml" hidden style="position:absolute;left:8px;top:36px;z-index:5;width:200px;background:rgba(0,0,0,.6);color:#fff;border-radius:8px;padding:4px 8px 6px;font-size:11px;line-height:1.3"><div>🌦️ Indice · <b id="hmdl">…</b> <span style="opacity:.75">(plein champ)</span></div><div style="height:7px;border-radius:4px;margin:3px 0 1px;background:linear-gradient(90deg,hsl(0,75%,50%),hsl(60,75%,50%),hsl(120,75%,50%))"></div><div style="display:flex;justify-content:space-between"><span>0</span><span>50</span><span>100</span></div><input type="range" id="hmd" min="0" max="7" step="1" value="0" disabled aria-label="Jour de prévision" style="display:block;width:100%;min-height:28px;margin:4px 0 0;padding:0;border:0;background:none;accent-color:#d4a94a"></div>
+  
+  <div id="pm" hidden><div id="pmt"></div><div class="pmb"><button id="pmp">📍 Point</button><button id="pmu" aria-label="Annuler le dernier point">↩️</button><button id="pme" aria-label="Terminer le chemin">✔</button><button id="pmd" hidden aria-label="Supprimer le chemin">🗑️</button><button id="pmx" aria-label="Quitter le mode chemins">✖</button></div></div>
+  <div id="tip" hidden><div id="tipt"></div><div class="tipb"><button id="tipg" hidden>📍 Voir</button><button id="tipn">🎲 Autre conseil</button><button id="tipx" aria-label="Fermer">✖</button></div></div>
+  <div id="zb"><button class="ib" id="tp" aria-label="Conseil aléatoire">💡</button><button class="ib" id="hmb" aria-label="Carte météo : où chercher aujourd'hui">🌡️</button><button class="ib" id="gr" aria-label="Afficher ou cacher la grille">▦</button><button class="ib" id="pt" aria-label="Cartographier les chemins">🥾</button><button class="ib" id="lb" aria-label="Liste des trouvailles">📋</button><button class="ib" id="fit" aria-label="Voir toutes mes cases">🎯</button><button class="ib" id="zo" aria-label="Dézoomer">➖</button><button class="ib" id="zi" aria-label="Zoomer">➕</button></div></div>
+<div id="dock"><button id="found" aria-label="Ajouter un cèpe">+1🍄</button><button id="visit" aria-label="Ajouter une visite">+1👣</button><button id="grab" aria-label="Réduire ou ouvrir la fiche">▾</button></div>
 <div id="panel" class="win"></div>
-<div id="menu"><div class="win"><h2 style="margin:0 0 8px">☰ Menu</h2>
+<div id="home" aria-hidden="true"></div>
+<div id="menu"><div class="win"><h2 style="margin:0 0 8px">⚙️ Options</h2>
   <button class="btn gold" id="imp">📂 Importer un carnet (ancien ou nouveau, JSON)</button>
   <button class="btn" id="exp">💾 Exporter (JSON)</button>
   <button class="btn" id="avg">⚖️ Poids moyen d'un cèpe</button>
   <button class="btn" id="cmb"></button>
+  <button class="btn" id="fob"></button>
+  <button class="btn" id="rob"></button>
+  <div class="hint" style="padding:0 6px 4px;font-size:11px">Routes forestières : © contributeurs OpenStreetMap</div>
+  <button class="btn" id="fs"></button>
+  <button class="btn" id="dl">📥 Enregistrer la zone affichée (hors connexion)</button>
+  <button class="btn gold" id="dl20">📥 Zone de 20 km autour du centre (tous les zooms)</button>
   <div class="hint" id="info"></div>
+  <button class="btn" id="rf">🔄 Actualiser l'application</button>
   <button class="btn" id="mc">Fermer</button><input type="file" id="fi" accept=".json,application/json" hidden></div></div>
 <div id="lst"><div class="win">
   <div class="lhd"><h2 id="lh">📋 Mes trouvailles</h2><button class="ib" id="lc" aria-label="Fermer">✖</button></div>
   <div class="seg"><button data-s="recent" class="on">🕒 Récentes</button><button data-s="best">🏆 Fructueuses</button></div>
   <input id="lq" type="search" placeholder="🔎 Rechercher un secteur…">
   <ul id="ll"></ul></div></div>
+<div id="pv"><div class="pvb"><button class="ib" id="pvd" aria-label="Supprimer la photo">🗑️</button><button class="ib" id="pvx" aria-label="Fermer">✖</button></div><img id="pvi" alt="Photo"></div>
 <div id="toast"><span id="tm"></span><button id="tu" hidden>Annuler</button></div>
+<div id="dlp" hidden><span id="dlt"></span><button id="dlc">Arrêter</button><div id="dlb"><i id="dlbi"></i></div></div>
+<div id="dlm"><div class="win"><h2 style="margin:0 0 8px">📥 Carte hors connexion</h2><div class="hint" id="dlh"></div>
+  <button class="btn" data-z="15" data-t="🗺️ Léger · jusqu'au zoom 15"></button>
+  <button class="btn gold" data-z="16" data-t="🌲 Standard · jusqu'au zoom 16"></button>
+  <button class="btn" data-z="17" data-t="🔍 Détaillé · jusqu'au zoom 17"></button>
+  <button class="btn" id="dlx">Annuler</button></div></div>
 <script>
 /* ===== Grille mondiale : chaque case = 50 m réels à 46° de latitude ; son identifiant « i,j » est caché ===== */
 const R = 6378137, CS = 50 / Math.cos(46 * Math.PI / 180), KEY = 'carnet-cepes-v4', O = 20037508.34;
@@ -85,21 +119,25 @@ const toM = (lat, lng) => [R * lng * Math.PI / 180, R * Math.log(Math.tan(Math.P
 const toLL = (x, y) => [(2 * Math.atan(Math.exp(y / R)) - Math.PI / 2) * 180 / Math.PI, x / R * 180 / Math.PI];
 const idAt = (x, y) => Math.floor(x / CS) + ',' + Math.floor(y / CS);
 const ctr = k => { const [i, j] = k.split(',').map(Number); return [(i + .5) * CS, (j + .5) * CS]; };
-const blank = () => ({ name: '', note: '', v: [] }), rec = c => c && (c.v.length || c.name || c.note);
+const blank = () => ({ name: '', note: '', ph: [], v: [] }), rec = c => c && (c.v.length || c.name || c.note || (c.ph && c.ph.length));
 const cnt = c => c ? c.v.reduce((a, v) => a + v.n, 0) : 0;
-let D = { cells: {}, avg: 150 }, sel = null, hereK = null, me = null, watch = null, pending = false, V = { cx: 0, cy: 0, mpp: 1500 };
+let D = { cells: {}, avg: 150, paths: [] }, sel = null, hereK = null, me = null, watch = null, pending = false, V = { cx: 0, cy: 0, mpp: 1500 }, P = { on: false, cur: null, start: null, sel: null, sa: null, adds: [] };
 
 /* ===== Sauvegarde ===== */
 function save() { try { localStorage.setItem(KEY, JSON.stringify(D)); } catch (e) { toast('Stockage plein : exportez vos données'); } }
-function clean(c) { return { name: String(c?.name || ''), note: String(c?.note || ''), v: (Array.isArray(c?.v) ? c.v : []).filter(v => v && /^\d{4}-\d\d-\d\d$/.test(v.d)).map(v => ({ d: v.d, n: Math.max(0, Math.round(+v.n || 0)), w: Math.max(0, +v.w || 0), e: !!v.e, t: String(v.t || '') })) }; }
+function clean(c) { return { name: String(c?.name || ''), note: String(c?.note || ''), ph: (Array.isArray(c?.ph) ? c.ph : []).filter(p => p && /^[\w-]+$/.test(String(p.id))).map(p => ({ id: String(p.id), d: /^\d{4}-\d\d-\d\d$/.test(p.d) ? p.d : '' })), v: (Array.isArray(c?.v) ? c.v : []).filter(v => v && /^\d{4}-\d\d-\d\d$/.test(v.d)).map(v => ({ d: v.d, n: Math.max(0, Math.round(+v.n || 0)), w: Math.max(0, +v.w || 0), e: !!v.e, t: String(v.t || '') })) }; }
 function mergeCell(k, c) {      // fusionne sans doublon (importer deux fois le même fichier ne double rien)
   c = clean(c); const a = D.cells[k] ||= blank(), sig = v => [v.d, v.n, Math.round(v.w), v.t].join('|'), have = new Set(a.v.map(sig));
   c.v.forEach(v => { if (!have.has(sig(v))) a.v.push(v); });
+  c.ph.forEach(p => { if (!a.ph.some(x => x.id === p.id)) a.ph.push(p); });
   if (c.name && !a.name.split(' / ').includes(c.name)) a.name = a.name ? a.name + ' / ' + c.name : c.name;
   if (c.note && !a.note.includes(c.note)) a.note = a.note ? a.note + '\n' + c.note : c.note;
 }
+const cleanPaths = a => (Array.isArray(a) ? a : []).filter(p => p && /^[\w-]+$/.test(String(p.id)) && Array.isArray(p.pts)).map(p => ({ id: String(p.id), pts: p.pts.filter(q => Array.isArray(q) && isFinite(q[0]) && isFinite(q[1])).map(q => [+q[0], +q[1]]) })).filter(p => p.pts.length >= 2);
+function mergePaths(a) { const have = new Set((D.paths ||= []).map(p => p.id)); cleanPaths(a).forEach(p => { if (!have.has(p.id)) D.paths.push(p); }); }
+function restoreSnap(snap) { const keep = D.paths; D = JSON.parse(snap); D.paths = keep; }      // annuler une action du carnet ne touche pas aux chemins
 function load() {
-  try { const d = JSON.parse(localStorage.getItem(KEY) || 'null'); if (d && d.cells) { D = { cells: {}, avg: d.avg || 150 }; Object.entries(d.cells).forEach(([k, c]) => /^-?\d+,-?\d+$/.test(k) && (D.cells[k] = clean(c))); } } catch (e) {}
+  try { const d = JSON.parse(localStorage.getItem(KEY) || 'null'); if (d && d.cells) { D = { cells: {}, avg: d.avg || 150, paths: cleanPaths(d.paths) }; Object.entries(d.cells).forEach(([k, c]) => /^-?\d+,-?\d+$/.test(k) && (D.cells[k] = clean(c))); } } catch (e) {}
 }
 
 /* ===== Conversion des anciennes cartes (grille 10×14 posée sur une image satellite) ===== */
@@ -123,7 +161,8 @@ function importData(d) {
   let msg;
   if (d && Array.isArray(d.maps)) { const r = fromOld(d.maps); msg = `${r.n} case(s) converties` + (r.merged ? `, ${r.merged} fusionnée(s) avec une voisine` : '') + (r.skipped ? ` · ${r.skipped} carte(s) sans coordonnées ignorée(s)` : ''); }
   else if (d && d.cells && d.geo) { const r = fromOld([d]); msg = r.n + ' case(s) converties'; }
-  else if (d && d.cells && d.grid === 50) { Object.entries(d.cells).forEach(([k, c]) => mergeCell(k, c)); msg = 'Carnet importé'; }
+  else if (d && d.cells && d.grid === 50) { Object.entries(d.cells).forEach(([k, c]) => mergeCell(k, c)); mergePaths(d.paths); msg = 'Carnet importé';
+    if (d.photos && typeof d.photos === 'object') Promise.all(Object.entries(d.photos).filter(([id, u]) => /^[\w-]+$/.test(id) && typeof u === 'string' && u.startsWith('data:image/')).map(([id, u]) => pPut(id, u).catch(() => {}))).then(() => renderPanel()); }
   else return toast('Fichier non reconnu');
   save(); fitData(); draw(); renderPanel(); toast('📂 ' + msg);
 }
@@ -131,11 +170,54 @@ function importData(d) {
 /* ===== Carte (canvas) : tuiles satellite + cases ===== */
 const cv = $('#cv'), g = cv.getContext('2d'), tiles = new Map(); let raf = 0;
 let gridOn = (() => { try { return localStorage.getItem('cartocepe-grid') !== '0'; } catch (e) { return true; } })();
-const tileImg = (z, x, y) => {
+const TURL = (z, x, y) => `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${z}/${y}/${x}`;
+const tdbP = new Promise(res => { try { const r = indexedDB.open('cartocepe-tiles', 1); r.onupgradeneeded = () => r.result.createObjectStore('t'); r.onsuccess = () => res(r.result); r.onerror = () => res(null); } catch (e) { res(null); } });
+const tget = async k => { const db = await tdbP; if (!db) return null; return new Promise(res => { try { const r = db.transaction('t').objectStore('t').get(k); r.onsuccess = () => res(r.result || null); r.onerror = () => res(null); } catch (e) { res(null); } }); };
+let tputN = 0;
+/* p = tuile « épinglée » (téléchargée pour le hors connexion) : jamais purgée. Une tuile ordinaire n'écrase pas une tuile existante (add), donc ne retire jamais l'épingle. */
+const tput = async (k, b, p) => { const db = await tdbP; if (!db) return false; return new Promise(res => { try {
+  const tr = db.transaction('t', 'readwrite'), st = tr.objectStore('t'), rec = p ? { b, t: Date.now(), p: 1 } : { b, t: Date.now() };
+  const rq = p ? st.put(rec, k) : st.add(rec, k); rq.onerror = e => e.preventDefault();
+  tr.oncomplete = () => { if (!p && ++tputN % 100 === 0) tprune(db); res(true); }; tr.onerror = tr.onabort = () => res(false); } catch (e) { res(false); } }); };
+function tprune(db) { try { const s = db.transaction('t', 'readwrite').objectStore('t'), all = [];      // garde au plus ~2000 tuiles ordinaires (les plus récentes) ; les tuiles épinglées ne comptent pas
+  s.openCursor().onsuccess = e => { const c = e.target.result; if (c) { if (!c.value.p) all.push([c.key, c.value.t]); c.continue(); } else if (all.length > 2000) all.sort((a, b) => a[1] - b[1]).slice(0, all.length - 1800).forEach(([k]) => s.delete(k)); }; } catch (e) {} }
+const tileImg = (z, x, y) => {      // cache d'abord ; sinon UNE seule requête (fetch → blob → cache + affichage) ; repli direct si CORS/erreur
   const k = z + '/' + x + '/' + y; let t = tiles.get(k);
-  if (!t) { t = new Image(); t.onload = () => schedule(); t.src = `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${z}/${y}/${x}`; tiles.set(k, t); if (tiles.size > 400) tiles.delete(tiles.keys().next().value); }
+  if (!t) { t = new Image(); tiles.set(k, t); if (tiles.size > 400) tiles.delete(tiles.keys().next().value);
+    const direct = () => { t.onload = () => schedule(); t.onerror = () => { t.bad = true; schedule(); setTimeout(() => { if (tiles.get(k) === t) tiles.delete(k); }, 15000); }; t.src = TURL(z, x, y); };
+    const show = b => { const u = URL.createObjectURL(b); t.onload = () => { URL.revokeObjectURL(u); schedule(); }; t.onerror = () => { URL.revokeObjectURL(u); direct(); }; t.src = u; };
+    tget(k).then(c => c && c.b ? show(c.b) : fetch(TURL(z, x, y), { mode: 'cors' }).then(r => r.ok ? r.blob() : Promise.reject(r.status)).then(b => { tput(k, b); show(b); })).catch(direct); }
   return t;
 };
+function drawTile(Z, tx, ty, dx, dy, ds) {
+  const im = tileImg(Z, tx, ty);
+  if (im.complete && im.naturalWidth) return g.drawImage(im, dx, dy, ds + .6, ds + .6);
+  if (!im.bad) return;      // tuile introuvable (hors connexion, zoom non enregistré…) : on étire celle d'un niveau inférieur
+  for (let u = 1; u <= 5 && Z - u >= 0; u++) { const p = tileImg(Z - u, tx >> u, ty >> u);
+    if (p.complete && p.naturalWidth) { const sz = 256 / 2 ** u; return g.drawImage(p, (tx - ((tx >> u) << u)) * sz, (ty - ((ty >> u) << u)) * sz, sz, sz, dx, dy, ds + .6, ds + .6); } }
+}
+const FURL = (z, x, y) => `https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=IGNF_MASQUE-FORET.2021-2023&STYLE=normal&FORMAT=image/png&TILEMATRIXSET=PM&TILEMATRIX=${z}&TILEROW=${y}&TILECOL=${x}`;
+const ftiles = new Map(); let forOn = (() => { try { return localStorage.getItem('cartocepe-forest') !== '0'; } catch (e) { return true; } })();
+const ftile = (z, x, y) => { const k = z + '/' + x + '/' + y; let t = ftiles.get(k);
+  if (!t) { t = { c: null, px: null }; ftiles.set(k, t); if (ftiles.size > 120) ftiles.delete(ftiles.keys().next().value);
+    t.p = new Promise(res => {
+      const done = (im, cors) => { try { const c = document.createElement('canvas'); c.width = c.height = 256; const q = c.getContext('2d'); q.drawImage(im, 0, 0, 256, 256);
+        if (cors) { try { const d = q.getImageData(0, 0, 256, 256).data, al = new Uint8Array(65536); for (let i = 0; i < 65536; i++) al[i] = d[i * 4 + 3]; t.px = al; } catch (e) {} }      // on ne garde que la transparence (64 Ko au lieu de 256 Ko)
+        q.globalCompositeOperation = 'source-in'; q.fillStyle = '#2fd14a'; q.fillRect(0, 0, 256, 256); t.c = c; schedule(); } catch (e) {} res(t); };
+      const a = new Image(); a.crossOrigin = 'anonymous'; a.onload = () => done(a, true);
+      a.onerror = () => { const b = new Image(); b.onload = () => done(b, false); b.onerror = () => { res(t); setTimeout(() => { if (ftiles.get(k) === t && !t.c) ftiles.delete(k); }, 30000); }; b.src = FURL(z, x, y); };   // repli sans CORS : affichage seul
+      a.src = FURL(z, x, y); }); }
+  return t; };
+/* Part de forêt d'une case (0 à 1) : 9 points échantillonnés dans le masque forêt (tuile zoom 17). 0 si indisponible. */
+async function forestFrac(k) {
+  try { const [x, y] = ctr(k), z = 17, span = 256 * 156543.03392 / 2 ** z, h = CS / 3, pts = [];
+    for (const dx of [-h, 0, h]) for (const dy of [-h, 0, h]) { const u = (x + dx + O) / span, v = (O - (y + dy)) / span, tx = Math.floor(u), ty = Math.floor(v); pts.push([tx, ty, Math.min(255, Math.floor((u - tx) * 256)), Math.min(255, Math.floor((v - ty) * 256))]); }
+    const keys = [...new Set(pts.map(p => p[0] + ',' + p[1]))];
+    const ts = await Promise.race([Promise.all(keys.map(q => { const [a, b] = q.split(',').map(Number); return ftile(z, a, b).p.then(t => [q, t]); })), new Promise(r => setTimeout(() => r(null), 4000))]);
+    if (!ts) return 0; const M = new Map(ts); let m = 0;
+    for (const p of pts) { const t = M.get(p[0] + ',' + p[1]); if (!t || !t.px) return 0; if (t.px[p[3] * 256 + p[2]] > 100) m++; }
+    return m / pts.length; } catch (e) { return 0; }
+}
 const schedule = () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; draw(); }); };
 function draw() {
   const dpr = devicePixelRatio || 1, W = cv.clientWidth, H = cv.clientHeight; if (!W) return;
@@ -146,12 +228,21 @@ function draw() {
   const Z = Math.max(3, Math.min(19, Math.ceil(Math.log2(156543.03392 / mpp)))), span = 256 * 156543.03392 / 2 ** Z, ts = span / mpp, lim = 2 ** Z - 1;
   for (let ty = Math.max(0, Math.floor((O - y1) / span)); ty <= Math.min(lim, Math.floor((O - y0) / span)); ty++)
     for (let tx = Math.max(0, Math.floor((x0 + O) / span)); tx <= Math.min(lim, Math.floor((x1 + O) / span)); tx++) {
-      const im = tileImg(Z, tx, ty); if (im.complete && im.naturalWidth) g.drawImage(im, sx(tx * span - O), sy(O - ty * span), ts + .6, ts + .6);
+      drawTile(Z, tx, ty, sx(tx * span - O), sy(O - ty * span), ts);
     }
+  if (forOn && Z >= 11) { const fz = Math.min(Z, 17), sh = Z - fz, n = 2 ** sh; g.globalAlpha = .3;
+    for (let ty = Math.max(0, Math.floor((O - y1) / span)); ty <= Math.min(lim, Math.floor((O - y0) / span)); ty++)
+      for (let tx = Math.max(0, Math.floor((x0 + O) / span)); tx <= Math.min(lim, Math.floor((x1 + O) / span)); tx++) {
+        const fx = tx >> sh, fy = ty >> sh, t = ftile(fz, fx, fy);
+        if (t.c) g.drawImage(t.c, (tx - (fx << sh)) * 256 / n, (ty - (fy << sh)) * 256 / n, 256 / n, 256 / n, sx(tx * span - O), sy(O - ty * span), ts + .6, ts + .6); }
+    g.globalAlpha = 1; }
+  drawRoads(sx, sy, W, H, x0, x1, y0, y1, mpp, Z, dpr);
+  if (hmOn) { if (hm && hm.img) { g.save(); g.imageSmoothingEnabled = true; g.globalAlpha = .42; g.drawImage(hm.img, sx(hm.bb[0]), sy(hm.bb[3]), (hm.bb[2] - hm.bb[0]) / mpp, (hm.bb[3] - hm.bb[1]) / mpp); g.restore(); }
+    if (!hmBusy && !hmPend && (!hm || x0 < hm.bb[0] || x1 > hm.bb[2] || y0 < hm.bb[1] || y1 > hm.bb[3] || Math.abs(Math.log2(mpp / hm.mpp)) > 1)) { hmPend = true; setTimeout(() => { hmPend = false; if (hmOn) hmLoad(); }, Math.max(500, 3000 - (Date.now() - hmT))); } }
   if (commOn) drawComm(0, sx, sy, W, x0, x1, y0, y1, mpp);
   const px = CS / mpp, i0 =Math.floor(x0 / CS), i1 = Math.floor(x1 / CS), j0 = Math.floor(y0 / CS), j1 = Math.floor(y1 / CS);
   if (gridOn && px >= 12 && (i1 - i0) * (j1 - j0) < 4000) {
-    g.strokeStyle = 'rgba(255,255,255,.28)'; g.lineWidth = 1; g.beginPath();
+    g.strokeStyle = 'rgba(255,255,255,.42)'; g.lineWidth = 1; g.beginPath();
     for (let i = i0; i <= i1 + 1; i++) { const x = Math.round(sx(i * CS)) + .5; g.moveTo(x, 0); g.lineTo(x, H); }
     for (let j = j0; j <= j1 + 1; j++) { const y = Math.round(sy(j * CS)) + .5; g.moveTo(0, y); g.lineTo(W, y); }
     g.stroke();
@@ -170,9 +261,10 @@ function draw() {
       if (n) { g.strokeText(n, x + px / 2, y + px * .72); g.fillText(n, x + px / 2, y + px * .72); }
       if (c.name && px >= 60) { g.font = '700 11px monospace'; const t = c.name.length > 14 ? c.name.slice(0, 13) + '…' : c.name; g.strokeText(t, x + px / 2, y + px - 9); g.fillText(t, x + px / 2, y + px - 9); } }
   });
+  drawPaths(sx, sy);
   if (commOn) drawComm(1, sx, sy, W, x0, x1, y0, y1, mpp);
   const box = (k, col, w) => { const [i, j] = k.split(',').map(Number); g.strokeStyle = col; g.lineWidth = w; g.strokeRect(sx(i * CS) + w / 2, sy((j + 1) * CS) + w / 2, px - w, px - w); };
-  if (hereK) box(hereK, '#4aa3ff', 3); if (sel) box(sel, '#d4a94a', 3);
+  if (hereK) { box(hereK, '#0b2a4a', 5); box(hereK, '#4aa3ff', 3); } if (sel) { box(sel, '#3b2412', 5); box(sel, '#d4a94a', 3); }
   if (me) { const x = sx(me.x), y = sy(me.y), r = Math.max(8, me.acc / mpp); g.fillStyle = 'rgba(74,163,255,.2)'; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill();
     g.fillStyle = '#4aa3ff'; g.strokeStyle = '#fff'; g.lineWidth = 2; g.beginPath(); g.arc(x, y, 6, 0, 7); g.fill(); g.stroke(); }
   $('#sc').textContent = '1 case ≈ 50 m'; if (commOn) scanSoon();
@@ -183,7 +275,14 @@ function fitData() {
   V.cx = (Math.min(...xs) + Math.max(...xs)) / 2; V.cy = (Math.min(...ys) + Math.max(...ys)) / 2;
   V.mpp = Math.max(1.2, Math.max((Math.max(...xs) - Math.min(...xs) + 4 * CS) / W, (Math.max(...ys) - Math.min(...ys) + 4 * CS) / H));
 }
-function zoomAt(k, px, py) {
+let fly = 0;
+function flyTo(k, z = 1.2) {      // centre en douceur la carte sur une case et zoome si besoin
+  const [tx, ty] = ctr(k), x0 = V.cx, y0 = V.cy, m0 = V.mpp, m1 = Math.min(m0, z), t0 = performance.now(), id = ++fly;
+  const step = now => { if (id !== fly) return; const p = Math.min(1, (now - t0) / 350), e = 1 - (1 - p) ** 3;
+    V.cx = x0 + (tx - x0) * e; V.cy = y0 + (ty - y0) * e; V.mpp = Math.exp(Math.log(m0) + (Math.log(m1) - Math.log(m0)) * e); draw(); if (p < 1) requestAnimationFrame(step); };
+  requestAnimationFrame(step);
+}
+function zoomAt(k, px, py) { fly++;
   const r = cv.getBoundingClientRect(), dx = (px ?? r.left + r.width / 2) - r.left - r.width / 2, dy = (py ?? r.top + r.height / 2) - r.top - r.height / 2;
   const ox = V.cx + dx * V.mpp, oy = V.cy - dy * V.mpp; V.mpp = Math.min(3000, Math.max(.3, V.mpp / k)); V.cx = ox - dx * V.mpp; V.cy = oy + dy * V.mpp; schedule();
 }
@@ -193,108 +292,207 @@ $('#gr').onclick = () => { gridOn = !gridOn; try { localStorage.setItem('cartoce
 grLabel();
 $('#zi').onclick = () => zoomAt(1.6); $('#zo').onclick = () => zoomAt(1 / 1.6);
 { const ptr = new Map(); let tap = null, pinch = 0; const dist = () => { const [a, b] = [...ptr.values()]; return Math.hypot(a.x - b.x, a.y - b.y); };
-  cv.addEventListener('pointerdown', e => { ptr.set(e.pointerId, { x: e.clientX, y: e.clientY }); if (ptr.size === 1) tap = { x: e.clientX, y: e.clientY, mv: false }; else { if (tap) tap.mv = true; pinch = dist(); } });
+  cv.addEventListener('pointerdown', e => { fly++; ptr.set(e.pointerId, { x: e.clientX, y: e.clientY }); if (ptr.size === 1) tap = { x: e.clientX, y: e.clientY, mv: false }; else { if (tap) tap.mv = true; pinch = dist(); } });
   addEventListener('pointermove', e => { const p = ptr.get(e.pointerId); if (!p) return; const dx = e.clientX - p.x, dy = e.clientY - p.y; p.x = e.clientX; p.y = e.clientY;
     if (ptr.size === 1 && tap) { if (!tap.mv && Math.hypot(e.clientX - tap.x, e.clientY - tap.y) > 8) tap.mv = true; if (tap.mv) { V.cx -= dx * V.mpp; V.cy += dy * V.mpp; schedule(); } }
     else if (ptr.size === 2 && pinch) { const [a, b] = [...ptr.values()], d = dist(); zoomAt(d / pinch, (a.x + b.x) / 2, (a.y + b.y) / 2); pinch = d; } });
   const end = e => { if (!ptr.has(e.pointerId)) return; const solo = ptr.size === 1; ptr.delete(e.pointerId);
-    if (solo && e.type === 'pointerup' && tap && !tap.mv) { const r = cv.getBoundingClientRect(); select(idAt(V.cx + (e.clientX - r.left - r.width / 2) * V.mpp, V.cy - (e.clientY - r.top - r.height / 2) * V.mpp)); }
+    if (solo && e.type === 'pointerup' && tap && !tap.mv) { const r = cv.getBoundingClientRect(), k = idAt(V.cx + (e.clientX - r.left - r.width / 2) * V.mpp, V.cy - (e.clientY - r.top - r.height / 2) * V.mpp); if (P.on) pathTap(e.clientX - r.left, e.clientY - r.top); else if (k === sel) { sel = null; collapse(); renderPanel(); draw(); } else { pick(k); if (rec(D.cells[k])) flyTo(k); } }
     if (!ptr.size) tap = null; pinch = 0; };
   addEventListener('pointerup', end); addEventListener('pointercancel', end);
   cv.addEventListener('wheel', e => { e.preventDefault(); zoomAt(e.deltaY < 0 ? 1.2 : 1 / 1.2, e.clientX, e.clientY); }, { passive: false });
   addEventListener('resize', schedule);
   if (window.ResizeObserver) new ResizeObserver(() => draw()).observe($('#mapBox')); }
 
+/* ===== Photos : réduites (1280 px max) et stockées dans IndexedDB ; la case ne garde que leur identifiant ===== */
+const idb = new Promise(res => { try { const r = indexedDB.open('cartocepe-photos', 1); r.onupgradeneeded = () => r.result.createObjectStore('p'); r.onsuccess = () => res(r.result); r.onerror = () => res(null); } catch (e) { res(null); } });
+const pdb = async (mode, fn) => { const db = await idb; if (!db) throw new Error('idb'); return new Promise((res, rej) => { const t = db.transaction('p', mode), r = fn(t.objectStore('p')); t.oncomplete = () => res(r.result); t.onerror = t.onabort = () => rej(t.error); }); };
+const pPut = (id, u) => pdb('readwrite', s => s.put(u, id)), pGet = id => pdb('readonly', s => s.get(id)), pDel = id => pdb('readwrite', s => s.delete(id));
+function shrink(f) { return new Promise((res, rej) => { const u = URL.createObjectURL(f), im = new Image(); im.onload = () => { const s = Math.min(1, 1280 / Math.max(im.width, im.height)), c = document.createElement('canvas'); c.width = Math.round(im.width * s); c.height = Math.round(im.height * s); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); URL.revokeObjectURL(u); res(c.toDataURL('image/jpeg', .72)); }; im.onerror = () => { URL.revokeObjectURL(u); rej(new Error('img')); }; im.src = u; }); }
+async function loadGal(k) {
+  const el = $('#gal'); if (!el) return; const c = D.cells[k];
+  if (!c || !c.ph.length) { el.innerHTML = '<div class="hint" style="grid-column:1/-1">Aucune photo.</div>'; return; }
+  el.innerHTML = '';
+  for (const p of c.ph) { let u = null; try { u = await pGet(p.id); } catch (e) {} if (sel !== k || !$('#gal')) return;
+    if (u) { const im = document.createElement('img'); im.src = u; im.alt = 'Photo'; im.dataset.id = p.id; el.appendChild(im); } else { const d = document.createElement('div'); d.className = 'ph0'; d.textContent = '🖼️?'; el.appendChild(d); } }
+}
+let pvId = null;
+const closePh = () => { $('#pv').classList.remove('open'); $('#pvi').removeAttribute('src'); pvId = null; };
+$('#pvx').onclick = closePh;
+$('#pvd').onclick = () => { const k = sel, id = pvId, c = k && D.cells[k], i = c ? c.ph.findIndex(p => p.id === id) : -1; if (i < 0) return closePh();
+  const snap = JSON.stringify(D); c.ph.splice(i, 1); save(); closePh(); draw(); renderPanel();
+  setTimeout(() => { if (!D.cells[k]?.ph.some(p => p.id === id)) pDel(id).catch(() => {}); }, 8000);
+  toast('Photo supprimée', () => { restoreSnap(snap); save(); draw(); renderPanel(); }); };
+$('#panel').addEventListener('change', async e => {
+  if (e.target.id !== 'phf') return; const files = [...e.target.files]; e.target.value = ''; if (!files.length || !sel) return; const k = sel; let n = 0;
+  for (const f of files) { try { const url = await shrink(f), id = Date.now().toString(36) + Math.random().toString(36).slice(2, 7); await pPut(id, url); (D.cells[k] ||= blank()).ph.push({ id, d: today() }); n++; } catch (x) { toast('Photo impossible à enregistrer'); } }
+  if (n) { save(); draw(); if (sel === k) { ptab = 'ph'; renderPanel(); } toast('📷 ' + n + ' photo' + (n > 1 ? 's ajoutées' : ' ajoutée')); }
+});
+
 /* ===== Fiche d'une case ===== */
 function select(k) { sel = k; document.body.classList.remove('pmin'); $('#grab').textContent = '▾'; renderPanel(); draw(); }
 const collapse = () => { document.body.classList.add('pmin'); $('#grab').textContent = '▴'; };
-$('#grab').onclick = () => { const m = document.body.classList.toggle('pmin'); $('#grab').textContent = m ? '▴' : '▾'; };
+function pick(k) { if (rec(D.cells[k])) select(k); else { sel = k; collapse(); draw(); } }      // une case vide se sélectionne sans ouvrir le carnet
+$('#grab').onclick = () => { const m = document.body.classList.toggle('pmin'); $('#grab').textContent = m ? '▴' : '▾'; if (!m) renderPanel(); };
 let ptab = 'wx';
 function setTab() { document.querySelectorAll('#panel [data-tab]').forEach(b => b.classList.toggle('on', b.dataset.tab === ptab)); document.querySelectorAll('#panel [data-pane]').forEach(x => x.classList.toggle('on', x.dataset.pane === ptab)); }
+let editI = null;
 function renderPanel() {
+  editI = null;
   const p = $('#panel');
-  if (!sel) { p.innerHTML = '<div class="hint">🧭 Touchez une case (≈ 50 m) pour l\'explorer, ou 🍄 « Trouvé ici ! » une fois sur place. Donnez un nom aux secteurs qui comptent : les cases n\'ont plus de numéro visible.' + (Object.keys(D.cells).length ? '' : '<br><br>Vous avez un ancien carnet ? ☰ Menu → Importer.') + '</div>'; return; }
+  if (!sel) { p.innerHTML = ''; return; }
   const c = D.cells[sel] || blank(), [la, lo] = toLL(...ctr(sel)), tot = c.v.reduce((a, v) => a + v.w, 0);
-  const hist = c.v.map((v, i) => [v, i]).sort((a, b) => b[0].d.localeCompare(a[0].d)).map(([v, i]) => `<li><span>📅 ${fmtD(v.d)} — 🍄 ${v.n} · ${v.e ? '≈' : ''}${Math.round(v.w)} g${v.t ? '<br><small>' + esc(v.t) + '</small>' : ''}</span><button data-act="del" data-i="${i}" aria-label="Supprimer">✖</button></li>`).join('');
+  const hist = c.v.map((v, i) => [v, i]).sort((a, b) => b[0].d.localeCompare(a[0].d)).map(([v, i]) => `<li><span>📅 ${fmtD(v.d)} — 🍄 ${v.n} · ${v.e ? '≈' : ''}${Math.round(v.w)} g${v.t ? '<br><small>' + esc(v.t) + '</small>' : ''}</span><button data-act="edit" data-i="${i}" aria-label="Modifier">✏️</button><button data-act="del" data-i="${i}" aria-label="Supprimer">✖</button></li>`).join('');
   p.innerHTML = `<div style="display:flex;gap:6px;align-items:center"><input class="pname" data-f="name" placeholder="✏️ Nommer ce secteur…" value="${esc(c.name)}" style="flex:1;min-width:0">${rec(c) ? '<button class="ib" data-act="delcell" aria-label="Supprimer cette case" style="width:36px;height:36px;font-size:15px;flex:none;margin-bottom:4px">🗑️</button>' : ''}</div>
-    <div class="chips"><span>🍄 ${cnt(c)}</span><span>⚖️ ${fmtW(tot)}</span><span>📅 ${c.v.length} visite${c.v.length > 1 ? 's' : ''}</span></div>
+    <div class="chips"><span>🍄 ${cnt(c)}</span><span>⚖️ ${fmtW(tot)}</span><span>👣 ${c.v.length} visite${c.v.length > 1 ? 's' : ''}</span></div>
+    <div id="fty" class="wxb">🌲 Type de forêt…</div>
     <div id="wxb" class="wxb">🌦️ Météo…</div>
-    <div class="acts"><button class="btn gold" data-act="quick">⚡ +1 cèpe <small>≈ ${D.avg} g</small></button><button class="btn" data-act="addtoggle">➕ Visite…</button></div>
+    <div class="acts"><button class="btn gold" data-act="quick" title="≈ ${D.avg} g">⚡ +1 cèpe</button><button class="btn" data-act="addtoggle">➕ Visite</button><a class="btn" target="_blank" rel="noopener" aria-label="Itinéraire à pied" href="https://www.google.com/maps/dir/?api=1&destination=${la.toFixed(6)},${lo.toFixed(6)}&travelmode=walking">🚶 À pied</a></div>
+    
     <div id="addv" class="row"><input type="date" id="vd" max="${today()}" value="${today()}"><input type="number" id="vn" min="0" placeholder="Cèpes" inputmode="numeric"><input type="number" id="vw" min="0" placeholder="Poids g" inputmode="numeric">
       <input class="full" id="vt" placeholder="Note de visite (facultatif)"><button class="btn gold full" data-act="add">✔ Enregistrer la visite</button></div>
-    <div class="ptab"><button data-tab="wx">🌦️ Météo</button><button data-tab="hs">📜 Visites</button><button data-tab="nt">📝 Notes${c.note ? ' •' : ''}</button></div>
+    <div class="ptab"><button data-tab="wx">🌦️ Météo</button><button data-tab="hs">📜 Visites</button><button data-tab="ph">📷 Photos${c.ph.length ? ' •' : ''}</button><button data-tab="nt">📝 Notes${c.note ? ' •' : ''}</button></div>
     <div class="tp" data-pane="wx"><div id="wx"><div class="hint">Chargement…</div></div></div>
+    <div class="tp" data-pane="ph"><label class="btn gold" style="text-align:center"><input type="file" accept="image/*" id="phf" multiple hidden>📷 Ajouter une photo</label><div class="gal" id="gal"></div></div>
     <div class="tp" data-pane="hs"><ul>${hist || '<li class="hint">Aucune visite.</li>'}</ul></div>
     <div class="tp" data-pane="nt"><textarea data-f="note" placeholder="Notes : pentes, essences, indices…">${esc(c.note)}</textarea>
-      <div class="hint" style="padding:2px 0">📍 ${la.toFixed(5)}, ${lo.toFixed(5)} · <a href="https://www.google.com/maps/dir/?api=1&destination=${la.toFixed(6)},${lo.toFixed(6)}" target="_blank" rel="noopener">🧭 Itinéraire</a></div></div>`;
-  setTab(); showWx(sel);
+      <div class="hint" style="padding:2px 0">📍 ${la.toFixed(5)}, ${lo.toFixed(5)}</div></div>`;
+  setTab(); showWx(sel); showFt(sel); loadGal(sel);
+}
+/* ===== Carte météo lissée : une seule requête Open-Meteo sur une grille grossière 6×6 de la zone affichée,
+   indice des 8 jours de chaque point (plein champ, sans repousse), interpolé en image basse définition puis étiré ===== */
+let hmOn = false, hm = null, hmBusy = false, hmPend = false, hmT = 0, hmFar = false, hmDay = 0;
+const dayLbl = (d, i) => i === 0 ? "Aujourd'hui" : new Date(d + 'T00:00').toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric' });
+function syncSlider() { const r = $('#hmd'); if (!r) return; const n = hm ? hm.nd : 1; r.max = n - 1; r.value = hmDay; r.disabled = !hm || n < 2; $('#hmdl').textContent = hm ? dayLbl(hm.dates[hmDay], hmDay) : '…'; }
+function hmPaint() {      // image basse définition du jour choisi (aucune requête réseau)
+  if (!hm) return; const N = 6, S = 48, v = hm.sc.map(a => a[hmDay]), img = document.createElement('canvas'); img.width = img.height = S; const q = img.getContext('2d');
+  for (let py = 0; py < S; py++) for (let px = 0; px < S; px++) {
+    const gx = px / (S - 1) * (N - 1), gy = (1 - py / (S - 1)) * (N - 1), x0 = Math.min(N - 2, Math.floor(gx)), y0 = Math.min(N - 2, Math.floor(gy)), fx = gx - x0, fy = gy - y0, A = (r, c) => v[r * N + c];
+    const val = A(y0, x0) * (1 - fx) * (1 - fy) + A(y0, x0 + 1) * fx * (1 - fy) + A(y0 + 1, x0) * (1 - fx) * fy + A(y0 + 1, x0 + 1) * fx * fy;
+    q.fillStyle = `hsl(${Math.round(Math.max(0, Math.min(100, val)) * 1.2)},75%,50%)`; q.fillRect(px, py, 1, 1); }
+  hm.img = img; syncSlider(); schedule();
+}
+async function hmLoad() {
+  if (hmBusy) return; const W = cv.clientWidth, H = cv.clientHeight, mpp = V.mpp;
+  if (Math.max(W, H) * mpp > 120000) { hm = null; hmT = Date.now(); schedule(); syncSlider(); if (!hmFar) { hmFar = true; toast('Zoomez davantage pour la carte météo'); } return; }
+  hmFar = false; hmBusy = true; hmT = Date.now(); const N = 6, mx = W / 2 * mpp * 1.3, my = H / 2 * mpp * 1.3, bb = [V.cx - mx, V.cy - my, V.cx + mx, V.cy + my], la = [], lo = [];
+  for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) { const [a, b] = toLL(bb[0] + (bb[2] - bb[0]) * c / (N - 1), bb[1] + (bb[3] - bb[1]) * r / (N - 1)); la.push(a.toFixed(3)); lo.push(b.toFixed(3)); }
+  try {
+    const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${la.join(',')}&longitude=${lo.join(',')}&daily=precipitation_sum,temperature_2m_min,temperature_2m_max,et0_fao_evapotranspiration&past_days=24&forecast_days=8&timezone=auto`);
+    if (!res.ok) throw new Error('wx'); const j = await res.json(), arr = Array.isArray(j) ? j : [j]; if (arr.length !== N * N) throw new Error('n');
+    const sc = arr.map(o => { const d = o.daily; d.elev = o.elevation; return wxScores(d, '', 0).map(x => x.score); });      // sc[point][jour] : tous les jours en une seule requête
+    const t0 = arr[0].daily, nd = Math.min(...sc.map(a => a.length)), dates = t0.time.slice(wxOff(t0), wxOff(t0) + nd);
+    hm = { bb, img: null, mpp, sc, dates, nd }; hmDay = Math.min(hmDay, nd - 1); hmPaint();
+    const v = sc.map(a => a[hmDay]); toast(`🌡️ Indice ${dayLbl(dates[hmDay], hmDay).toLowerCase()} sur la zone : de ${Math.min(...v)} à ${Math.max(...v)}`);
+  } catch (e) { toast('Carte météo indisponible (connexion ?)'); hmOn = false; $('#hmb').classList.remove('on'); $('#hml').hidden = true; }
+  hmBusy = false; schedule();
+}
+$('#hmb').onclick = () => { hmOn = !hmOn; hmFar = false; $('#hmb').classList.toggle('on', hmOn); $('#hml').hidden = !hmOn; if (hmOn) { syncSlider(); hmLoad(); } else { hm = null; schedule(); } };
+$('#hmd').oninput = e => { hmDay = +e.target.value; hmPaint(); };
+/* ===== Type de forêt (BD Forêt v2 de l'IGN, service WFS gratuit) : polygone au centre de la case ===== */
+const ftCache = new Map();
+async function forestType(k) {
+  if (ftCache.has(k)) return ftCache.get(k);
+  const [x, y] = ctr(k), r = 4, bb = [x - r, y - r, x + r, y + r].map(v => v.toFixed(1)).join(',');
+  const res = await fetch(`https://data.geopf.fr/wfs/ows?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=${encodeURIComponent('LANDCOVER.FORESTINVENTORY.V2:formation_vegetale')}&OUTPUTFORMAT=${encodeURIComponent('application/json')}&COUNT=1&BBOX=${bb},EPSG:3857`);
+  if (!res.ok) throw new Error('wfs'); const j = await res.json(), pr = (j.features && j.features[0] && j.features[0].properties) || null;
+  ftCache.set(k, pr); return pr;
+}
+async function showFt(k) {
+  const put = h => { if (sel === k && $('#fty')) $('#fty').innerHTML = h; };
+  try {
+    const pr = await forestType(k); if (!pr) return put('🌲 Pas de forêt répertoriée ici (BD Forêt IGN)');
+    const g = n => { const key = Object.keys(pr).find(x => x.toLowerCase() === n); return key && pr[key] != null ? String(pr[key]) : ''; };
+    const tfv = g('tfv') || g('tfv_g11') || g('code_tfv') || 'Forêt', ess = g('essence'), low = (tfv + ' ' + ess).toLowerCase();
+    const ic = /conif|pin|épicéa|sapin|mélèze/.test(low) ? (/feuill|chêne|hêtre|châtaign/.test(low) ? '🌲🌳' : '🌲') : '🌳';
+    const bad = /peuplerai|robinier|sans couvert|lande|ligneu|verger|vigne/.test(low), good = /chêne|hêtre|châtaign|épicéa|pin|sapin|mélèze|feuillus|conifères|mixte/.test(low);
+    put(`${ic} <b>${esc(tfv)}</b>${ess && !low.startsWith(ess.toLowerCase()) && !tfv.toLowerCase().includes(ess.toLowerCase()) ? ' · ' + esc(ess) : ''}<br><small>${bad ? '⚠️ Peuplement peu propice aux cèpes' : good ? '🍄 Essence généralement associée au cèpe' : 'Essence à vérifier sur le terrain'} · source IGN, indicatif</small>`);
+  } catch (e) { put('🌲 Type de forêt indisponible (connexion ?)'); }
 }
 /* ===== Météo : indice « bon jour pour aller voir » (Open-Meteo, gratuit, sans clé) =====
-   Série = 14 jours passés + aujourd'hui + 7 jours de prévision (index 0..21).
+   Série = 24 jours passés + aujourd'hui + 7 jours de prévision (index 0..31).
    Pour un jour D : pluie cumulée de D-12 à D-4 (déclencheur de la pousse, ~30 mm = idéal),
    Tmin moyenne des 7 derniers jours (idéal 8-15 °C), Tmax trop chaude pénalisée, gel pénalisé, saison. */
 const wxCache = new Map();
 async function wxFor(la, lo) {
   const k = la.toFixed(2) + ',' + lo.toFixed(2), c = wxCache.get(k); if (c && Date.now() - c.t < 36e5) return c.d;
-  const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${la.toFixed(3)}&longitude=${lo.toFixed(3)}&daily=precipitation_sum,temperature_2m_min,temperature_2m_max&past_days=14&forecast_days=8&timezone=auto`);
-  if (!r.ok) throw new Error('wx'); const d = (await r.json()).daily; wxCache.set(k, { t: Date.now(), d }); return d;
+  const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${la.toFixed(3)}&longitude=${lo.toFixed(3)}&daily=precipitation_sum,temperature_2m_min,temperature_2m_max,et0_fao_evapotranspiration&past_days=24&forecast_days=8&timezone=auto`);
+  if (!r.ok) throw new Error('wx'); const j = await r.json(), d = j.daily; d.elev = j.elevation; wxCache.set(k, { t: Date.now(), d }); return d;
 }
 /* Repousse : après une récolte, la case a besoin d'environ 8 jours pour se regarnir.
    Facteur 0,1 le jour même → 1 au bout de 8 jours (linéaire). `last` = date de la dernière visite avec cèpes. */
+const wxOff = d => d.precipitation_sum.length - 8;   // index d'aujourd'hui (8 jours de prévision à la fin)
 const regrow = (date, last) => { if (!last) return 1; const n = Math.round((new Date(date + 'T00:00') - new Date(last + 'T00:00')) / 864e5); return n >= 8 ? 1 : Math.max(.1, .1 + .9 * n / 8); };
-function wxScores(d, last) {
+function wxScores(d, last, ff = 0) {   // ff = part de forêt de la case (0-1) : sous le couvert, moins d'évaporation, réserve d'eau plus durable, chaleur atténuée
+  const kE = .15 * (1 - .5 * ff), kO = .5 + .3 * ff;
   const P = d.precipitation_sum.map(v => v ?? 0), Tn = d.temperature_2m_min.map(v => v ?? 8), Tx = d.temperature_2m_max.map(v => v ?? 18);
   const sum = (a, i, j) => { let s = 0; for (let x = i; x <= j; x++) s += a[x]; return s; }, mean = (a, i, j) => sum(a, i, j) / (j - i + 1);
+  const E = d.et0_fao_evapotranspiration ? d.et0_fao_evapotranspiration.map(v => v ?? 0) : P.map(() => 0), elev = d.elev || 0;
   const season = [.05, .05, .05, .05, .4, .7, 1, 1, 1, 1, 1, .3];
+  if (elev >= 1000) { season[4] = .1; season[9] = .5; season[10] = .1; } else if (elev >= 600) { season[9] = .8; season[10] = .3; }   // en altitude la saison s'arrête plus tôt
   const out = [];
-  for (let i = 14; i < P.length; i++) {
-    const rain = Math.min(1, sum(P, i - 12, i - 4) / 30), tn = mean(Tn, i - 6, i), tx = mean(Tx, i - 6, i), fr = Math.min(...Tn.slice(i - 3, i + 1));
+  for (let i = wxOff(d); i < P.length; i++) {
+    const tn = mean(Tn, i - 6, i), lag = tn >= 12 ? 0 : tn >= 8 ? 1 : 2, a = i - 12 - lag, b = i - 4 - lag, wr = sum(P, a, b) + kO * sum(P, a - 8, a - 1);   // la pluie plus ancienne compte pour moitié (réserve d'eau du sol)
+    const rain = Math.min(1, Math.max(0, wr - kE * (sum(E, a, b) + kO * sum(E, a - 8, a - 1))) / 25) * (wr > 120 ? .85 : 1), tx = mean(Tx, i - 6, i) - 3 * ff, fr = Math.min(...Tn.slice(i - 3, i + 1));
     const tS = tn <= 3 ? 0 : tn < 8 ? (tn - 3) / 5 : tn <= 15 ? 1 : tn < 20 ? (20 - tn) / 5 : 0;
     const hot = tx <= 24 ? 1 : Math.max(0, 1 - (tx - 24) / 8), frost = fr < 0 ? .25 : fr < 2 ? .7 : 1;
     const m = new Date(d.time[i] + 'T00:00').getMonth();
     const rg = regrow(d.time[i], last), base = 100 * rain * tS * hot * frost * season[m];
-    out.push({ date: d.time[i], p: P[i], rg, base: Math.round(base), score: Math.round(base * rg) });
+    out.push({ date: d.time[i], p: P[i], rg, base: Math.round(base), score: Math.round(base * rg), f: { ff, wr, net: Math.max(0, wr - kE * (sum(E, a, b) + kO * sum(E, a - 8, a - 1))), rain, tn, tS, hot, frost, sea: season[m] } });
   }
   return out;
 }
 async function showWx(k) {
   const put = (h, b) => { if (sel !== k) return; if ($('#wx')) $('#wx').innerHTML = h; if ($('#wxb')) $('#wxb').innerHTML = b; };
   try {
-    const [la, lo] = toLL(...ctr(k)), d = await wxFor(la, lo), last = (D.cells[k]?.v || []).filter(v => v.n > 0).reduce((a, v) => v.d > a ? v.d : a, ''), s = wxScores(d, last);
+    const [la, lo] = toLL(...ctr(k)), d = await wxFor(la, lo), last = (D.cells[k]?.v || []).filter(v => v.n > 0).reduce((a, v) => v.d > a ? v.d : a, ''), ff = await forestFrac(k), s = wxScores(d, last, ff);
     const since = last ? Math.round((new Date(today() + 'T00:00') - new Date(last + 'T00:00')) / 864e5) : 99;
-    const past = d.precipitation_sum.slice(0, 14).reduce((a, v) => a + (v ?? 0), 0), tn7 = d.temperature_2m_min.slice(7, 14).reduce((a, v) => a + (v ?? 0), 0) / 7;
+    const past = d.precipitation_sum.slice(wxOff(d) - 14, wxOff(d)).reduce((a, v) => a + (v ?? 0), 0), tn7 = d.temperature_2m_min.slice(wxOff(d) - 7, wxOff(d)).reduce((a, v) => a + (v ?? 0), 0) / 7;
     const best = s.reduce((a, b) => b.score > a.score ? b : a), day = x => new Date(x + 'T00:00').toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric' });
     const lab = v => v >= 70 ? '🌟 Excellent' : v >= 50 ? '🟢 Bon' : v >= 30 ? '🟠 Moyen' : '🔴 Faible';
     const ago2 = since <= 0 ? "aujourd'hui" : since === 1 ? 'hier' : 'il y a ' + since + ' j';
     put(`<div class="wxg">${s.map((x, i) => `<div class="wxd${x === best && x.score >= 30 ? ' best' : ''}" style="background:hsl(${Math.round(x.score * 1.2)},70%,62%)"><small>${i ? new Date(x.date + 'T00:00').toLocaleDateString('fr-FR', { weekday: 'narrow' }) + ' ' + x.date.slice(8) : 'auj.'}</small><b>${x.score}</b><small>${x.p >= 1 ? '🌧' + Math.round(x.p) : '☀'}${x.rg < .8 ? '⏳' : ''}</small></div>`).join('')}</div>
-      <details class="wxi"><summary>ℹ️ Comment lire l'indice</summary><div class="wxn">Note de 0 à 100 par jour : pluie des 2 semaines avant le jour + nuits fraîches + gel + saison. ⏳ = la case est encore en repousse après une récolte (~8 j). Pluie 14 j passés : ${Math.round(past)} mm · nuits moy. 7 j : ${tn7.toFixed(1)} °C.</div></details>`,
+      <details class="wxi"><summary>ℹ️ Comment lire l'indice</summary><div class="wxn">Note de 0 à 100 par jour : pluie utile (pluie moins évaporation) tombée 4 à 14 jours avant (plus tôt si les nuits sont fraîches, la pousse est alors plus lente) + nuits fraîches + chaleur + gel + saison (raccourcie en altitude). ⏳ = la case est encore en repousse après une récolte (~8 j). Pluie 14 j passés : ${Math.round(past)} mm · nuits moy. 7 j : ${tn7.toFixed(1)} °C.<br><b>Détail du jour :</b> ${(f => f ? `pluie pondérée ${Math.round(f.wr)} mm, utile ${Math.round(f.net)} mm → ${Math.round(f.rain * 100)} % · nuits ${f.tn.toFixed(1)} °C → ${Math.round(f.tS * 100)} % · chaleur ${Math.round(f.hot * 100)} % · gel ${Math.round(f.frost * 100)} % · saison ${Math.round(f.sea * 100)} % · repousse ${Math.round(s[0].rg * 100)} %${f.ff > 0 ? ` · 🌲 forêt ${Math.round(f.ff * 100)} % (sol plus humide)` : ''}` : '')(s[0].f)}</div></details>`,
       (best.score >= 30 ? `🎯 <b>${day(best.date)}</b> · ${lab(best.score)} (${best.score})` : '😴 Aucun jour favorable cette semaine') + (since <= 8 ? `<br>⏳ Dernière récolte ${ago2} : repousse en cours` : ''));
   } catch (e) { put('<div class="hint">🌦️ Météo indisponible (connexion ?)</div>', '🌦️ Météo indisponible'); }
 }
 
 $('#panel').addEventListener('input', e => { const f = e.target.dataset.f; if (!f || !sel) return; (D.cells[sel] ||= blank())[f] = e.target.value; save(); draw(); });
 $('#panel').addEventListener('click', e => {
+  const gi = e.target.closest('#gal img'); if (gi) { pvId = gi.dataset.id; $('#pvi').src = gi.src; $('#pv').classList.add('open'); return; }
   const t = e.target.closest('[data-tab]'); if (t) { ptab = t.dataset.tab; return setTab(); }
   const b = e.target.closest('[data-act]'); if (!b || !sel) return; const a = b.dataset.act, c = D.cells[sel] ||= blank();
-  if (a === 'delcell') { const snap = JSON.stringify(D), k = sel; delete D.cells[k]; sel = null; save(); renderPanel(); draw(); return toast('Case supprimée', () => { D = JSON.parse(snap); sel = k; save(); draw(); renderPanel(); }); }
+  if (a === 'delcell') { const snap = JSON.stringify(D), k = sel; delete D.cells[k]; sel = null; save(); renderPanel(); draw(); return toast('Case supprimée', () => { restoreSnap(snap); sel = k; save(); draw(); renderPanel(); }); }
   if (a === 'quick') return addFind(sel);
-  if (a === 'addtoggle') { const f = $('#addv'); f.classList.toggle('on'); if (f.classList.contains('on')) $('#vn').focus(); return; }
-  if (a === 'del') { const snap = JSON.stringify(D); c.v.splice(+b.dataset.i, 1); save(); draw(); renderPanel(); return toast('Visite supprimée', () => { D = JSON.parse(snap); save(); draw(); renderPanel(); }); }
+  if (a === 'addtoggle') { const f = $('#addv'); if (editI !== null) { renderPanel(); return $('#addv').classList.add('on'); } f.classList.toggle('on'); if (f.classList.contains('on')) $('#vn').focus(); return; }
+  if (a === 'edit') { const v = c.v[+b.dataset.i]; if (!v) return; editI = +b.dataset.i; const f = $('#addv'); f.classList.add('on');
+    $('#vd').value = v.d; $('#vn').value = v.n; $('#vw').value = v.e ? '' : Math.round(v.w); $('#vt').value = v.t || '';
+    f.querySelector('[data-act=add]').textContent = '✔ Mettre à jour la visite'; f.scrollIntoView({ block: 'nearest' }); $('#vd').focus(); return; }
+  if (a === 'del') { const snap = JSON.stringify(D); c.v.splice(+b.dataset.i, 1); save(); draw(); renderPanel(); return toast('Visite supprimée', () => { restoreSnap(snap); save(); draw(); renderPanel(); }); }
   if (a === 'add') { const d = $('#vd').value || today(); if (d > today()) return toast('La date est dans le futur'); const n = Math.max(0, Math.round(+$('#vn').value || 0)), w = $('#vw').value;
-    c.v.push({ d, n, w: w !== '' ? Math.max(0, +w) : n * D.avg, e: w === '', t: $('#vt').value.trim() }); save(); draw(); renderPanel(); collapse(); toast('Visite ajoutée 🍄'); }
+    const nv = { d, n, w: w !== '' ? Math.max(0, +w) : n * D.avg, e: w === '', t: $('#vt').value.trim() };
+    if (editI !== null && c.v[editI]) { const snap = JSON.stringify(D); c.v[editI] = nv; save(); draw(); renderPanel(); return toast('Visite modifiée ✏️', () => { restoreSnap(snap); save(); draw(); renderPanel(); }); }
+    c.v.push(nv); save(); draw(); renderPanel(); collapse(); toast('Visite ajoutée 🍄'); }
 });
 function addFind(k) {
   const snap = JSON.stringify(D), c = D.cells[k] ||= blank(), t = today(), v = c.v.find(v => v.d === t && !v.t) || c.v.find(v => v.d === t);
   if (v) { v.n++; v.w += D.avg; } else c.v.push({ d: t, n: 1, w: D.avg, e: true, t: '' });
-  save(); sel = k; renderPanel(); collapse(); draw(); try { navigator.vibrate && navigator.vibrate(40); } catch (e) {}
-  toast('🍄 +1 · ' + c.v.filter(x => x.d === t).reduce((a, x) => a + x.n, 0) + ' aujourd\'hui sur cette case', () => { D = JSON.parse(snap); save(); draw(); renderPanel(); });
+  save(); collapse(); draw(); try { navigator.vibrate && navigator.vibrate(40); } catch (e) {}
+  toast('🍄 +1 · ' + c.v.filter(x => x.d === t).reduce((a, x) => a + x.n, 0) + ' aujourd\'hui sur cette case', () => { restoreSnap(snap); save(); draw(); renderPanel(); });
+}
+
+function addVisit(k) {
+  const snap = JSON.stringify(D), c = D.cells[k] ||= blank();
+  c.v.push({ d: today(), n: 0, w: 0, e: false, t: '' });
+  save(); collapse(); draw(); try { navigator.vibrate && navigator.vibrate(40); } catch (e) {}
+  toast('👣 +1 visite · ' + c.v.length + ' au total sur cette case', () => { restoreSnap(snap); save(); draw(); renderPanel(); });
 }
 
 /* ===== Position ===== */
-function onPos(p) {
+function onPos(p) { setTimeout(() => P.on && pmUpdate(), 0); if (samp) { const [mx, my] = toM(p.coords.latitude, p.coords.longitude); samp.push({ x: mx, y: my, a: p.coords.accuracy }); }
   const [x, y] = toM(p.coords.latitude, p.coords.longitude); me = { x, y, acc: p.coords.accuracy }; const first = !hereK; hereK = idAt(x, y);
   if (first) { V.cx = x; V.cy = y; if (V.mpp > 4) V.mpp = 1.5; }
-  if (pending) { pending = false; addFind(hereK); } else if (first && !sel) select(hereK);
+  if (pending) { const p = pending; pending = false; p === 'visit' ? addVisit(hereK) : addFind(hereK); }
   schedule();
 }
 function startLoc() {
@@ -304,15 +502,19 @@ function startLoc() {
 }
 function stopLoc() { if (watch !== null) navigator.geolocation.clearWatch(watch); watch = null; hereK = null; me = null; pending = false; $('#loc').classList.remove('on'); schedule(); }
 $('#loc').onclick = () => watch === null ? startLoc() : (stopLoc(), toast('Localisation arrêtée'));
-$('#found').onclick = () => { if (hereK) return addFind(hereK); pending = true; if (watch === null) startLoc(); else toast('Position pas encore trouvée…'); };
+const askGps = kind => { pending = kind; if (watch === null) startLoc(); else toast('Position pas encore trouvée…'); };
+$('#found').onclick = () => { const k = sel || hereK; if (k) return addFind(k); askGps('find'); };
+$('#visit').onclick = () => { const k = sel || hereK; if (k) return addVisit(k); askGps('visit'); };
 
 /* ===== Menu, import / export, toast ===== */
 let tt; function toast(m, undo) { $('#tm').textContent = m; $('#tu').hidden = !undo; $('#tu').onclick = () => { undo && undo(); $('#toast').classList.remove('show'); }; $('#toast').classList.add('show'); clearTimeout(tt); tt = setTimeout(() => $('#toast').classList.remove('show'), undo ? 7000 : 3500); }
 $('#mn').onclick = () => { $('#info').textContent = Object.values(D.cells).filter(rec).length + ' case(s) enregistrée(s) · cases de 50 m'; $('#menu').classList.add('open'); };
+$('#rf').onclick = async () => { toast('🔄 Actualisation…'); try { if (navigator.serviceWorker) (await navigator.serviceWorker.getRegistrations()).forEach(r => r.unregister()); } catch (e) {} try { if (window.caches) (await caches.keys()).forEach(k => caches.delete(k)); } catch (e) {}
+  setTimeout(() => { try { const u = new URL(location.href); u.searchParams.set('maj', Date.now()); location.replace(u.href); } catch (e) { location.reload(); } }, 400); };
 $('#mc').onclick = () => $('#menu').classList.remove('open'); $('#menu').onclick = e => { if (e.target.id === 'menu') $('#menu').classList.remove('open'); };
 $('#imp').onclick = () => $('#fi').click();
 $('#fi').onchange = e => { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { try { importData(JSON.parse(r.result)); $('#menu').classList.remove('open'); } catch (x) { toast('Fichier illisible'); } }; r.readAsText(f); e.target.value = ''; };
-$('#exp').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify({ app: 'carnet-cepes', version: 4, grid: 50, avg: D.avg, cells: D.cells })], { type: 'application/json' })); a.download = 'carnet-cepes-' + today() + '.json'; a.click(); toast('💾 Exporté'); };
+$('#exp').onclick = async () => { const photos = {}; for (const c of Object.values(D.cells)) for (const p of c.ph) { try { const u = await pGet(p.id); if (u) photos[p.id] = u; } catch (e) {} } const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify({ app: 'carnet-cepes', version: 4, grid: 50, avg: D.avg, cells: D.cells, paths: D.paths || [], photos })], { type: 'application/json' })); a.download = 'carnet-cepes-' + today() + '.json'; a.click(); toast('💾 Exporté'); };
 $('#avg').onclick = () => { const v = prompt('Poids moyen estimé d\'un cèpe (g)', D.avg); if (v && +v > 9) { D.avg = Math.round(+v); save(); renderPanel(); } };
 
 /* ===== Liste des cases avec trouvailles ===== */
@@ -388,8 +590,280 @@ async function scan() {      // télécharge les communes qui couvrent l'écran 
   } finally { scanning = false; }
 }
 const cmLabel = () => { $('#cmb').textContent = '🏘️ Limites des communes : ' + (commOn ? 'oui' : 'non'); };
+const foLabel = () => $('#fob').textContent = forOn ? '🌲 Forêts en vert : activé' : '🌲 Forêts en vert : désactivé';
+$('#fob').onclick = () => { forOn = !forOn; try { localStorage.setItem('cartocepe-forest', forOn ? '1' : '0'); } catch (e) {} foLabel(); schedule(); }; foLabel();
 $('#cmb').onclick = () => { commOn = !commOn; try { localStorage.setItem('cartocepe-comm', commOn ? '1' : '0'); } catch (e) {} cmLabel(); if (commOn) scan(); schedule(); };
 $('#mn').addEventListener('click', cmLabel); cmLabel();
+
+/* ===== Plein écran (activé par défaut ; le navigateur exige un premier toucher pour l'accorder) ===== */
+let fsOn = (() => { try { return localStorage.getItem('cartocepe-full') !== '0'; } catch (e) { return true; } })();
+const fsEl = document.documentElement, fsCan = !!(fsEl.requestFullscreen || fsEl.webkitRequestFullscreen);
+const inFs = () => !!(document.fullscreenElement || document.webkitFullscreenElement);
+const enterFs = () => { try { return Promise.resolve((fsEl.requestFullscreen || fsEl.webkitRequestFullscreen).call(fsEl, { navigationUI: 'hide' })); } catch (e) { return Promise.reject(e); } };
+const exitFs = () => { try { const r = (document.exitFullscreen || document.webkitExitFullscreen).call(document); r && r.catch && r.catch(() => {}); } catch (e) {} };
+const fsLabel = () => { $('#fs').textContent = '⛶ Plein écran : ' + (fsOn ? 'oui' : 'non') + (fsCan ? '' : ' (non pris en charge ici)'); };
+$('#fs').onclick = () => { fsOn = !fsOn; try { localStorage.setItem('cartocepe-full', fsOn ? '1' : '0'); } catch (e) {} fsLabel();
+  if (fsOn) { if (!fsCan) toast(`Plein écran indisponible ici : ajoutez la page à l'écran d'accueil`); else if (!inFs()) enterFs().catch(() => toast('Plein écran refusé par le navigateur')); } else if (inFs()) exitFs(); };
+$('#mn').addEventListener('click', fsLabel); fsLabel();
+document.addEventListener('click', () => { if (fsOn && fsCan && !inFs()) enterFs().catch(() => {}); }, { once: true });
+
+/* ===== Conseils aléatoires (💡) : connaissances, vos zones, météo ===== */
+const KB = [
+  `🌳 Les cèpes vivent en association avec des arbres (chênes, hêtres, châtaigniers, épicéas, pins) : explorez les lisières, les clairières et le pied des vieux arbres.`,
+  `🌧️ La poussée se déclenche environ 7 à 12 jours après une bonne pluie (≈ 30 mm cumulés), à condition que les nuits restent douces.`,
+  `🌡️ Les nuits idéales sont entre 8 et 15 °C : trop chaud ou trop froid, la poussée ralentit. Le gel l'arrête net.`,
+  `🧭 Quand vous trouvez un cèpe, cherchez-en d'autres dans un rayon de 10 à 20 m : ils poussent souvent en groupe ou en arc de cercle.`,
+  `🔪 Coupez le pied au couteau, au ras du sol, et rebouchez le trou avec des feuilles pour préserver le mycélium.`,
+  `🧺 Préférez un panier ajouré à un sac plastique : les cèpes respirent et évitent de se ramollir.`,
+  `🔍 Sous le chapeau d'un cèpe, on voit des pores (pas de lamelles), blancs puis jaune-vert. Méfiez-vous des bolets à pied rouge ou qui bleuissent fortement à la coupe. Au moindre doute, faites vérifier par un pharmacien ou une société de mycologie.`,
+  `🍂 Écartez délicatement feuilles et mousse : les jeunes cèpes se cachent souvent à moitié sous la litière.`,
+  `🐛 Coupez un cèpe en deux sur place : si le pied est déjà plein de larves, laissez-le, il ne vaut plus la peine.`,
+  `☀️ En été chaud, privilégiez les versants nord et les sous-bois frais ; en automne frais, les versants sud, plus doux, sont souvent meilleurs.`,
+  `📏 Les cèpes jeunes et fermes sont les meilleurs : chapeau bombé, pied dodu, chair ferme et sans trace de larves.`,
+  `📝 Notez chaque sortie, même les bredouilles : avec les années, vos dates et vos secteurs gagnants se dessinent.`,
+  `🥶 Après une nuit de gel, inutile de forcer : attendez le redoux et quelques jours pour que la poussée reparte.`,
+  `⛰️ Le cèpe apprécie les sols bien drainés : évitez les fonds de vallon détrempés et cherchez plutôt les pentes douces.`
+];
+const rnd = a => a[Math.floor(Math.random() * a.length)];
+const dsince = d => Math.round((new Date(today() + 'T00:00') - new Date(d + 'T00:00')) / 864e5);
+const cl = (k, c) => c && c.name ? `« ${c.name} »` : 'la case ' + toLL(...ctr(k)).map(x => x.toFixed(3)).join(', ');
+const infos = () => Object.entries(D.cells).filter(([k, c]) => rec(c)).map(([k, c]) => ({ k, c, n: cnt(c), last: c.v.filter(v => v.n > 0).reduce((a, v) => v.d > a ? v.d : a, '') }));
+async function tipWx() {
+  const best = infos().filter(x => x.n > 0).sort((a, b) => b.n - a.n)[0], k = sel || hereK || best?.k || idAt(V.cx, V.cy), c = D.cells[k], [la, lo] = toLL(...ctr(k));
+  const d = await Promise.race([wxFor(la, lo), new Promise((_, r) => setTimeout(r, 6000))]);
+  const last = (c?.v || []).filter(v => v.n > 0).reduce((a, v) => v.d > a ? v.d : a, ''), s = wxScores(d, last, await forestFrac(k)), t0 = s[0], b = s.reduce((a, x) => x.score > a.score ? x : a);
+  const past = d.precipitation_sum.slice(wxOff(d) - 14, wxOff(d)).reduce((a, v) => a + (v ?? 0), 0), tn = d.temperature_2m_min.slice(wxOff(d) - 7, wxOff(d)).reduce((a, v) => a + (v ?? 0), 0) / 7;
+  const w = rec(c) ? cl(k, c) : 'ce secteur', day = x => new Date(x + 'T00:00').toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric' }), o = [`📊 Indice du jour pour ${w} : ${t0.score}/100, avec ${Math.round(past)} mm de pluie ces 14 derniers jours.`];
+  if (t0.score >= 50) o.push(`🌟 Conditions favorables aujourd'hui pour ${w} (indice ${t0.score}/100) : bonne sortie en vue !`);
+  if (b.score >= 30 && b !== t0) o.push(`🎯 Meilleur jour à venir pour ${w} : ${day(b.date)} (indice ${b.score}/100).`);
+  if (b.score < 30) o.push(`😴 Rien de vraiment favorable cette semaine pour ${w} (meilleur indice : ${b.score}). Attendez la prochaine pluie.`);
+  if (past < 10) o.push(`☀️ Seulement ${Math.round(past)} mm de pluie en 14 jours : le sol est sec, il faut environ 30 mm pour relancer la poussée.`);
+  if (past >= 40) o.push(`🌧️ ${Math.round(past)} mm de pluie en 14 jours : de quoi déclencher une belle poussée, comptez 7 à 12 jours après les averses.`);
+  if (tn < 3) o.push(`🥶 Nuits très fraîches (${tn.toFixed(1)} °C en moyenne) : la poussée ralentit, et le gel l'arrêterait.`);
+  if (tn > 16) o.push(`🌡️ Nuits chaudes (${tn.toFixed(1)} °C en moyenne) : les cèpes préfèrent 8 à 15 °C la nuit.`);
+  return { t: rnd(o) };
+}
+const tipGens = [
+  () => ({ t: rnd(KB) }), () => ({ t: rnd(KB) }), () => ({ t: rnd(KB) }),
+  () => infos().length ? null : { t: `🍄 Enregistrez votre première trouvaille avec +1🍄 : l'appli pourra ensuite vous conseiller selon vos zones.` },
+  () => { const a = infos().filter(x => x.n > 0).sort((x, y) => y.n - x.n)[0]; return a && { t: `🏆 ${cl(a.k, a.c)} est votre case la plus fructueuse : ${a.n} cèpe(s) en ${a.c.v.length} visite(s). Repassez-y après les prochaines pluies.`, k: a.k }; },
+  () => { const a = infos().filter(x => x.last && dsince(x.last) < 8); if (!a.length) return null; const x = rnd(a), s = dsince(x.last); return { t: `⏳ ${cl(x.k, x.c)} a été récoltée ${s <= 0 ? `aujourd'hui` : 'il y a ' + s + ' j'} : laissez-lui encore ~${Math.max(1, 8 - s)} jour(s) pour se regarnir.`, k: x.k }; },
+  () => { const a = infos().filter(x => x.n > 0 && x.last && dsince(x.last) >= 21); if (!a.length) return null; const x = rnd(a); return { t: `🔁 ${cl(x.k, x.c)} n'a plus été récoltée depuis ${dsince(x.last)} jours : un passage de contrôle pourrait payer.`, k: x.k }; },
+  () => { const m = {}, vs = infos().flatMap(x => x.c.v).filter(v => v.n > 0); if (vs.length < 2) return null; vs.forEach(v => { const k = +v.d.slice(5, 7) - 1; m[k] = (m[k] || 0) + v.n; }); const b = Object.entries(m).sort((x, y) => y[1] - x[1])[0]; return { t: `📅 Vos plus belles récoltes tombent en ${new Date(2000, +b[0], 1).toLocaleDateString('fr-FR', { month: 'long' })} (${b[1]} cèpes) : c'est votre période à surveiller.` }; },
+  () => { const vs = infos().flatMap(x => x.c.v).filter(v => v.n > 0 && !v.e), n = vs.reduce((a, v) => a + v.n, 0); if (n < 3) return null; const avg = vs.reduce((a, v) => a + v.w, 0) / n; return Math.abs(avg - D.avg) / D.avg > .25 ? { t: `⚖️ Vos cèpes pesés font ${Math.round(avg)} g en moyenne, contre ${D.avg} g réglés dans les options : ajustez « Poids moyen » pour des estimations plus justes.` } : null; },
+  () => { const a = infos().filter(x => x.n >= 2); if (!a.length) return null; const x = rnd(a), [i, j] = x.k.split(',').map(Number), e = []; for (let di = -1; di <= 1; di++) for (let dj = -1; dj <= 1; dj++) { const k = (i + di) + ',' + (j + dj); if ((di || dj) && !rec(D.cells[k])) e.push(k); } return e.length ? { t: `🧭 Autour de ${cl(x.k, x.c)}, ${e.length} case(s) voisine(s) sont encore vierges : les cèpes poussent souvent en groupe, explorez-les.`, k: rnd(e) } : null; },
+  tipWx, tipWx
+];
+let lastTip = '', tipBusy = false, tipK = null;
+const closeTip = () => { $('#tip').hidden = true; $('#tp').classList.remove('on'); };
+async function nextTip() {
+  if (tipBusy) return; tipBusy = true; $('#tip').hidden = false; $('#tp').classList.add('on'); $('#tipt').textContent = '💡 Je cherche un bon conseil…'; $('#tipg').hidden = true;
+  let tip = null;
+  for (const gen of [...tipGens].sort(() => Math.random() - .5)) { try { const r = await gen(); if (r && r.t !== lastTip) { tip = r; break; } } catch (e) {} }
+  tip ||= { t: rnd(KB) }; lastTip = tip.t; tipK = tip.k || null; $('#tipt').textContent = tip.t; $('#tipg').hidden = !tipK; tipBusy = false;
+}
+$('#tp').onclick = () => $('#tip').hidden ? nextTip() : closeTip();
+$('#tipn').onclick = nextTip; $('#tipx').onclick = closeTip;
+$('#tipg').onclick = () => { if (!tipK) return; const k = tipK; closeTip(); flyTo(k); pick(k); };
+
+/* ===== Chemins : lignes posées point par point avec le GPS (coordonnées en mètres Mercator) ===== */
+function drawPaths(sx, sy) {
+  const ps = D.paths || []; if (!ps.length && !P.start) return;
+  g.save(); g.lineCap = 'round'; g.lineJoin = 'round';
+  const trace = p => { g.beginPath(); p.pts.forEach(([x, y], i) => i ? g.lineTo(sx(x), sy(y)) : g.moveTo(sx(x), sy(y))); g.stroke(); };
+  ps.forEach(p => { g.lineWidth = 7; g.strokeStyle = 'rgba(0,0,0,.25)'; trace(p); g.lineWidth = 4; g.strokeStyle = p.id === P.sel ? 'rgba(255,255,255,.8)' : 'rgba(255,190,60,.7)'; trace(p); });
+  const cnt = new Map(); ps.forEach(p => p.pts.forEach(([x, y]) => { const k = x + ',' + y; cnt.set(k, (cnt.get(k) || 0) + 1); }));      // sommet partagé = carrefour
+  ps.forEach(p => p.pts.forEach(([x, y], i) => { const e = i === 0 || i === p.pts.length - 1, j = cnt.get(x + ',' + y) > 1; g.beginPath(); g.arc(sx(x), sy(y), j ? 6 : e ? 4.5 : 3, 0, 7); g.fillStyle = j ? 'rgba(255,255,255,.95)' : p.id === P.sel ? 'rgba(255,255,255,.85)' : 'rgba(255,190,60,.8)'; g.fill(); g.lineWidth = j ? 2.5 : 1.5; g.strokeStyle = j ? 'rgb(212,169,74)' : 'rgba(59,36,18,.7)'; g.stroke(); }));
+  if (P.start) { const x = sx(P.start[0]), y = sy(P.start[1]); g.beginPath(); g.arc(x, y, 10, 0, 7); g.lineWidth = 3; g.strokeStyle = 'rgba(255,255,255,.9)'; g.stroke(); g.beginPath(); g.arc(x, y, 5, 0, 7); g.fillStyle = 'rgba(255,120,40,.9)'; g.fill(); }
+  g.restore();
+}
+function pmUpdate() {
+  const n = (D.paths || []).length, gps = me ? ' · GPS ±' + Math.round(me.acc) + ' m' : ' · GPS en attente';
+  $('#pmt').textContent = (P.cur ? `🥾 Chemin en cours : ${P.cur.pts.length} points. Marchez, puis 📍 Point (virage ou fin), ✔ pour finir.` : P.start ? `📍 Départ posé. Marchez en ligne droite, puis 📍 Point.` : `🥾 ${n} chemin(s). 📍 Point pose un départ ; touchez une ligne pour repartir de n'importe quel endroit (début, milieu ou bout). Les croisements deviennent des carrefours 🔀.`) + gps;
+  $('#pmd').hidden = !P.sel; $('#pt').classList.toggle('on', P.on); $('#pm').hidden = !P.on;
+}
+const segProj = (p, a, b) => { const dx = b[0] - a[0], dy = b[1] - a[1], l2 = dx * dx + dy * dy, t = l2 ? Math.max(0, Math.min(1, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / l2)) : 0, q = [a[0] + t * dx, a[1] + t * dy]; return { q, t, d: Math.hypot(p[0] - q[0], p[1] - q[1]) }; };
+const segInter = (a, b, c, d) => {      // croisement strict de [a,b] et [c,d] (hors extrémités)
+  const rx = b[0] - a[0], ry = b[1] - a[1], sx = d[0] - c[0], sy = d[1] - c[1], den = rx * sy - ry * sx; if (Math.abs(den) < 1e-9) return null;
+  const t = ((c[0] - a[0]) * sy - (c[1] - a[1]) * sx) / den, u = ((c[0] - a[0]) * ry - (c[1] - a[1]) * rx) / den;
+  return t > 1e-6 && t < 1 - 1e-6 && u > 1e-6 && u < 1 - 1e-6 ? { q: [a[0] + t * rx, a[1] + t * ry], t } : null;
+};
+const rd1 = v => +v.toFixed(1), rp1 = q => [rd1(q[0]), rd1(q[1])];
+function junction(p, i, q) {      // insère q dans le trait p, entre pts[i] et pts[i+1] (ou réutilise un sommet voisin à moins de 1,5 m) : q devient un point d'accroche
+  for (const j of [i, i + 1]) if (Math.hypot(p.pts[j][0] - q[0], p.pts[j][1] - q[1]) < 1.5) return p.pts[j];
+  p.pts.splice(i + 1, 0, [q[0], q[1]]); return p.pts[i + 1];
+}
+function nearSeg(p, q) { let b = null; for (let i = 0; i + 1 < p.pts.length; i++) { const r = segProj(q, p.pts[i], p.pts[i + 1]); if (!b || r.d < b.d) b = { i, d: r.d }; } return b; }
+function commitStart() {      // un départ posé au milieu d'un trait devient un vrai sommet (carrefour) de ce trait
+  if (!P.sa || !P.start) return 0;
+  const p = (D.paths || []).find(x => x.id === P.sa); P.sa = null; if (!p) return 0;
+  const b = nearSeg(p, P.start); if (!b || b.d > 3) return 0;
+  const v = junction(p, b.i, P.start); P.start = [v[0], v[1]]; return 1;
+}
+function placePt(me) {
+  if (!me) { toast('Position GPS introuvable : patientez un instant'); if (watch === null) startLoc(); return; }
+  const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]), last = P.cur ? P.cur.pts[P.cur.pts.length - 1] : P.start, gp = [me.x, me.y];
+  const others = (D.paths || []).filter(p => p !== P.cur), away = (p, i, a) => !a || segProj(a, p.pts[i], p.pts[i + 1]).d > 2;      // ignore le tronçon qu'on quitte
+  let pt = gp, bd = 10, vtx = false, hit = null;      // s'aimante sur un point existant à moins de 10 m (carrefours)
+  (D.paths || []).forEach(p => p.pts.forEach(q => { if (last && q[0] === last[0] && q[1] === last[1]) return; const d = dist(q, gp); if (d < bd) { bd = d; pt = q; vtx = true; } }));
+  if (!vtx) {      // arrivée au milieu d'un trait : on s'y accroche, et le point devient un carrefour
+    let sd = Math.min(12, Math.max(6, me.acc));
+    others.forEach(p => { for (let i = 0; i + 1 < p.pts.length; i++) { if (!away(p, i, last)) continue; const r = segProj(gp, p.pts[i], p.pts[i + 1]); if (r.d < sd) { sd = r.d; hit = { p, i }; pt = r.q; } } });
+  }
+  if (last && dist(last, pt) < 2.5) return toast(`Déplacez-vous avant d'ajouter un point`);
+  let nj = commitStart(), q = rp1(pt);
+  const from = P.cur ? P.cur.pts[P.cur.pts.length - 1] : P.start, X = [];
+  if (hit && from) { const v = junction(hit.p, hit.i, q); q = [v[0], v[1]]; nj++; }
+  if (from) others.forEach(p => { for (let i = 0; i + 1 < p.pts.length; i++) {      // traversée : chaque croisement devient un carrefour des deux traits
+    if (!away(p, i, from)) continue; const c = segInter(from, q, p.pts[i], p.pts[i + 1]);
+    if (c && dist(c.q, from) > 2 && dist(c.q, q) > 2) X.push({ p, i, t: c.t, q: rp1(c.q) });
+  } });
+  X.sort((a, b) => a.p.id < b.p.id ? -1 : a.p.id > b.p.id ? 1 : b.i - a.i);      // du dernier tronçon au premier : les indices restent valides
+  X.forEach(x => { x.v = junction(x.p, x.i, x.q); });
+  X.sort((a, b) => a.t - b.t); nj += X.length;
+  const mids = X.map(x => [x.v[0], x.v[1]]), acc = ' (±' + Math.round(me.acc) + ' m)', jt = nj ? ' · 🔀 ' + nj + ' carrefour' + (nj > 1 ? 's' : '') : '';
+  if (P.cur) { P.cur.pts.push(...mids, q); P.adds.push(mids.length + 1); toast('📍 Point ' + P.cur.pts.length + acc + jt); }
+  else if (P.start) { P.cur = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), pts: [P.start, ...mids, q] }; P.adds = [mids.length + 1]; (D.paths ||= []).push(P.cur); P.start = null; P.sel = null; toast('🥾 Chemin tracé' + acc + jt); }
+  else { P.start = q; P.sa = hit ? hit.p.id : null; toast(hit ? '📍 Départ posé sur un trait (carrefour)' + acc + ' : marchez, puis rappuyez' : '📍 Départ posé' + acc + ' : marchez, puis rappuyez'); }
+  save(); pmUpdate(); draw();
+}
+let samp = null;
+async function addPathPt() {      // mesure pendant 3 s et pose la position moyenne (pondérée par la précision)
+  if (samp) return;
+  if (!me) { toast('Position GPS introuvable : patientez un instant'); if (watch === null) startLoc(); return; }
+  samp = [{ x: me.x, y: me.y, a: me.acc }]; const b = $('#pmp'); let n = 3; b.textContent = '⏳ ' + n + ' s'; toast('⏳ Mesure : ne bougez pas pendant 3 s');
+  const iv = setInterval(() => { b.textContent = '⏳ ' + Math.max(0, --n) + ' s'; }, 1000);
+  await new Promise(r => setTimeout(r, 3000)); clearInterval(iv);
+  const s = samp; samp = null; b.textContent = '📍 Point';
+  let w = 0, ax = 0, ay = 0; s.forEach(o => { const k = 1 / Math.max(3, o.a) ** 2; w += k; ax += o.x * k; ay += o.y * k; });
+  placePt({ x: ax / w, y: ay / w, acc: Math.min(...s.map(o => o.a)) });
+  try { navigator.vibrate && navigator.vibrate(40); } catch (e) {}
+}
+function undoPathPt() {
+  if (P.cur) { const k = P.adds.pop() || 1; if (P.cur.pts.length - k >= 2) P.cur.pts.length -= k; else { const c = P.cur; D.paths = D.paths.filter(p => p !== c); P.start = c.pts[0]; P.sa = null; P.cur = null; P.adds = []; } }
+  else if (P.start) { P.start = null; P.sa = null; } else return toast('Rien à annuler');
+  save(); pmUpdate(); draw();
+}
+function finishPath() { if (!P.cur && !P.start) return toast('Aucun chemin en cours'); P.cur = null; P.start = null; P.sel = null; P.sa = null; P.adds = []; pmUpdate(); draw(); toast('✔ Chemin terminé'); }
+function delPath() {
+  if (!P.sel) return; const snap = JSON.stringify(D), id = P.sel; D.paths = D.paths.filter(p => p.id !== id); if (P.cur && P.cur.id === id) P.cur = null; P.sel = null; P.start = null; P.sa = null;
+  save(); pmUpdate(); draw(); toast('Chemin supprimé', () => { D.paths = JSON.parse(snap).paths; save(); draw(); renderPanel(); pmUpdate(); });
+}
+function pathTap(px, py) {      // toucher une ligne : la sélectionne et pose le départ (sur un sommet proche, sinon au milieu du trait = futur carrefour)
+  const W = cv.clientWidth, H = cv.clientHeight, sx = x => (x - V.cx) / V.mpp + W / 2, sy = y => H / 2 - (y - V.cy) / V.mpp, wx = x => V.cx + (x - W / 2) * V.mpp, wy = y => V.cy - (y - H / 2) * V.mpp;
+  let best = null, bd = 22;
+  (D.paths || []).forEach(p => { for (let i = 1; i < p.pts.length; i++) { const r = segProj([px, py], [sx(p.pts[i - 1][0]), sy(p.pts[i - 1][1])], [sx(p.pts[i][0]), sy(p.pts[i][1])]); if (r.d < bd) { bd = r.d; best = { p, q: r.q }; } } });
+  if (!best) { P.sel = null; pmUpdate(); draw(); return; }
+  let v = best.p.pts[0], vd = Infinity; best.p.pts.forEach(q => { const d = Math.hypot(sx(q[0]) - px, sy(q[1]) - py); if (d < vd) { vd = d; v = q; } });
+  const mid = vd > 16;
+  P.sel = best.p.id; P.cur = null; P.adds = []; P.start = mid ? rp1([wx(best.q[0]), wy(best.q[1])]) : [v[0], v[1]]; P.sa = mid ? best.p.id : null;
+  pmUpdate(); draw(); toast(mid ? '📍 Départ posé au milieu du chemin (carrefour) : marchez, puis 📍 Point' : '📍 Départ posé sur ce point du chemin : marchez, puis 📍 Point');
+}
+$('#pt').onclick = () => { P.on = !P.on; if (P.on) { if (watch === null) startLoc(); } else { P.cur = null; P.start = null; P.sel = null; P.sa = null; P.adds = []; } pmUpdate(); draw(); };
+$('#pmp').onclick = addPathPt; $('#pmu').onclick = undoPathPt; $('#pme').onclick = finishPath; $('#pmd').onclick = delPath; $('#pmx').onclick = () => $('#pt').click();
+pmUpdate();
+
+/* ===== Carte hors connexion : tuiles « épinglées » (jamais purgées), téléchargement reprenable, 6 requêtes en parallèle ===== */
+const DLK = 25;      // Ko par tuile (estimation)
+const fmtMo = n => { const mo = n * DLK / 1024; return mo >= 1000 ? (mo / 1024).toFixed(1).replace('.', ',') + ' Go' : Math.max(1, Math.round(mo)) + ' Mo'; };
+function tileList(x0, x1, y0, y1, zmin, zmax) {
+  const list = [];
+  for (let Z = zmin; Z <= Math.min(19, zmax); Z++) { const span = 256 * 156543.03392 / 2 ** Z, lim = 2 ** Z - 1;
+    for (let ty = Math.max(0, Math.floor((O - y1) / span)); ty <= Math.min(lim, Math.floor((O - y0) / span)); ty++)
+      for (let tx = Math.max(0, Math.floor((x0 + O) / span)); tx <= Math.min(lim, Math.floor((x1 + O) / span)); tx++) list.push([Z, tx, ty]); }
+  return list.reverse();      // on dépile par la fin : la vue d'ensemble (petits zooms) arrive en premier
+}
+let dlBusy = false, dlStop = false;
+async function dlTiles(list, label) {
+  if (dlBusy) return toast('Un téléchargement est déjà en cours');
+  if (!list.length) return;
+  if (!(await tdbP)) return toast('Stockage hors connexion indisponible sur cet appareil');
+  dlBusy = true; dlStop = false; try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) {}
+  let wl = null; try { wl = await navigator.wakeLock.request('screen'); } catch (e) {}      // garde l'écran allumé pendant le téléchargement
+  const total = list.length, bar = $('#dlp'); let done = 0, ok = 0, kept = 0, fail = 0, wfail = 0, why = '';
+  const upd = () => { $('#dlt').textContent = `📥 ${label} : ${done} / ${total}` + (fail ? ` · ${fail} échec(s)` : ''); $('#dlbi').style.width = (done / total * 100) + '%'; };
+  bar.hidden = false; upd();
+  const worker = async () => { while (!dlStop) { const it = list.pop(); if (!it) break; const [z, x, y] = it, k = z + '/' + x + '/' + y;
+    try { const c = await tget(k);
+      if (c) { if (!c.p) await tput(k, c.b, true); kept++; ok++; }      // déjà en mémoire : on l'épingle sans retélécharger
+      else { let b = null; for (let n = 0; n < 2 && !b; n++) { try { const r = await fetch(TURL(z, x, y), { mode: 'cors' }); if (r.ok) b = await r.blob(); } catch (e) {} }
+        if (!b) fail++; else if (await tput(k, b, true)) { ok++; wfail = 0; } else { fail++; if (++wfail >= 8) { dlStop = true; why = 'stockage plein ou refusé'; } } }
+    } catch (e) { fail++; }
+    if (++done % 10 === 0 || done === total) upd(); } };
+  await Promise.all([0, 1, 2, 3, 4, 5].map(worker));
+  try { wl && wl.release(); } catch (e) {}
+  bar.hidden = true; dlBusy = false; schedule();
+  toast((dlStop ? '⏹️ Interrompu' + (why ? ' (' + why + ')' : '') : '📥 Terminé') + ` : ${ok} tuile(s) disponibles hors connexion` + (kept ? ` (dont ${kept} déjà en mémoire)` : '') + (fail ? ` · ${fail} échec(s)` : ''));
+}
+$('#dlc').onclick = () => { dlStop = true; };
+function dlArea() {      // écran actuel + 2 niveaux de zoom
+  const W = cv.clientWidth, H = cv.clientHeight, x0 = V.cx - W / 2 * V.mpp, x1 = V.cx + W / 2 * V.mpp, y0 = V.cy - H / 2 * V.mpp, y1 = V.cy + H / 2 * V.mpp;
+  const Z0 = Math.max(3, Math.min(19, Math.ceil(Math.log2(156543.03392 / V.mpp)))), list = tileList(x0, x1, y0, y1, Z0, Z0 + 2);
+  if (list.length > 800) return toast(`Zone trop grande (${list.length} tuiles) : zoomez davantage ou utilisez la zone de 20 km`);
+  dlTiles(list, 'Écran');
+}
+const zoneList = zmax => { const h = 10000 / Math.cos(toLL(V.cx, V.cy)[0] * Math.PI / 180); return tileList(V.cx - h, V.cx + h, V.cy - h, V.cy + h, 6, zmax); };      // 20 km × 20 km réels, du zoom 6 (vue d'ensemble) au zoom choisi
+$('#dl').onclick = () => { $('#menu').classList.remove('open'); dlArea(); };
+$('#dl20').onclick = () => { $('#menu').classList.remove('open'); const [la, lo] = toLL(V.cx, V.cy);
+  $('#dlh').textContent = `Zone de 20 km × 20 km centrée sur le milieu de la carte (${la.toFixed(3)}, ${lo.toFixed(3)}), du zoom 6 (vue d'ensemble) au niveau choisi. Au-delà, la carte agrandit la dernière image disponible. Déplacez la carte pour changer de zone ; Wi‑Fi conseillé.`;
+  document.querySelectorAll('#dlm [data-z]').forEach(b => { const n = zoneList(+b.dataset.z).length; b.innerHTML = b.dataset.t + `<br><small>${n.toLocaleString('fr-FR')} tuiles · ≈ ${fmtMo(n)}</small>`; });
+  $('#dlm').classList.add('open'); };
+$('#dlm').onclick = async e => { if (e.target.id === 'dlm' || e.target.id === 'dlx') return $('#dlm').classList.remove('open');
+  const b = e.target.closest('[data-z]'); if (!b) return; $('#dlm').classList.remove('open'); const list = zoneList(+b.dataset.z);
+  try { const est = await navigator.storage.estimate(), free = est.quota - est.usage, need = list.length * DLK * 1024;
+    if (free < need * 1.3 && !confirm(`Espace libre estimé : ${Math.round(free / 1048576)} Mo, besoin ≈ ${fmtMo(list.length)}. Continuer quand même ?`)) return; } catch (e) {}
+  dlTiles(list, 'Zone 20 km'); };
+
+/* ===== Routes forestières : pistes OpenStreetMap (highway=track), en transparence, uniquement dans les forêts (masque IGN) ===== */
+let roOn = (() => { try { return localStorage.getItem('cartocepe-roads') !== '0'; } catch (e) { return true; } })();
+const rdbP = new Promise(res => { try { const r = indexedDB.open('cartocepe-roads', 1); r.onupgradeneeded = () => r.result.createObjectStore('r'); r.onsuccess = () => res(r.result); r.onerror = () => res(null); } catch (e) { res(null); } });
+const rget = async k => { const db = await rdbP; if (!db) return null; return new Promise(res => { try { const q = db.transaction('r').objectStore('r').get(k); q.onsuccess = () => res(q.result || null); q.onerror = () => res(null); } catch (e) { res(null); } }); };
+const rput = async (k, v) => { const db = await rdbP; if (!db) return; try { db.transaction('r', 'readwrite').objectStore('r').put(v, k); } catch (e) {} };
+const RSPAN = 256 * 156543.03392 / 2 ** 14, rtiles = new Map(), ROV = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter'];
+let rQ = [], rBusy = 0, rErrT = 0, rcv = null, mcv = null;
+async function rFetch(tx, ty) {      // pistes d'une tuile zoom 14 → lignes aplaties [x, y, x, y…] en mètres Mercator
+  const [s, w] = toLL(tx * RSPAN - O, O - (ty + 1) * RSPAN), [n, e] = toLL((tx + 1) * RSPAN - O, O - ty * RSPAN);
+  const q = `[out:json][timeout:25];way["highway"="track"](${s.toFixed(5)},${w.toFixed(5)},${n.toFixed(5)},${e.toFixed(5)});out geom;`; let err;
+  for (const u of ROV) { try { const r = await fetch(u, { method: 'POST', body: 'data=' + encodeURIComponent(q), headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }); if (!r.ok) throw new Error(r.status);
+      return ((await r.json()).elements || []).filter(el => el.geometry && el.geometry.length > 1).map(el => el.geometry.flatMap(p => { const [x, y] = toM(p.lat, p.lon); return [+x.toFixed(1), +y.toFixed(1)]; })); } catch (e2) { err = e2; } }
+  throw err;
+}
+function rTile(tx, ty) {
+  const k = tx + '/' + ty; let t = rtiles.get(k);
+  if (!t) { t = { w: null }; rtiles.set(k, t);
+    rget(k).then(c => { if (c && c.w) { t.w = c.w; schedule(); if (Date.now() - c.t < 7.8e9) return; }      // en cache : on le garde 90 jours
+      rQ.push([k, tx, ty, t]); while (rQ.length > 12) rtiles.delete(rQ.shift()[0]); rPump(); }); }
+  return t;
+}
+async function rPump() {
+  if (rBusy >= 2 || !rQ.length) return; rBusy++; const [k, tx, ty, t] = rQ.shift();
+  try { const w = await rFetch(tx, ty); t.w = w; rput(k, { w, t: Date.now() }); schedule(); }
+  catch (e) { if (!t.w) { if (Date.now() - rErrT > 20000) { rErrT = Date.now(); toast('Routes forestières indisponibles (connexion ?)'); } setTimeout(() => { if (rtiles.get(k) === t) rtiles.delete(k); }, 30000); } }
+  rBusy--; setTimeout(rPump, 600);
+}
+function drawRoads(sx, sy, W, H, x0, x1, y0, y1, mpp, Z, dpr) {
+  if (!roOn || mpp > 8) return;
+  const tl = [];
+  for (let ty = Math.max(0, Math.floor((O - y1) / RSPAN)); ty <= Math.floor((O - y0) / RSPAN); ty++) for (let tx = Math.max(0, Math.floor((x0 + O) / RSPAN)); tx <= Math.floor((x1 + O) / RSPAN); tx++) tl.push(rTile(tx, ty));
+  if (!tl.some(t => t.w)) return;
+  rcv ||= document.createElement('canvas'); mcv ||= document.createElement('canvas');
+  for (const c of [rcv, mcv]) if (c.width !== cv.width || c.height !== cv.height) { c.width = cv.width; c.height = cv.height; }
+  const r = rcv.getContext('2d'), m = mcv.getContext('2d'), path = new Path2D();
+  tl.forEach(t => t.w && t.w.forEach(a => { for (let i = 0; i < a.length; i += 2) i ? path.lineTo(sx(a[i]), sy(a[i + 1])) : path.moveTo(sx(a[0]), sy(a[1])); }));
+  r.setTransform(dpr, 0, 0, dpr, 0, 0); r.clearRect(0, 0, W, H); r.lineCap = r.lineJoin = 'round';
+  r.lineWidth = 4.4; r.strokeStyle = 'rgba(0,0,0,.4)'; r.stroke(path); r.lineWidth = 2.2; r.strokeStyle = '#f4f1e8'; r.stroke(path);
+  /* masque : on ne garde les routes que là où le masque forêt IGN est présent (tuile non disponible = pas de découpe) */
+  m.setTransform(dpr, 0, 0, dpr, 0, 0); m.clearRect(0, 0, W, H); m.fillStyle = '#000';
+  const fz = Math.min(Z, 17), ms = 256 * 156543.03392 / 2 ** fz, mz = ms / mpp + .6;
+  for (let fy = Math.max(0, Math.floor((O - y1) / ms)); fy <= Math.floor((O - y0) / ms); fy++) for (let fx = Math.max(0, Math.floor((x0 + O) / ms)); fx <= Math.floor((x1 + O) / ms); fx++) {
+    const t = ftile(fz, fx, fy); if (!t.hk) { t.hk = 1; t.p.then(() => { t.settled = true; schedule(); }); }
+    const dx = sx(fx * ms - O), dy = sy(O - fy * ms);
+    if (t.c) m.drawImage(t.c, dx, dy, mz, mz); else if (t.settled) m.fillRect(dx, dy, mz, mz); }
+  r.setTransform(1, 0, 0, 1, 0, 0); r.globalCompositeOperation = 'destination-in'; r.drawImage(mcv, 0, 0); r.globalCompositeOperation = 'source-over';
+  g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = .6; g.drawImage(rcv, 0, 0); g.restore();
+}
+const roLabel = () => { $('#rob').textContent = roOn ? '🛤️ Routes forestières : affichées' : '🛤️ Routes forestières : masquées'; };
+$('#rob').onclick = () => { roOn = !roOn; try { localStorage.setItem('cartocepe-roads', roOn ? '1' : '0'); } catch (e) {} roLabel(); schedule(); if (roOn && V.mpp > 8) toast('🛤️ Zoomez pour voir les routes forestières'); }; roLabel();
 
 /* ===== Démarrage ===== */
 load();
