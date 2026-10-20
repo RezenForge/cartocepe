@@ -35,6 +35,13 @@ canvas{position:absolute;left:0;top:0;width:100%;height:100%;display:block;touch
 .pmb{display:flex;gap:6px;margin-top:6px}.pmb button{height:44px;min-width:44px;border:2px solid var(--dark);border-radius:8px;background:var(--forest);color:#fff;font-size:18px;box-shadow:0 2px 0 var(--dark);cursor:pointer}.pmb button[hidden]{display:none}#pmp{flex:1;background:var(--gold);color:var(--dark);font-size:15px}
 #dock{display:flex;gap:6px;margin:4px}
 #visit{height:48px;font-size:15px;padding:0 14px;min-width:72px;border-radius:8px;border:2px solid var(--dark);background:var(--forest);color:#fff;box-shadow:0 3px 0 var(--dark);cursor:pointer}
+#react{height:48px;min-width:52px;padding:0 10px;font-size:20px;border-radius:8px;border:2px solid var(--dark);background:var(--wood);color:#fff;box-shadow:0 3px 0 var(--dark);cursor:pointer}
+#react:active,.mki:active{transform:translateY(3px);box-shadow:none}
+#mkm{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:12px;z-index:40}#mkm.open{display:flex}
+#mkm .win{width:100%;max-width:420px;max-height:92dvh;overflow:auto;padding:12px;background:linear-gradient(var(--parch),#e6d29c)}
+#mkg{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin:8px 0}
+.mki{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;border:2px solid var(--leather);border-radius:8px;background:#fff8e1;font-size:10px;line-height:1.1;cursor:pointer;text-align:center}
+.mki.on{border-color:var(--dark);background:var(--gold);box-shadow:0 0 0 2px var(--dark)}.mki svg{width:38px;height:38px}
 #found:active,#visit:active{transform:translateY(3px);box-shadow:none}
 #found{height:48px;font-size:15px;padding:0 14px;min-width:72px;border-radius:8px;border:2px solid var(--dark);background:linear-gradient(#e6bd5a,var(--gold));color:var(--dark);box-shadow:0 3px 0 var(--dark);cursor:pointer}
 #grab{flex:1;height:48px;font-size:18px;border:2px solid var(--dark);border-radius:8px;background:var(--wood);color:var(--gold);cursor:pointer}
@@ -79,8 +86,11 @@ li button{border:0;background:none;cursor:pointer;min-width:40px;min-height:40px
   <div id="pm" hidden><div id="pmt"></div><div class="pmb"><button id="pmp">📍 Point</button><button id="pmu" aria-label="Annuler le dernier point">↩️</button><button id="pme" aria-label="Terminer le chemin">✔</button><button id="pmd" hidden aria-label="Supprimer le chemin">🗑️</button><button id="pmx" aria-label="Quitter le mode chemins">✖</button></div></div>
   <div id="tip" hidden><div id="tipt"></div><div class="tipb"><button id="tipg" hidden>📍 Voir</button><button id="tipn">🎲 Autre conseil</button><button id="tipx" aria-label="Fermer">✖</button></div></div>
   <div id="zb"><button class="ib" id="tp" aria-label="Conseil aléatoire">💡</button><button class="ib" id="hmb" aria-label="Carte météo : où chercher aujourd'hui">🌡️</button><button class="ib" id="gr" aria-label="Afficher ou cacher la grille">▦</button><button class="ib" id="pt" aria-label="Cartographier les chemins">🥾</button><button class="ib" id="lb" aria-label="Liste des trouvailles">📋</button><button class="ib" id="fit" aria-label="Voir toutes mes cases">🎯</button><button class="ib" id="zo" aria-label="Dézoomer">➖</button><button class="ib" id="zi" aria-label="Zoomer">➕</button></div></div>
-<div id="dock"><button id="found" aria-label="Ajouter un cèpe">+1🍄</button><button id="visit" aria-label="Ajouter une visite">+1👣</button><button id="grab" aria-label="Réduire ou ouvrir la fiche">▾</button></div>
+<div id="dock"><button id="found" aria-label="Ajouter un cèpe">+1🍄</button><button id="visit" aria-label="Ajouter une visite">+1👣</button><button id="react" aria-label="Ajouter une réaction avec une note">📌</button><button id="grab" aria-label="Réduire ou ouvrir la fiche">▾</button></div>
 <div id="panel" class="win"></div>
+<div id="mkm"><div class="win"><h2 id="mkt" style="margin:0 0 4px">📌 Nouvelle réaction</h2><div class="hint" id="mkw" style="padding:0"></div>
+  <div id="mkg"></div><textarea id="mkn" placeholder="Note : ce que vous avez vu, à retenir…" maxlength="500" style="min-height:76px"></textarea>
+  <button class="btn gold" id="mks">✔ Enregistrer</button><button class="btn" id="mkv" hidden></button><button class="btn" id="mkd" hidden style="background:#8b2d22">🗑️ Supprimer</button><button class="btn" id="mkc">Annuler</button></div></div>
 <div id="home" aria-hidden="true"></div>
 <div id="menu"><div class="win"><h2 style="margin:0 0 8px">⚙️ Options</h2>
   <button class="btn gold" id="imp">📂 Importer un carnet (ancien ou nouveau, JSON)</button>
@@ -121,7 +131,7 @@ const idAt = (x, y) => Math.floor(x / CS) + ',' + Math.floor(y / CS);
 const ctr = k => { const [i, j] = k.split(',').map(Number); return [(i + .5) * CS, (j + .5) * CS]; };
 const blank = () => ({ name: '', note: '', ph: [], v: [] }), rec = c => c && (c.v.length || c.name || c.note || (c.ph && c.ph.length));
 const cnt = c => c ? c.v.reduce((a, v) => a + v.n, 0) : 0;
-let D = { cells: {}, avg: 150, paths: [] }, sel = null, hereK = null, me = null, watch = null, pending = false, V = { cx: 0, cy: 0, mpp: 1500 }, P = { on: false, cur: null, start: null, sel: null, sa: null, adds: [] };
+let D = { cells: {}, avg: 150, paths: [], marks: [] }, sel = null, hereK = null, me = null, watch = null, pending = false, V = { cx: 0, cy: 0, mpp: 1500 }, P = { on: false, cur: null, start: null, sel: null, sa: null, adds: [] };
 
 /* ===== Sauvegarde ===== */
 function save() { try { localStorage.setItem(KEY, JSON.stringify(D)); } catch (e) { toast('Stockage plein : exportez vos données'); } }
@@ -135,9 +145,20 @@ function mergeCell(k, c) {      // fusionne sans doublon (importer deux fois le 
 }
 const cleanPaths = a => (Array.isArray(a) ? a : []).filter(p => p && /^[\w-]+$/.test(String(p.id)) && Array.isArray(p.pts)).map(p => ({ id: String(p.id), pts: p.pts.filter(q => Array.isArray(q) && isFinite(q[0]) && isFinite(q[1])).map(q => [+q[0], +q[1]]) })).filter(p => p.pts.length >= 2);
 function mergePaths(a) { const have = new Set((D.paths ||= []).map(p => p.id)); cleanPaths(a).forEach(p => { if (!have.has(p.id)) D.paths.push(p); }); }
-function restoreSnap(snap) { const keep = D.paths; D = JSON.parse(snap); D.paths = keep; }      // annuler une action du carnet ne touche pas aux chemins
+var MK = { park: ['Parking', '#1e6fd9'], pin: ['Repère', '#d93a2f'], oak: ['Chêne', '#3f7d2a'], no: ['Pas intéressant', '#757575'], yes: ['Intéressant', '#e0a800'] };
+var MKG = {
+  park: '<text x="16" y="17.2" font-size="14.5" font-weight="800" text-anchor="middle" fill="#fff" font-family="Arial,Helvetica,sans-serif">P</text>',
+  pin: '<circle cx="16" cy="12.2" r="4.6" fill="#fff"/><circle cx="16" cy="12.2" r="1.8" fill="#d93a2f"/>',
+  oak: '<rect x="14.9" y="13.4" width="2.3" height="5.2" fill="#fff"/><circle cx="12.3" cy="12.3" r="3.4" fill="#fff"/><circle cx="19.7" cy="12.3" r="3.4" fill="#fff"/><circle cx="16" cy="8.9" r="3.8" fill="#fff"/>',
+  no: '<path d="M12 8.2L20 16.2M20 8.2L12 16.2" stroke="#fff" stroke-width="2.9" stroke-linecap="round"/>',
+  yes: '<polygon fill="#fff" points="' + [...Array(10)].map((_, k) => { const a = -Math.PI / 2 + k * Math.PI / 5, r = k % 2 ? 3 : 7.2; return (16 + r * Math.cos(a)).toFixed(1) + ',' + (12.4 + r * Math.sin(a)).toFixed(1); }).join(' ') + '"/>' };
+var mkSvg = t => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M16 30.5C16 30.5 4.6 19.2 4.6 12.2a11.4 11.4 0 0 1 22.8 0C27.4 19.2 16 30.5 16 30.5z" fill="${MK[t][1]}" stroke="rgba(0,0,0,.5)" stroke-width="3.6" stroke-linejoin="round"/><path d="M16 30.5C16 30.5 4.6 19.2 4.6 12.2a11.4 11.4 0 0 1 22.8 0C27.4 19.2 16 30.5 16 30.5z" fill="${MK[t][1]}" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/>${MKG[t]}</svg>`;
+var MKI = {}; Object.keys(MK).forEach(t => { const im = new Image(); im.onload = () => schedule(); im.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(mkSvg(t)); MKI[t] = im; });
+const cleanMarks = a => (Array.isArray(a) ? a : []).filter(m => m && /^[\w-]+$/.test(String(m.id)) && isFinite(m.x) && isFinite(m.y) && MK[m.t]).map(m => ({ id: String(m.id), x: +m.x, y: +m.y, t: m.t, note: String(m.note || '').slice(0, 500), d: /^\d{4}-\d\d-\d\d$/.test(m.d) ? m.d : '' }));
+function mergeMarks(a) { const have = new Set((D.marks ||= []).map(m => m.id)); cleanMarks(a).forEach(m => { if (!have.has(m.id)) D.marks.push(m); }); }
+function restoreSnap(snap) { const keep = D.paths, km = D.marks; D = JSON.parse(snap); D.paths = keep; D.marks = km || []; }      // annuler une action du carnet ne touche pas aux chemins
 function load() {
-  try { const d = JSON.parse(localStorage.getItem(KEY) || 'null'); if (d && d.cells) { D = { cells: {}, avg: d.avg || 150, paths: cleanPaths(d.paths) }; Object.entries(d.cells).forEach(([k, c]) => /^-?\d+,-?\d+$/.test(k) && (D.cells[k] = clean(c))); } } catch (e) {}
+  try { const d = JSON.parse(localStorage.getItem(KEY) || 'null'); if (d && d.cells) { D = { cells: {}, avg: d.avg || 150, paths: cleanPaths(d.paths), marks: cleanMarks(d.marks) }; Object.entries(d.cells).forEach(([k, c]) => /^-?\d+,-?\d+$/.test(k) && (D.cells[k] = clean(c))); } } catch (e) {}
 }
 
 /* ===== Conversion des anciennes cartes (grille 10×14 posée sur une image satellite) ===== */
@@ -161,7 +182,7 @@ function importData(d) {
   let msg;
   if (d && Array.isArray(d.maps)) { const r = fromOld(d.maps); msg = `${r.n} case(s) converties` + (r.merged ? `, ${r.merged} fusionnée(s) avec une voisine` : '') + (r.skipped ? ` · ${r.skipped} carte(s) sans coordonnées ignorée(s)` : ''); }
   else if (d && d.cells && d.geo) { const r = fromOld([d]); msg = r.n + ' case(s) converties'; }
-  else if (d && d.cells && d.grid === 50) { Object.entries(d.cells).forEach(([k, c]) => mergeCell(k, c)); mergePaths(d.paths); msg = 'Carnet importé';
+  else if (d && d.cells && d.grid === 50) { Object.entries(d.cells).forEach(([k, c]) => mergeCell(k, c)); mergePaths(d.paths); mergeMarks(d.marks); msg = 'Carnet importé';
     if (d.photos && typeof d.photos === 'object') Promise.all(Object.entries(d.photos).filter(([id, u]) => /^[\w-]+$/.test(id) && typeof u === 'string' && u.startsWith('data:image/')).map(([id, u]) => pPut(id, u).catch(() => {}))).then(() => renderPanel()); }
   else return toast('Fichier non reconnu');
   save(); fitData(); draw(); renderPanel(); toast('📂 ' + msg);
@@ -261,7 +282,7 @@ function draw() {
       if (n) { g.strokeText(n, x + px / 2, y + px * .72); g.fillText(n, x + px / 2, y + px * .72); }
       if (c.name && px >= 60) { g.font = '700 11px monospace'; const t = c.name.length > 14 ? c.name.slice(0, 13) + '…' : c.name; g.strokeText(t, x + px / 2, y + px - 9); g.fillText(t, x + px / 2, y + px - 9); } }
   });
-  drawPaths(sx, sy);
+  drawPaths(sx, sy); drawMarks(sx, sy);
   if (commOn) drawComm(1, sx, sy, W, x0, x1, y0, y1, mpp);
   const box = (k, col, w) => { const [i, j] = k.split(',').map(Number); g.strokeStyle = col; g.lineWidth = w; g.strokeRect(sx(i * CS) + w / 2, sy((j + 1) * CS) + w / 2, px - w, px - w); };
   if (hereK) { box(hereK, '#0b2a4a', 5); box(hereK, '#4aa3ff', 3); } if (sel) { box(sel, '#3b2412', 5); box(sel, '#d4a94a', 3); }
@@ -297,7 +318,7 @@ $('#zi').onclick = () => zoomAt(1.6); $('#zo').onclick = () => zoomAt(1 / 1.6);
     if (ptr.size === 1 && tap) { if (!tap.mv && Math.hypot(e.clientX - tap.x, e.clientY - tap.y) > 8) tap.mv = true; if (tap.mv) { V.cx -= dx * V.mpp; V.cy += dy * V.mpp; schedule(); } }
     else if (ptr.size === 2 && pinch) { const [a, b] = [...ptr.values()], d = dist(); zoomAt(d / pinch, (a.x + b.x) / 2, (a.y + b.y) / 2); pinch = d; } });
   const end = e => { if (!ptr.has(e.pointerId)) return; const solo = ptr.size === 1; ptr.delete(e.pointerId);
-    if (solo && e.type === 'pointerup' && tap && !tap.mv) { const r = cv.getBoundingClientRect(), k = idAt(V.cx + (e.clientX - r.left - r.width / 2) * V.mpp, V.cy - (e.clientY - r.top - r.height / 2) * V.mpp); if (P.on) pathTap(e.clientX - r.left, e.clientY - r.top); else if (k === sel) { sel = null; collapse(); renderPanel(); draw(); } else { pick(k); if (rec(D.cells[k])) flyTo(k); } }
+    if (solo && e.type === 'pointerup' && tap && !tap.mv) { const r = cv.getBoundingClientRect(), k = idAt(V.cx + (e.clientX - r.left - r.width / 2) * V.mpp, V.cy - (e.clientY - r.top - r.height / 2) * V.mpp); const mk = markAt(e.clientX - r.left, e.clientY - r.top); if (mk) openMark(mk.id); else if (P.on) pathTap(e.clientX - r.left, e.clientY - r.top); else if (k === sel) { sel = null; collapse(); renderPanel(); draw(); } else { pick(k); if (rec(D.cells[k])) flyTo(k); } }
     if (!ptr.size) tap = null; pinch = 0; };
   addEventListener('pointerup', end); addEventListener('pointercancel', end);
   cv.addEventListener('wheel', e => { e.preventDefault(); zoomAt(e.deltaY < 0 ? 1.2 : 1 / 1.2, e.clientX, e.clientY); }, { passive: false });
@@ -514,7 +535,7 @@ $('#rf').onclick = async () => { toast('🔄 Actualisation…'); try { if (navig
 $('#mc').onclick = () => $('#menu').classList.remove('open'); $('#menu').onclick = e => { if (e.target.id === 'menu') $('#menu').classList.remove('open'); };
 $('#imp').onclick = () => $('#fi').click();
 $('#fi').onchange = e => { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { try { importData(JSON.parse(r.result)); $('#menu').classList.remove('open'); } catch (x) { toast('Fichier illisible'); } }; r.readAsText(f); e.target.value = ''; };
-$('#exp').onclick = async () => { const photos = {}; for (const c of Object.values(D.cells)) for (const p of c.ph) { try { const u = await pGet(p.id); if (u) photos[p.id] = u; } catch (e) {} } const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify({ app: 'carnet-cepes', version: 4, grid: 50, avg: D.avg, cells: D.cells, paths: D.paths || [], photos })], { type: 'application/json' })); a.download = 'carnet-cepes-' + today() + '.json'; a.click(); toast('💾 Exporté'); };
+$('#exp').onclick = async () => { const photos = {}; for (const c of Object.values(D.cells)) for (const p of c.ph) { try { const u = await pGet(p.id); if (u) photos[p.id] = u; } catch (e) {} } const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify({ app: 'carnet-cepes', version: 4, grid: 50, avg: D.avg, cells: D.cells, paths: D.paths || [], marks: D.marks || [], photos })], { type: 'application/json' })); a.download = 'carnet-cepes-' + today() + '.json'; a.click(); toast('💾 Exporté'); };
 $('#avg').onclick = () => { const v = prompt('Poids moyen estimé d\'un cèpe (g)', D.avg); if (v && +v > 9) { D.avg = Math.round(+v); save(); renderPanel(); } };
 
 /* ===== Liste des cases avec trouvailles ===== */
@@ -673,7 +694,7 @@ function drawPaths(sx, sy) {
   const trace = p => { g.beginPath(); p.pts.forEach(([x, y], i) => i ? g.lineTo(sx(x), sy(y)) : g.moveTo(sx(x), sy(y))); g.stroke(); };
   ps.forEach(p => { g.lineWidth = 7; g.strokeStyle = 'rgba(0,0,0,.25)'; trace(p); g.lineWidth = 4; g.strokeStyle = p.id === P.sel ? 'rgba(255,255,255,.8)' : 'rgba(255,190,60,.7)'; trace(p); });
   const cnt = new Map(); ps.forEach(p => p.pts.forEach(([x, y]) => { const k = x + ',' + y; cnt.set(k, (cnt.get(k) || 0) + 1); }));      // sommet partagé = carrefour
-  ps.forEach(p => p.pts.forEach(([x, y], i) => { const e = i === 0 || i === p.pts.length - 1, j = cnt.get(x + ',' + y) > 1; g.beginPath(); g.arc(sx(x), sy(y), j ? 6 : e ? 4.5 : 3, 0, 7); g.fillStyle = j ? 'rgba(255,255,255,.95)' : p.id === P.sel ? 'rgba(255,255,255,.85)' : 'rgba(255,190,60,.8)'; g.fill(); g.lineWidth = j ? 2.5 : 1.5; g.strokeStyle = j ? 'rgb(212,169,74)' : 'rgba(59,36,18,.7)'; g.stroke(); }));
+  if (P.on) ps.forEach(p => p.pts.forEach(([x, y], i) => { const e = i === 0 || i === p.pts.length - 1, j = cnt.get(x + ',' + y) > 1; g.beginPath(); g.arc(sx(x), sy(y), j ? 6 : e ? 4.5 : 3, 0, 7); g.fillStyle = j ? 'rgba(255,255,255,.95)' : p.id === P.sel ? 'rgba(255,255,255,.85)' : 'rgba(255,190,60,.8)'; g.fill(); g.lineWidth = j ? 2.5 : 1.5; g.strokeStyle = j ? 'rgb(212,169,74)' : 'rgba(59,36,18,.7)'; g.stroke(); }));
   if (P.start) { const x = sx(P.start[0]), y = sy(P.start[1]); g.beginPath(); g.arc(x, y, 10, 0, 7); g.lineWidth = 3; g.strokeStyle = 'rgba(255,255,255,.9)'; g.stroke(); g.beginPath(); g.arc(x, y, 5, 0, 7); g.fillStyle = 'rgba(255,120,40,.9)'; g.fill(); }
   g.restore();
 }
@@ -871,5 +892,37 @@ if (!Object.keys(D.cells).length) {      // ancien carnet présent sur cet appar
   try { const old = JSON.parse(localStorage.getItem('carnet-cepes-v2') || 'null'); if (old && Array.isArray(old.maps) && confirm('Un ancien carnet a été trouvé sur cet appareil. Le convertir en cases de 50 m ?')) importData(old); } catch (e) {}
 }
 if (Object.keys(D.cells).length) fitData(); else { [V.cx, V.cy] = toM(46.6, 2.5); V.mpp = 1500; }
+/* ===== Réactions : repères avec icône et note (icônes dessinées en SVG) ===== */
+var MKE = null, mkLast = 'pin';
+function drawMarks(sx, sy) {
+  (D.marks || []).forEach(m => { const im = MKI[m.t]; if (!im || !im.complete) return; const x = sx(m.x), y = sy(m.y), s = 32;
+    g.drawImage(im, x - s / 2, y - s, s, s);
+    if (m.note) { g.beginPath(); g.arc(x + 12, y - s + 4, 4.2, 0, 7); g.fillStyle = '#fff'; g.fill(); g.lineWidth = 1.4; g.strokeStyle = '#3b2412'; g.stroke(); g.beginPath(); g.arc(x + 12, y - s + 4, 1.6, 0, 7); g.fillStyle = '#3b2412'; g.fill(); } });
+}
+function markAt(px, py) {
+  const W = cv.clientWidth, H = cv.clientHeight; let best = null, bd = 1e9;
+  (D.marks || []).forEach(m => { const x = (m.x - V.cx) / V.mpp + W / 2, y = H / 2 - (m.y - V.cy) / V.mpp, dx = Math.abs(px - x), d = Math.hypot(dx, py - (y - 14)); if (dx <= 19 && py >= y - 36 && py <= y + 8 && d < bd) { best = m; bd = d; } });
+  return best;
+}
+function here() { return me ? { x: me.x, y: me.y, where: 'gps' } : { x: V.cx, y: V.cy, where: 'center' }; }
+function mkWhere() { const e = MKE; $('#mkw').textContent = (e.id ? 'Placée le ' + fmtD(e.d) + ' · ' : '') + (e.moved ? (me ? '📍 déplacée à votre position (±' + Math.round(me.acc) + ' m)' : '🎯 déplacée au centre de la carte') : e.id ? 'position inchangée' : e.where === 'gps' ? '📍 À votre position (±' + Math.round(me.acc) + ' m)' : '🎯 Au centre de la carte (activez 📍 pour utiliser votre position)'); }
+function openMk(e) {
+  MKE = e; $('#mkt').textContent = e.id ? '📌 Modifier la réaction' : '📌 Nouvelle réaction'; $('#mkn').value = e.note || '';
+  $('#mkg').innerHTML = Object.keys(MK).map(t => `<button class="mki${t === e.t ? ' on' : ''}" data-t="${t}" aria-label="${MK[t][0]}">${mkSvg(t)}<span>${MK[t][0]}</span></button>`).join('');
+  $('#mkd').hidden = !e.id; $('#mkv').hidden = !e.id; $('#mkv').textContent = me ? '📍 Déplacer à ma position' : '🎯 Déplacer au centre de la carte'; mkWhere(); $('#mkm').classList.add('open');
+}
+const closeMk = () => $('#mkm').classList.remove('open');
+function openMark(id) { const m = (D.marks || []).find(x => x.id === id); if (m) openMk({ ...m }); }
+$('#react').onclick = () => openMk({ id: null, t: mkLast, note: '', ...here() });
+$('#mkg').onclick = e => { const b = e.target.closest('.mki'); if (!b) return; MKE.t = b.dataset.t; document.querySelectorAll('.mki').forEach(x => x.classList.toggle('on', x === b)); };
+$('#mkv').onclick = () => { Object.assign(MKE, here(), { moved: true }); mkWhere(); };
+$('#mkc').onclick = closeMk; $('#mkm').onclick = e => { if (e.target.id === 'mkm') closeMk(); };
+$('#mks').onclick = () => {
+  const e = MKE, note = $('#mkn').value.trim().slice(0, 500), snap = JSON.stringify(D.marks || []); D.marks ||= [];
+  if (e.id) { const m = D.marks.find(x => x.id === e.id); if (m) { m.t = e.t; m.note = note; m.x = e.x; m.y = e.y; } }
+  else D.marks.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), x: e.x, y: e.y, t: e.t, note, d: today() });
+  mkLast = e.t; save(); closeMk(); draw(); toast(MK[e.t][0] + ' enregistré', () => { D.marks = JSON.parse(snap); save(); draw(); });
+};
+$('#mkd').onclick = () => { const snap = JSON.stringify(D.marks || []); D.marks = D.marks.filter(x => x.id !== MKE.id); save(); closeMk(); draw(); toast('Réaction supprimée', () => { D.marks = JSON.parse(snap); save(); draw(); }); };
 renderPanel(); draw();
 </script></body></html>
