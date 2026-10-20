@@ -119,7 +119,7 @@ const idAt = (x, y) => Math.floor(x / CS) + ',' + Math.floor(y / CS);
 const ctr = k => { const [i, j] = k.split(',').map(Number); return [(i + .5) * CS, (j + .5) * CS]; };
 const blank = () => ({ name: '', note: '', ph: [], v: [] }), rec = c => c && (c.v.length || c.name || c.note || (c.ph && c.ph.length));
 const cnt = c => c ? c.v.reduce((a, v) => a + v.n, 0) : 0;
-let D = { cells: {}, avg: 150, paths: [] }, sel = null, hereK = null, me = null, watch = null, pending = false, V = { cx: 0, cy: 0, mpp: 1500 }, P = { on: false, cur: null, start: null, sel: null };
+let D = { cells: {}, avg: 150, paths: [] }, sel = null, hereK = null, me = null, watch = null, pending = false, V = { cx: 0, cy: 0, mpp: 1500 }, P = { on: false, cur: null, start: null, sel: null, sa: null, adds: [] };
 
 /* ===== Sauvegarde ===== */
 function save() { try { localStorage.setItem(KEY, JSON.stringify(D)); } catch (e) { toast('Stockage plein : exportez vos données'); } }
@@ -669,25 +669,59 @@ function drawPaths(sx, sy) {
   g.save(); g.lineCap = 'round'; g.lineJoin = 'round';
   const trace = p => { g.beginPath(); p.pts.forEach(([x, y], i) => i ? g.lineTo(sx(x), sy(y)) : g.moveTo(sx(x), sy(y))); g.stroke(); };
   ps.forEach(p => { g.lineWidth = 7; g.strokeStyle = 'rgba(0,0,0,.25)'; trace(p); g.lineWidth = 4; g.strokeStyle = p.id === P.sel ? 'rgba(255,255,255,.8)' : 'rgba(255,190,60,.7)'; trace(p); });
-  ps.forEach(p => p.pts.forEach(([x, y], i) => { const e = i === 0 || i === p.pts.length - 1; g.beginPath(); g.arc(sx(x), sy(y), e ? 4.5 : 3, 0, 7); g.fillStyle = p.id === P.sel ? 'rgba(255,255,255,.85)' : 'rgba(255,190,60,.8)'; g.fill(); g.lineWidth = 1.5; g.strokeStyle = 'rgba(59,36,18,.7)'; g.stroke(); }));
+  const cnt = new Map(); ps.forEach(p => p.pts.forEach(([x, y]) => { const k = x + ',' + y; cnt.set(k, (cnt.get(k) || 0) + 1); }));      // sommet partagé = carrefour
+  ps.forEach(p => p.pts.forEach(([x, y], i) => { const e = i === 0 || i === p.pts.length - 1, j = cnt.get(x + ',' + y) > 1; g.beginPath(); g.arc(sx(x), sy(y), j ? 6 : e ? 4.5 : 3, 0, 7); g.fillStyle = j ? 'rgba(255,255,255,.95)' : p.id === P.sel ? 'rgba(255,255,255,.85)' : 'rgba(255,190,60,.8)'; g.fill(); g.lineWidth = j ? 2.5 : 1.5; g.strokeStyle = j ? 'rgb(212,169,74)' : 'rgba(59,36,18,.7)'; g.stroke(); }));
   if (P.start) { const x = sx(P.start[0]), y = sy(P.start[1]); g.beginPath(); g.arc(x, y, 10, 0, 7); g.lineWidth = 3; g.strokeStyle = 'rgba(255,255,255,.9)'; g.stroke(); g.beginPath(); g.arc(x, y, 5, 0, 7); g.fillStyle = 'rgba(255,120,40,.9)'; g.fill(); }
   g.restore();
 }
 function pmUpdate() {
   const n = (D.paths || []).length, gps = me ? ' · GPS ±' + Math.round(me.acc) + ' m' : ' · GPS en attente';
-  $('#pmt').textContent = (P.cur ? `🥾 Chemin en cours : ${P.cur.pts.length} points. Marchez, puis 📍 Point (virage ou fin), ✔ pour finir.` : P.start ? `📍 Départ posé. Marchez en ligne droite, puis 📍 Point.` : `🥾 ${n} chemin(s). 📍 Point pose un départ ; touchez une ligne pour repartir de son bout.`) + gps;
+  $('#pmt').textContent = (P.cur ? `🥾 Chemin en cours : ${P.cur.pts.length} points. Marchez, puis 📍 Point (virage ou fin), ✔ pour finir.` : P.start ? `📍 Départ posé. Marchez en ligne droite, puis 📍 Point.` : `🥾 ${n} chemin(s). 📍 Point pose un départ ; touchez une ligne pour repartir de n'importe quel endroit (début, milieu ou bout). Les croisements deviennent des carrefours 🔀.`) + gps;
   $('#pmd').hidden = !P.sel; $('#pt').classList.toggle('on', P.on); $('#pm').hidden = !P.on;
+}
+const segProj = (p, a, b) => { const dx = b[0] - a[0], dy = b[1] - a[1], l2 = dx * dx + dy * dy, t = l2 ? Math.max(0, Math.min(1, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / l2)) : 0, q = [a[0] + t * dx, a[1] + t * dy]; return { q, t, d: Math.hypot(p[0] - q[0], p[1] - q[1]) }; };
+const segInter = (a, b, c, d) => {      // croisement strict de [a,b] et [c,d] (hors extrémités)
+  const rx = b[0] - a[0], ry = b[1] - a[1], sx = d[0] - c[0], sy = d[1] - c[1], den = rx * sy - ry * sx; if (Math.abs(den) < 1e-9) return null;
+  const t = ((c[0] - a[0]) * sy - (c[1] - a[1]) * sx) / den, u = ((c[0] - a[0]) * ry - (c[1] - a[1]) * rx) / den;
+  return t > 1e-6 && t < 1 - 1e-6 && u > 1e-6 && u < 1 - 1e-6 ? { q: [a[0] + t * rx, a[1] + t * ry], t } : null;
+};
+const rd1 = v => +v.toFixed(1), rp1 = q => [rd1(q[0]), rd1(q[1])];
+function junction(p, i, q) {      // insère q dans le trait p, entre pts[i] et pts[i+1] (ou réutilise un sommet voisin à moins de 1,5 m) : q devient un point d'accroche
+  for (const j of [i, i + 1]) if (Math.hypot(p.pts[j][0] - q[0], p.pts[j][1] - q[1]) < 1.5) return p.pts[j];
+  p.pts.splice(i + 1, 0, [q[0], q[1]]); return p.pts[i + 1];
+}
+function nearSeg(p, q) { let b = null; for (let i = 0; i + 1 < p.pts.length; i++) { const r = segProj(q, p.pts[i], p.pts[i + 1]); if (!b || r.d < b.d) b = { i, d: r.d }; } return b; }
+function commitStart() {      // un départ posé au milieu d'un trait devient un vrai sommet (carrefour) de ce trait
+  if (!P.sa || !P.start) return 0;
+  const p = (D.paths || []).find(x => x.id === P.sa); P.sa = null; if (!p) return 0;
+  const b = nearSeg(p, P.start); if (!b || b.d > 3) return 0;
+  const v = junction(p, b.i, P.start); P.start = [v[0], v[1]]; return 1;
 }
 function placePt(me) {
   if (!me) { toast('Position GPS introuvable : patientez un instant'); if (watch === null) startLoc(); return; }
-  const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]), last = P.cur ? P.cur.pts[P.cur.pts.length - 1] : P.start;
-  let pt = [me.x, me.y], bd = 10;      // s'aimante sur un point existant à moins de 10 m (carrefours)
-  (D.paths || []).forEach(p => p.pts.forEach(q => { if (last && q[0] === last[0] && q[1] === last[1]) return; const d = dist(q, pt); if (d < bd) { bd = d; pt = q; } }));
+  const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]), last = P.cur ? P.cur.pts[P.cur.pts.length - 1] : P.start, gp = [me.x, me.y];
+  const others = (D.paths || []).filter(p => p !== P.cur), away = (p, i, a) => !a || segProj(a, p.pts[i], p.pts[i + 1]).d > 2;      // ignore le tronçon qu'on quitte
+  let pt = gp, bd = 10, vtx = false, hit = null;      // s'aimante sur un point existant à moins de 10 m (carrefours)
+  (D.paths || []).forEach(p => p.pts.forEach(q => { if (last && q[0] === last[0] && q[1] === last[1]) return; const d = dist(q, gp); if (d < bd) { bd = d; pt = q; vtx = true; } }));
+  if (!vtx) {      // arrivée au milieu d'un trait : on s'y accroche, et le point devient un carrefour
+    let sd = Math.min(12, Math.max(6, me.acc));
+    others.forEach(p => { for (let i = 0; i + 1 < p.pts.length; i++) { if (!away(p, i, last)) continue; const r = segProj(gp, p.pts[i], p.pts[i + 1]); if (r.d < sd) { sd = r.d; hit = { p, i }; pt = r.q; } } });
+  }
   if (last && dist(last, pt) < 2.5) return toast(`Déplacez-vous avant d'ajouter un point`);
-  const q = [+pt[0].toFixed(1), +pt[1].toFixed(1)], acc = ' (±' + Math.round(me.acc) + ' m)';
-  if (P.cur) { P.cur.pts.push(q); toast('📍 Point ' + P.cur.pts.length + acc); }
-  else if (P.start) { P.cur = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), pts: [P.start, q] }; (D.paths ||= []).push(P.cur); P.start = null; P.sel = null; toast('🥾 Chemin tracé' + acc); }
-  else { P.start = q; toast('📍 Départ posé' + acc + ' : marchez, puis rappuyez'); }
+  let nj = commitStart(), q = rp1(pt);
+  const from = P.cur ? P.cur.pts[P.cur.pts.length - 1] : P.start, X = [];
+  if (hit && from) { const v = junction(hit.p, hit.i, q); q = [v[0], v[1]]; nj++; }
+  if (from) others.forEach(p => { for (let i = 0; i + 1 < p.pts.length; i++) {      // traversée : chaque croisement devient un carrefour des deux traits
+    if (!away(p, i, from)) continue; const c = segInter(from, q, p.pts[i], p.pts[i + 1]);
+    if (c && dist(c.q, from) > 2 && dist(c.q, q) > 2) X.push({ p, i, t: c.t, q: rp1(c.q) });
+  } });
+  X.sort((a, b) => a.p.id < b.p.id ? -1 : a.p.id > b.p.id ? 1 : b.i - a.i);      // du dernier tronçon au premier : les indices restent valides
+  X.forEach(x => { x.v = junction(x.p, x.i, x.q); });
+  X.sort((a, b) => a.t - b.t); nj += X.length;
+  const mids = X.map(x => [x.v[0], x.v[1]]), acc = ' (±' + Math.round(me.acc) + ' m)', jt = nj ? ' · 🔀 ' + nj + ' carrefour' + (nj > 1 ? 's' : '') : '';
+  if (P.cur) { P.cur.pts.push(...mids, q); P.adds.push(mids.length + 1); toast('📍 Point ' + P.cur.pts.length + acc + jt); }
+  else if (P.start) { P.cur = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), pts: [P.start, ...mids, q] }; P.adds = [mids.length + 1]; (D.paths ||= []).push(P.cur); P.start = null; P.sel = null; toast('🥾 Chemin tracé' + acc + jt); }
+  else { P.start = q; P.sa = hit ? hit.p.id : null; toast(hit ? '📍 Départ posé sur un trait (carrefour)' + acc + ' : marchez, puis rappuyez' : '📍 Départ posé' + acc + ' : marchez, puis rappuyez'); }
   save(); pmUpdate(); draw();
 }
 let samp = null;
@@ -703,24 +737,26 @@ async function addPathPt() {      // mesure pendant 3 s et pose la position moye
   try { navigator.vibrate && navigator.vibrate(40); } catch (e) {}
 }
 function undoPathPt() {
-  if (P.cur) { if (P.cur.pts.length > 2) P.cur.pts.pop(); else { const c = P.cur; D.paths = D.paths.filter(p => p !== c); P.start = c.pts[0]; P.cur = null; } }
-  else if (P.start) P.start = null; else return toast('Rien à annuler');
+  if (P.cur) { const k = P.adds.pop() || 1; if (P.cur.pts.length - k >= 2) P.cur.pts.length -= k; else { const c = P.cur; D.paths = D.paths.filter(p => p !== c); P.start = c.pts[0]; P.sa = null; P.cur = null; P.adds = []; } }
+  else if (P.start) { P.start = null; P.sa = null; } else return toast('Rien à annuler');
   save(); pmUpdate(); draw();
 }
-function finishPath() { if (!P.cur && !P.start) return toast('Aucun chemin en cours'); P.cur = null; P.start = null; P.sel = null; pmUpdate(); draw(); toast('✔ Chemin terminé'); }
+function finishPath() { if (!P.cur && !P.start) return toast('Aucun chemin en cours'); P.cur = null; P.start = null; P.sel = null; P.sa = null; P.adds = []; pmUpdate(); draw(); toast('✔ Chemin terminé'); }
 function delPath() {
-  if (!P.sel) return; const snap = JSON.stringify(D), id = P.sel; D.paths = D.paths.filter(p => p.id !== id); if (P.cur && P.cur.id === id) P.cur = null; P.sel = null; P.start = null;
+  if (!P.sel) return; const snap = JSON.stringify(D), id = P.sel; D.paths = D.paths.filter(p => p.id !== id); if (P.cur && P.cur.id === id) P.cur = null; P.sel = null; P.start = null; P.sa = null;
   save(); pmUpdate(); draw(); toast('Chemin supprimé', () => { D.paths = JSON.parse(snap).paths; save(); draw(); renderPanel(); pmUpdate(); });
 }
-function pathTap(px, py) {      // toucher une ligne : la sélectionne et pose le départ sur son sommet le plus proche
-  const W = cv.clientWidth, H = cv.clientHeight, sx = x => (x - V.cx) / V.mpp + W / 2, sy = y => H / 2 - (y - V.cy) / V.mpp;
+function pathTap(px, py) {      // toucher une ligne : la sélectionne et pose le départ (sur un sommet proche, sinon au milieu du trait = futur carrefour)
+  const W = cv.clientWidth, H = cv.clientHeight, sx = x => (x - V.cx) / V.mpp + W / 2, sy = y => H / 2 - (y - V.cy) / V.mpp, wx = x => V.cx + (x - W / 2) * V.mpp, wy = y => V.cy - (y - H / 2) * V.mpp;
   let best = null, bd = 22;
-  (D.paths || []).forEach(p => { for (let i = 1; i < p.pts.length; i++) { const ax = sx(p.pts[i - 1][0]), ay = sy(p.pts[i - 1][1]), dx = sx(p.pts[i][0]) - ax, dy = sy(p.pts[i][1]) - ay, l2 = dx * dx + dy * dy, t = l2 ? Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / l2)) : 0, d = Math.hypot(px - (ax + t * dx), py - (ay + t * dy)); if (d < bd) { bd = d; best = p; } } });
+  (D.paths || []).forEach(p => { for (let i = 1; i < p.pts.length; i++) { const r = segProj([px, py], [sx(p.pts[i - 1][0]), sy(p.pts[i - 1][1])], [sx(p.pts[i][0]), sy(p.pts[i][1])]); if (r.d < bd) { bd = r.d; best = { p, q: r.q }; } } });
   if (!best) { P.sel = null; pmUpdate(); draw(); return; }
-  let v = best.pts[0], vd = Infinity; best.pts.forEach(q => { const d = Math.hypot(sx(q[0]) - px, sy(q[1]) - py); if (d < vd) { vd = d; v = q; } });
-  P.sel = best.id; P.cur = null; P.start = [v[0], v[1]]; pmUpdate(); draw(); toast('📍 Départ posé sur ce chemin : marchez, puis 📍 Point');
+  let v = best.p.pts[0], vd = Infinity; best.p.pts.forEach(q => { const d = Math.hypot(sx(q[0]) - px, sy(q[1]) - py); if (d < vd) { vd = d; v = q; } });
+  const mid = vd > 16;
+  P.sel = best.p.id; P.cur = null; P.adds = []; P.start = mid ? rp1([wx(best.q[0]), wy(best.q[1])]) : [v[0], v[1]]; P.sa = mid ? best.p.id : null;
+  pmUpdate(); draw(); toast(mid ? '📍 Départ posé au milieu du chemin (carrefour) : marchez, puis 📍 Point' : '📍 Départ posé sur ce point du chemin : marchez, puis 📍 Point');
 }
-$('#pt').onclick = () => { P.on = !P.on; if (P.on) { if (watch === null) startLoc(); } else { P.cur = null; P.start = null; P.sel = null; } pmUpdate(); draw(); };
+$('#pt').onclick = () => { P.on = !P.on; if (P.on) { if (watch === null) startLoc(); } else { P.cur = null; P.start = null; P.sel = null; P.sa = null; P.adds = []; } pmUpdate(); draw(); };
 $('#pmp').onclick = addPathPt; $('#pmu').onclick = undoPathPt; $('#pme').onclick = finishPath; $('#pmd').onclick = delPath; $('#pmx').onclick = () => $('#pt').click();
 pmUpdate();
 
