@@ -87,6 +87,7 @@ li button{border:0;background:none;cursor:pointer;min-width:40px;min-height:40px
   <button class="btn" id="avg">⚖️ Poids moyen d'un cèpe</button>
   <button class="btn" id="cmb"></button>
   <button class="btn" id="fs"></button>
+  <button class="btn" id="dl">📥 Enregistrer la zone affichée (hors connexion)</button>
   <div class="hint" id="info"></div>
   <button class="btn" id="rf">🔄 Actualiser l'application</button>
   <button class="btn" id="mc">Fermer</button><input type="file" id="fi" accept=".json,application/json" hidden></div></div>
@@ -123,6 +124,7 @@ function mergeCell(k, c) {      // fusionne sans doublon (importer deux fois le 
 }
 const cleanPaths = a => (Array.isArray(a) ? a : []).filter(p => p && /^[\w-]+$/.test(String(p.id)) && Array.isArray(p.pts)).map(p => ({ id: String(p.id), pts: p.pts.filter(q => Array.isArray(q) && isFinite(q[0]) && isFinite(q[1])).map(q => [+q[0], +q[1]]) })).filter(p => p.pts.length >= 2);
 function mergePaths(a) { const have = new Set((D.paths ||= []).map(p => p.id)); cleanPaths(a).forEach(p => { if (!have.has(p.id)) D.paths.push(p); }); }
+function restoreSnap(snap) { const keep = D.paths; D = JSON.parse(snap); D.paths = keep; }      // annuler une action du carnet ne touche pas aux chemins
 function load() {
   try { const d = JSON.parse(localStorage.getItem(KEY) || 'null'); if (d && d.cells) { D = { cells: {}, avg: d.avg || 150, paths: cleanPaths(d.paths) }; Object.entries(d.cells).forEach(([k, c]) => /^-?\d+,-?\d+$/.test(k) && (D.cells[k] = clean(c))); } } catch (e) {}
 }
@@ -157,9 +159,18 @@ function importData(d) {
 /* ===== Carte (canvas) : tuiles satellite + cases ===== */
 const cv = $('#cv'), g = cv.getContext('2d'), tiles = new Map(); let raf = 0;
 let gridOn = (() => { try { return localStorage.getItem('cartocepe-grid') !== '0'; } catch (e) { return true; } })();
+const TURL = (z, x, y) => `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${z}/${y}/${x}`;
+const tdbP = new Promise(res => { try { const r = indexedDB.open('cartocepe-tiles', 1); r.onupgradeneeded = () => r.result.createObjectStore('t'); r.onsuccess = () => res(r.result); r.onerror = () => res(null); } catch (e) { res(null); } });
+const tget = async k => { const db = await tdbP; if (!db) return null; return new Promise(res => { try { const r = db.transaction('t').objectStore('t').get(k); r.onsuccess = () => res(r.result || null); r.onerror = () => res(null); } catch (e) { res(null); } }); };
+let tputN = 0;
+const tput = async (k, b) => { const db = await tdbP; if (!db) return; try { db.transaction('t', 'readwrite').objectStore('t').put({ b, t: Date.now() }, k); if (++tputN % 100 === 0) tprune(db); } catch (e) {} };
+function tprune(db) { try { const s = db.transaction('t', 'readwrite').objectStore('t'), all = [];      // garde au plus ~2000 tuiles (les plus récentes)
+  s.openCursor().onsuccess = e => { const c = e.target.result; if (c) { all.push([c.key, c.value.t]); c.continue(); } else if (all.length > 2000) all.sort((a, b) => a[1] - b[1]).slice(0, all.length - 1800).forEach(([k]) => s.delete(k)); }; } catch (e) {} }
 const tileImg = (z, x, y) => {
   const k = z + '/' + x + '/' + y; let t = tiles.get(k);
-  if (!t) { t = new Image(); t.onload = () => schedule(); t.src = `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${z}/${y}/${x}`; tiles.set(k, t); if (tiles.size > 400) tiles.delete(tiles.keys().next().value); }
+  if (!t) { t = new Image(); t.onload = () => schedule(); tiles.set(k, t); if (tiles.size > 400) tiles.delete(tiles.keys().next().value);
+    tget(k).then(c => { if (c && c.b) { const u = URL.createObjectURL(c.b); t.onload = () => { URL.revokeObjectURL(u); schedule(); }; t.src = u; }
+      else { t.src = TURL(z, x, y); fetch(TURL(z, x, y), { mode: 'cors' }).then(r => r.ok ? r.blob() : null).then(b => b && tput(k, b)).catch(() => {}); } }); }
   return t;
 };
 const schedule = () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; draw(); }); };
@@ -257,7 +268,7 @@ $('#pvx').onclick = closePh;
 $('#pvd').onclick = () => { const k = sel, id = pvId, c = k && D.cells[k], i = c ? c.ph.findIndex(p => p.id === id) : -1; if (i < 0) return closePh();
   const snap = JSON.stringify(D); c.ph.splice(i, 1); save(); closePh(); draw(); renderPanel();
   setTimeout(() => { if (!D.cells[k]?.ph.some(p => p.id === id)) pDel(id).catch(() => {}); }, 8000);
-  toast('Photo supprimée', () => { D = JSON.parse(snap); save(); draw(); renderPanel(); }); };
+  toast('Photo supprimée', () => { restoreSnap(snap); save(); draw(); renderPanel(); }); };
 $('#panel').addEventListener('change', async e => {
   if (e.target.id !== 'phf') return; const files = [...e.target.files]; e.target.value = ''; if (!files.length || !sel) return; const k = sel; let n = 0;
   for (const f of files) { try { const url = await shrink(f), id = Date.now().toString(36) + Math.random().toString(36).slice(2, 7); await pPut(id, url); (D.cells[k] ||= blank()).ph.push({ id, d: today() }); n++; } catch (x) { toast('Photo impossible à enregistrer'); } }
@@ -339,10 +350,10 @@ $('#panel').addEventListener('click', e => {
   const gi = e.target.closest('#gal img'); if (gi) { pvId = gi.dataset.id; $('#pvi').src = gi.src; $('#pv').classList.add('open'); return; }
   const t = e.target.closest('[data-tab]'); if (t) { ptab = t.dataset.tab; return setTab(); }
   const b = e.target.closest('[data-act]'); if (!b || !sel) return; const a = b.dataset.act, c = D.cells[sel] ||= blank();
-  if (a === 'delcell') { const snap = JSON.stringify(D), k = sel; delete D.cells[k]; sel = null; save(); renderPanel(); draw(); return toast('Case supprimée', () => { D = JSON.parse(snap); sel = k; save(); draw(); renderPanel(); }); }
+  if (a === 'delcell') { const snap = JSON.stringify(D), k = sel; delete D.cells[k]; sel = null; save(); renderPanel(); draw(); return toast('Case supprimée', () => { restoreSnap(snap); sel = k; save(); draw(); renderPanel(); }); }
   if (a === 'quick') return addFind(sel);
   if (a === 'addtoggle') { const f = $('#addv'); f.classList.toggle('on'); if (f.classList.contains('on')) $('#vn').focus(); return; }
-  if (a === 'del') { const snap = JSON.stringify(D); c.v.splice(+b.dataset.i, 1); save(); draw(); renderPanel(); return toast('Visite supprimée', () => { D = JSON.parse(snap); save(); draw(); renderPanel(); }); }
+  if (a === 'del') { const snap = JSON.stringify(D); c.v.splice(+b.dataset.i, 1); save(); draw(); renderPanel(); return toast('Visite supprimée', () => { restoreSnap(snap); save(); draw(); renderPanel(); }); }
   if (a === 'add') { const d = $('#vd').value || today(); if (d > today()) return toast('La date est dans le futur'); const n = Math.max(0, Math.round(+$('#vn').value || 0)), w = $('#vw').value;
     c.v.push({ d, n, w: w !== '' ? Math.max(0, +w) : n * D.avg, e: w === '', t: $('#vt').value.trim() }); save(); draw(); renderPanel(); collapse(); toast('Visite ajoutée 🍄'); }
 });
@@ -350,18 +361,18 @@ function addFind(k) {
   const snap = JSON.stringify(D), c = D.cells[k] ||= blank(), t = today(), v = c.v.find(v => v.d === t && !v.t) || c.v.find(v => v.d === t);
   if (v) { v.n++; v.w += D.avg; } else c.v.push({ d: t, n: 1, w: D.avg, e: true, t: '' });
   save(); collapse(); draw(); try { navigator.vibrate && navigator.vibrate(40); } catch (e) {}
-  toast('🍄 +1 · ' + c.v.filter(x => x.d === t).reduce((a, x) => a + x.n, 0) + ' aujourd\'hui sur cette case', () => { D = JSON.parse(snap); save(); draw(); renderPanel(); });
+  toast('🍄 +1 · ' + c.v.filter(x => x.d === t).reduce((a, x) => a + x.n, 0) + ' aujourd\'hui sur cette case', () => { restoreSnap(snap); save(); draw(); renderPanel(); });
 }
 
 function addVisit(k) {
   const snap = JSON.stringify(D), c = D.cells[k] ||= blank();
   c.v.push({ d: today(), n: 0, w: 0, e: false, t: '' });
   save(); collapse(); draw(); try { navigator.vibrate && navigator.vibrate(40); } catch (e) {}
-  toast('👣 +1 visite · ' + c.v.length + ' au total sur cette case', () => { D = JSON.parse(snap); save(); draw(); renderPanel(); });
+  toast('👣 +1 visite · ' + c.v.length + ' au total sur cette case', () => { restoreSnap(snap); save(); draw(); renderPanel(); });
 }
 
 /* ===== Position ===== */
-function onPos(p) { setTimeout(() => P.on && pmUpdate(), 0);
+function onPos(p) { setTimeout(() => P.on && pmUpdate(), 0); if (samp) { const [mx, my] = toM(p.coords.latitude, p.coords.longitude); samp.push({ x: mx, y: my, a: p.coords.accuracy }); }
   const [x, y] = toM(p.coords.latitude, p.coords.longitude); me = { x, y, acc: p.coords.accuracy }; const first = !hereK; hereK = idAt(x, y);
   if (first) { V.cx = x; V.cy = y; if (V.mpp > 4) V.mpp = 1.5; }
   if (pending) { const p = pending; pending = false; p === 'visit' ? addVisit(hereK) : addFind(hereK); }
@@ -551,7 +562,7 @@ function pmUpdate() {
   $('#pmt').textContent = (P.cur ? `🥾 Chemin en cours : ${P.cur.pts.length} points. Marchez, puis 📍 Point (virage ou fin), ✔ pour finir.` : P.start ? `📍 Départ posé. Marchez en ligne droite, puis 📍 Point.` : `🥾 ${n} chemin(s). 📍 Point pose un départ ; touchez une ligne pour repartir de son bout.`) + gps;
   $('#pmd').hidden = !P.sel; $('#pt').classList.toggle('on', P.on); $('#pm').hidden = !P.on;
 }
-function addPathPt() {
+function placePt(me) {
   if (!me) { toast('Position GPS introuvable : patientez un instant'); if (watch === null) startLoc(); return; }
   const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]), last = P.cur ? P.cur.pts[P.cur.pts.length - 1] : P.start;
   let pt = [me.x, me.y], bd = 10;      // s'aimante sur un point existant à moins de 10 m (carrefours)
@@ -563,6 +574,18 @@ function addPathPt() {
   else { P.start = q; toast('📍 Départ posé' + acc + ' : marchez, puis rappuyez'); }
   save(); pmUpdate(); draw();
 }
+let samp = null;
+async function addPathPt() {      // mesure pendant 3 s et pose la position moyenne (pondérée par la précision)
+  if (samp) return;
+  if (!me) { toast('Position GPS introuvable : patientez un instant'); if (watch === null) startLoc(); return; }
+  samp = [{ x: me.x, y: me.y, a: me.acc }]; const b = $('#pmp'); let n = 3; b.textContent = '⏳ ' + n + ' s'; toast('⏳ Mesure : ne bougez pas pendant 3 s');
+  const iv = setInterval(() => { b.textContent = '⏳ ' + Math.max(0, --n) + ' s'; }, 1000);
+  await new Promise(r => setTimeout(r, 3000)); clearInterval(iv);
+  const s = samp; samp = null; b.textContent = '📍 Point';
+  let w = 0, ax = 0, ay = 0; s.forEach(o => { const k = 1 / Math.max(3, o.a) ** 2; w += k; ax += o.x * k; ay += o.y * k; });
+  placePt({ x: ax / w, y: ay / w, acc: Math.min(...s.map(o => o.a)) });
+  try { navigator.vibrate && navigator.vibrate(40); } catch (e) {}
+}
 function undoPathPt() {
   if (P.cur) { if (P.cur.pts.length > 2) P.cur.pts.pop(); else { const c = P.cur; D.paths = D.paths.filter(p => p !== c); P.start = c.pts[0]; P.cur = null; } }
   else if (P.start) P.start = null; else return toast('Rien à annuler');
@@ -571,7 +594,7 @@ function undoPathPt() {
 function finishPath() { if (!P.cur && !P.start) return toast('Aucun chemin en cours'); P.cur = null; P.start = null; P.sel = null; pmUpdate(); draw(); toast('✔ Chemin terminé'); }
 function delPath() {
   if (!P.sel) return; const snap = JSON.stringify(D), id = P.sel; D.paths = D.paths.filter(p => p.id !== id); if (P.cur && P.cur.id === id) P.cur = null; P.sel = null; P.start = null;
-  save(); pmUpdate(); draw(); toast('Chemin supprimé', () => { D = JSON.parse(snap); save(); draw(); renderPanel(); pmUpdate(); });
+  save(); pmUpdate(); draw(); toast('Chemin supprimé', () => { D.paths = JSON.parse(snap).paths; save(); draw(); renderPanel(); pmUpdate(); });
 }
 function pathTap(px, py) {      // toucher une ligne : la sélectionne et pose le départ sur son sommet le plus proche
   const W = cv.clientWidth, H = cv.clientHeight, sx = x => (x - V.cx) / V.mpp + W / 2, sy = y => H / 2 - (y - V.cy) / V.mpp;
@@ -584,6 +607,23 @@ function pathTap(px, py) {      // toucher une ligne : la sélectionne et pose l
 $('#pt').onclick = () => { P.on = !P.on; if (P.on) { if (watch === null) startLoc(); } else { P.cur = null; P.start = null; P.sel = null; } pmUpdate(); draw(); };
 $('#pmp').onclick = addPathPt; $('#pmu').onclick = undoPathPt; $('#pme').onclick = finishPath; $('#pmd').onclick = delPath; $('#pmx').onclick = () => $('#pt').click();
 pmUpdate();
+
+/* ===== Carte hors connexion : télécharge les tuiles de la zone affichée (3 niveaux de zoom) ===== */
+async function dlArea() {
+  const W = cv.clientWidth, H = cv.clientHeight, x0 = V.cx - W / 2 * V.mpp, x1 = V.cx + W / 2 * V.mpp, y0 = V.cy - H / 2 * V.mpp, y1 = V.cy + H / 2 * V.mpp;
+  const Z0 = Math.max(3, Math.min(19, Math.ceil(Math.log2(156543.03392 / V.mpp)))), list = [];
+  for (let Z = Z0; Z <= Math.min(19, Z0 + 2); Z++) { const span = 256 * 156543.03392 / 2 ** Z, lim = 2 ** Z - 1;
+    for (let ty = Math.max(0, Math.floor((O - y1) / span)); ty <= Math.min(lim, Math.floor((O - y0) / span)); ty++)
+      for (let tx = Math.max(0, Math.floor((x0 + O) / span)); tx <= Math.min(lim, Math.floor((x1 + O) / span)); tx++) list.push([Z, tx, ty]); }
+  if (list.length > 500) return toast(`Zone trop grande (${list.length} tuiles) : zoomez davantage`);
+  const total = list.length; let done = 0, ok = 0; toast(`📥 Téléchargement de ${total} tuiles…`);
+  const worker = async () => { while (list.length) { const [z, x, y] = list.pop(), k = z + '/' + x + '/' + y;
+    try { if (await tget(k)) ok++; else { const r = await fetch(TURL(z, x, y), { mode: 'cors' }); if (r.ok) { await tput(k, await r.blob()); ok++; } } } catch (e) {}
+    if (++done % 25 === 0) toast(`📥 ${done} / ${total}`); } };
+  await Promise.all([worker(), worker(), worker(), worker()]);
+  toast(ok ? `📥 Carte enregistrée : ${ok} tuiles disponibles hors connexion` : 'Impossible : le serveur de cartes refuse l\'enregistrement');
+}
+$('#dl').onclick = () => { $('#menu').classList.remove('open'); dlArea(); };
 
 /* ===== Démarrage ===== */
 load();
