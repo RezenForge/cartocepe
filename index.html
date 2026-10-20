@@ -32,7 +32,7 @@ canvas{position:absolute;left:0;top:0;width:100%;height:100%;display:block;touch
 #found{height:48px;font-size:15px;padding:0 16px;border-radius:8px;border:2px solid var(--dark);background:linear-gradient(#e6bd5a,var(--gold));color:var(--dark);box-shadow:0 3px 0 var(--dark);cursor:pointer}
 #grab{flex:1;height:48px;font-size:18px;border:2px solid var(--dark);border-radius:8px;background:var(--wood);color:var(--gold);cursor:pointer}
 body.pmin #panel{display:none}
-#panel{overscroll-behavior:contain;margin:0 4px 4px;padding:8px;max-height:42dvh;overflow:auto;background:linear-gradient(var(--parch),#e6d29c)}
+#panel{overscroll-behavior:contain;margin:0 4px 4px;padding:6px 8px;max-height:46dvh;overflow:auto;background:linear-gradient(var(--parch),#e6d29c)}
 input,textarea{width:100%;padding:6px;border:2px solid var(--leather);border-radius:6px;background:#fff8e1;min-height:38px;margin:2px 0}
 .btn{display:block;width:100%;margin:5px 0;padding:13px 10px;border-radius:8px;border:2px solid var(--dark);background:var(--forest);color:#fff;cursor:pointer;box-shadow:0 3px 0 var(--dark)}
 .btn.gold{background:var(--gold);color:var(--dark)}
@@ -45,11 +45,11 @@ li button{border:0;background:none;cursor:pointer;min-width:40px;min-height:40px
 .wxd.best{border-color:#fff;box-shadow:0 0 0 2px var(--gold)}.wxd small{display:block;font-size:10px;font-weight:400}.wxd b{font-size:15px;display:block}
 .wxs{font-size:12px;margin:5px 0 2px}.wxn{font-size:11px;font-weight:400;color:var(--wood)}
 .pname{font-size:16px;font-weight:700;background:transparent;border:0;border-bottom:2px dashed var(--leather);border-radius:0;min-height:34px;margin:0 0 4px;padding:4px 2px}
-.chips{display:flex;gap:6px;flex-wrap:wrap;margin:2px 0 4px}.chips span{background:#fff8e1;border:2px solid var(--leather);border-radius:999px;padding:3px 10px;font-size:13px}
-.wxb{font-size:13px;margin:4px 0 6px;line-height:1.4}.acts{display:grid;grid-template-columns:1.4fr 1fr;gap:6px}.acts .btn{margin:4px 0;padding:12px 6px}.acts small{font-weight:400}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 2px}.chips span{background:#fff8e1;border:2px solid var(--leather);border-radius:999px;padding:3px 10px;font-size:13px}
+.wxb{font-size:13px;margin:2px 0 4px;line-height:1.4}.acts{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:5px}.acts .btn{margin:3px 0;padding:11px 4px;font-size:13px;text-align:center;text-decoration:none}.acts small{font-weight:400}
 #addv{display:none;margin-bottom:4px}#addv.on{display:grid}
-.ptab{display:flex;gap:4px;margin:4px 0 6px}.ptab button{flex:1;padding:10px 2px;font-size:12px;border:2px solid var(--dark);border-radius:8px;background:#e6d29c;cursor:pointer}.ptab button.on{background:var(--forest);color:#fff}
-.tp{display:none}.tp.on{display:block}.tp textarea{min-height:90px}.wxi{margin-top:6px;font-size:11px}.wxi summary{cursor:pointer;color:var(--leather)}
+.ptab{display:flex;gap:4px;margin:4px 0}.ptab button{flex:1;padding:10px 2px;font-size:12px;border:2px solid var(--dark);border-radius:8px;background:#e6d29c;cursor:pointer}.ptab button.on{background:var(--forest);color:#fff}
+.tp{display:none}.tp.on{display:block}.tp textarea{min-height:72px}.wxi{margin-top:6px;font-size:11px}.wxi summary{cursor:pointer;color:var(--leather)}
 .gal{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:4px}.gal img,.gal .ph0{width:100%;aspect-ratio:1;object-fit:cover;border:2px solid var(--leather);border-radius:6px;cursor:pointer;background:#e6d29c;display:flex;align-items:center;justify-content:center}
 #pv{position:fixed;inset:0;background:rgba(0,0,0,.92);display:none;flex-direction:column;z-index:40;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}#pv.open{display:flex}.pvb{display:flex;justify-content:flex-end;gap:8px;padding:8px}#pvi{flex:1;min-height:0;width:100%;object-fit:contain}
 #lst .win{display:flex;flex-direction:column;max-height:82dvh}
@@ -197,7 +197,14 @@ function fitData() {
   V.cx = (Math.min(...xs) + Math.max(...xs)) / 2; V.cy = (Math.min(...ys) + Math.max(...ys)) / 2;
   V.mpp = Math.max(1.2, Math.max((Math.max(...xs) - Math.min(...xs) + 4 * CS) / W, (Math.max(...ys) - Math.min(...ys) + 4 * CS) / H));
 }
-function zoomAt(k, px, py) {
+let fly = 0;
+function flyTo(k, z = 1.2) {      // centre en douceur la carte sur une case et zoome si besoin
+  const [tx, ty] = ctr(k), x0 = V.cx, y0 = V.cy, m0 = V.mpp, m1 = Math.min(m0, z), t0 = performance.now(), id = ++fly;
+  const step = now => { if (id !== fly) return; const p = Math.min(1, (now - t0) / 350), e = 1 - (1 - p) ** 3;
+    V.cx = x0 + (tx - x0) * e; V.cy = y0 + (ty - y0) * e; V.mpp = Math.exp(Math.log(m0) + (Math.log(m1) - Math.log(m0)) * e); draw(); if (p < 1) requestAnimationFrame(step); };
+  requestAnimationFrame(step);
+}
+function zoomAt(k, px, py) { fly++;
   const r = cv.getBoundingClientRect(), dx = (px ?? r.left + r.width / 2) - r.left - r.width / 2, dy = (py ?? r.top + r.height / 2) - r.top - r.height / 2;
   const ox = V.cx + dx * V.mpp, oy = V.cy - dy * V.mpp; V.mpp = Math.min(3000, Math.max(.3, V.mpp / k)); V.cx = ox - dx * V.mpp; V.cy = oy + dy * V.mpp; schedule();
 }
@@ -207,12 +214,12 @@ $('#gr').onclick = () => { gridOn = !gridOn; try { localStorage.setItem('cartoce
 grLabel();
 $('#zi').onclick = () => zoomAt(1.6); $('#zo').onclick = () => zoomAt(1 / 1.6);
 { const ptr = new Map(); let tap = null, pinch = 0; const dist = () => { const [a, b] = [...ptr.values()]; return Math.hypot(a.x - b.x, a.y - b.y); };
-  cv.addEventListener('pointerdown', e => { ptr.set(e.pointerId, { x: e.clientX, y: e.clientY }); if (ptr.size === 1) tap = { x: e.clientX, y: e.clientY, mv: false }; else { if (tap) tap.mv = true; pinch = dist(); } });
+  cv.addEventListener('pointerdown', e => { fly++; ptr.set(e.pointerId, { x: e.clientX, y: e.clientY }); if (ptr.size === 1) tap = { x: e.clientX, y: e.clientY, mv: false }; else { if (tap) tap.mv = true; pinch = dist(); } });
   addEventListener('pointermove', e => { const p = ptr.get(e.pointerId); if (!p) return; const dx = e.clientX - p.x, dy = e.clientY - p.y; p.x = e.clientX; p.y = e.clientY;
     if (ptr.size === 1 && tap) { if (!tap.mv && Math.hypot(e.clientX - tap.x, e.clientY - tap.y) > 8) tap.mv = true; if (tap.mv) { V.cx -= dx * V.mpp; V.cy += dy * V.mpp; schedule(); } }
     else if (ptr.size === 2 && pinch) { const [a, b] = [...ptr.values()], d = dist(); zoomAt(d / pinch, (a.x + b.x) / 2, (a.y + b.y) / 2); pinch = d; } });
   const end = e => { if (!ptr.has(e.pointerId)) return; const solo = ptr.size === 1; ptr.delete(e.pointerId);
-    if (solo && e.type === 'pointerup' && tap && !tap.mv) { const r = cv.getBoundingClientRect(); select(idAt(V.cx + (e.clientX - r.left - r.width / 2) * V.mpp, V.cy - (e.clientY - r.top - r.height / 2) * V.mpp)); }
+    if (solo && e.type === 'pointerup' && tap && !tap.mv) { const r = cv.getBoundingClientRect(), k = idAt(V.cx + (e.clientX - r.left - r.width / 2) * V.mpp, V.cy - (e.clientY - r.top - r.height / 2) * V.mpp); select(k); if (rec(D.cells[k])) flyTo(k); }
     if (!ptr.size) tap = null; pinch = 0; };
   addEventListener('pointerup', end); addEventListener('pointercancel', end);
   cv.addEventListener('wheel', e => { e.preventDefault(); zoomAt(e.deltaY < 0 ? 1.2 : 1 / 1.2, e.clientX, e.clientY); }, { passive: false });
@@ -258,8 +265,8 @@ function renderPanel() {
   p.innerHTML = `<div style="display:flex;gap:6px;align-items:center"><input class="pname" data-f="name" placeholder="✏️ Nommer ce secteur…" value="${esc(c.name)}" style="flex:1;min-width:0">${rec(c) ? '<button class="ib" data-act="delcell" aria-label="Supprimer cette case" style="width:36px;height:36px;font-size:15px;flex:none;margin-bottom:4px">🗑️</button>' : ''}</div>
     <div class="chips"><span>🍄 ${cnt(c)}</span><span>⚖️ ${fmtW(tot)}</span><span>📅 ${c.v.length} visite${c.v.length > 1 ? 's' : ''}</span></div>
     <div id="wxb" class="wxb">🌦️ Météo…</div>
-    <div class="acts"><button class="btn gold" data-act="quick">⚡ +1 cèpe <small>≈ ${D.avg} g</small></button><button class="btn" data-act="addtoggle">➕ Visite…</button></div>
-    <a class="btn" style="text-align:center;text-decoration:none;margin-top:0" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${la.toFixed(6)},${lo.toFixed(6)}&travelmode=walking">🚶 Itinéraire à pied</a>
+    <div class="acts"><button class="btn gold" data-act="quick" title="≈ ${D.avg} g">⚡ +1 cèpe</button><button class="btn" data-act="addtoggle">➕ Visite</button><a class="btn" target="_blank" rel="noopener" aria-label="Itinéraire à pied" href="https://www.google.com/maps/dir/?api=1&destination=${la.toFixed(6)},${lo.toFixed(6)}&travelmode=walking">🚶 À pied</a></div>
+    
     <div id="addv" class="row"><input type="date" id="vd" max="${today()}" value="${today()}"><input type="number" id="vn" min="0" placeholder="Cèpes" inputmode="numeric"><input type="number" id="vw" min="0" placeholder="Poids g" inputmode="numeric">
       <input class="full" id="vt" placeholder="Note de visite (facultatif)"><button class="btn gold full" data-act="add">✔ Enregistrer la visite</button></div>
     <div class="ptab"><button data-tab="wx">🌦️ Météo</button><button data-tab="hs">📜 Visites</button><button data-tab="ph">📷 Photos${c.ph.length ? ' •' : ''}</button><button data-tab="nt">📝 Notes${c.note ? ' •' : ''}</button></div>
@@ -267,7 +274,7 @@ function renderPanel() {
     <div class="tp" data-pane="ph"><label class="btn gold" style="text-align:center"><input type="file" accept="image/*" id="phf" multiple hidden>📷 Ajouter une photo</label><div class="gal" id="gal"></div></div>
     <div class="tp" data-pane="hs"><ul>${hist || '<li class="hint">Aucune visite.</li>'}</ul></div>
     <div class="tp" data-pane="nt"><textarea data-f="note" placeholder="Notes : pentes, essences, indices…">${esc(c.note)}</textarea>
-      <div class="hint" style="padding:2px 0">📍 ${la.toFixed(5)}, ${lo.toFixed(5)} · <a href="https://www.google.com/maps/dir/?api=1&destination=${la.toFixed(6)},${lo.toFixed(6)}" target="_blank" rel="noopener">🧭 Itinéraire</a></div></div>`;
+      <div class="hint" style="padding:2px 0">📍 ${la.toFixed(5)}, ${lo.toFixed(5)}</div></div>`;
   setTab(); showWx(sel); loadGal(sel);
 }
 /* ===== Météo : indice « bon jour pour aller voir » (Open-Meteo, gratuit, sans clé) =====
