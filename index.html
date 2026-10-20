@@ -18,7 +18,7 @@ button,input,textarea{font:inherit;color:inherit}
 .ib{width:42px;height:42px;border-radius:8px;border:2px solid var(--dark);background:var(--forest);font-size:18px;box-shadow:0 3px 0 var(--dark);padding:0;cursor:pointer}
 .ib:active{transform:translateY(3px);box-shadow:none}.ib.on{background:var(--gold)}
 #mapBox{flex:1;min-height:0;position:relative;margin:0 4px;border:3px solid #d9c48b;border-radius:6px;overflow:hidden}
-canvas{width:100%;height:100%;display:block;touch-action:none}
+canvas{position:absolute;left:0;top:0;width:100%;height:100%;display:block;touch-action:none}
 #zb{position:absolute;right:8px;bottom:8px;display:flex;flex-direction:column;gap:6px}
 #zb .ib{opacity:.92}
 #sc{position:absolute;left:8px;bottom:8px;color:#fff;font-size:11px;background:rgba(0,0,0,.5);padding:2px 6px;border-radius:6px}
@@ -59,7 +59,7 @@ li button{border:0;background:none;cursor:pointer}
 <header class="bar win"><h1>🍄 Cartocèpe</h1>
   <button class="ib" id="loc" aria-label="Ma position">📍</button><button class="ib" id="mn" aria-label="Menu">☰</button></header>
 <div id="mapBox"><canvas id="cv"></canvas><div id="sc"></div>
-  <div id="zb"><button class="ib" id="lb" aria-label="Liste des trouvailles">📋</button><button class="ib" id="fit" aria-label="Voir toutes mes cases">🎯</button><button class="ib" id="zi" aria-label="Zoomer">➕</button><button class="ib" id="zo" aria-label="Dézoomer">➖</button></div></div>
+  <div id="zb"><button class="ib" id="gr" aria-label="Afficher ou cacher la grille">▦</button><button class="ib" id="lb" aria-label="Liste des trouvailles">📋</button><button class="ib" id="fit" aria-label="Voir toutes mes cases">🎯</button><button class="ib" id="zi" aria-label="Zoomer">➕</button><button class="ib" id="zo" aria-label="Dézoomer">➖</button></div></div>
 <div id="dock"><button id="found">🍄 Trouvé ici !</button><button id="grab" aria-label="Réduire ou ouvrir la fiche">▾</button></div>
 <div id="panel" class="win"></div>
 <div id="menu"><div class="win"><h2 style="margin:0 0 8px">☰ Menu</h2>
@@ -130,6 +130,7 @@ function importData(d) {
 
 /* ===== Carte (canvas) : tuiles satellite + cases ===== */
 const cv = $('#cv'), g = cv.getContext('2d'), tiles = new Map(); let raf = 0;
+let gridOn = (() => { try { return localStorage.getItem('cartocepe-grid') !== '0'; } catch (e) { return true; } })();
 const tileImg = (z, x, y) => {
   const k = z + '/' + x + '/' + y; let t = tiles.get(k);
   if (!t) { t = new Image(); t.onload = () => schedule(); t.src = `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${z}/${y}/${x}`; tiles.set(k, t); if (tiles.size > 400) tiles.delete(tiles.keys().next().value); }
@@ -149,7 +150,7 @@ function draw() {
     }
   if (commOn) drawComm(0, sx, sy, W, x0, x1, y0, y1, mpp);
   const px = CS / mpp, i0 =Math.floor(x0 / CS), i1 = Math.floor(x1 / CS), j0 = Math.floor(y0 / CS), j1 = Math.floor(y1 / CS);
-  if (px >= 12 && (i1 - i0) * (j1 - j0) < 4000) {
+  if (gridOn && px >= 12 && (i1 - i0) * (j1 - j0) < 4000) {
     g.strokeStyle = 'rgba(255,255,255,.28)'; g.lineWidth = 1; g.beginPath();
     for (let i = i0; i <= i1 + 1; i++) { const x = Math.round(sx(i * CS)) + .5; g.moveTo(x, 0); g.lineTo(x, H); }
     for (let j = j0; j <= j1 + 1; j++) { const y = Math.round(sy(j * CS)) + .5; g.moveTo(0, y); g.lineTo(W, y); }
@@ -187,6 +188,9 @@ function zoomAt(k, px, py) {
   const ox = V.cx + dx * V.mpp, oy = V.cy - dy * V.mpp; V.mpp = Math.min(3000, Math.max(.3, V.mpp / k)); V.cx = ox - dx * V.mpp; V.cy = oy + dy * V.mpp; schedule();
 }
 $('#fit').onclick = () => { if (!Object.values(D.cells).some(rec)) return toast('Aucune case enregistrée'); fitData(); schedule(); };
+const grLabel = () => { $('#gr').classList.toggle('on', gridOn); $('#gr').style.opacity = gridOn ? '' : '.6'; };
+$('#gr').onclick = () => { gridOn = !gridOn; try { localStorage.setItem('cartocepe-grid', gridOn ? '1' : '0'); } catch (e) {} grLabel(); schedule(); toast(gridOn ? '▦ Grille affichée' : '▢ Grille masquée'); };
+grLabel();
 $('#zi').onclick = () => zoomAt(1.6); $('#zo').onclick = () => zoomAt(1 / 1.6);
 { const ptr = new Map(); let tap = null, pinch = 0; const dist = () => { const [a, b] = [...ptr.values()]; return Math.hypot(a.x - b.x, a.y - b.y); };
   cv.addEventListener('pointerdown', e => { ptr.set(e.pointerId, { x: e.clientX, y: e.clientY }); if (ptr.size === 1) tap = { x: e.clientX, y: e.clientY, mv: false }; else { if (tap) tap.mv = true; pinch = dist(); } });
@@ -199,7 +203,7 @@ $('#zi').onclick = () => zoomAt(1.6); $('#zo').onclick = () => zoomAt(1 / 1.6);
   addEventListener('pointerup', end); addEventListener('pointercancel', end);
   cv.addEventListener('wheel', e => { e.preventDefault(); zoomAt(e.deltaY < 0 ? 1.2 : 1 / 1.2, e.clientX, e.clientY); }, { passive: false });
   addEventListener('resize', schedule);
-  if (window.ResizeObserver) new ResizeObserver(() => { cv.width = 0; schedule(); }).observe($('#mapBox')); }
+  if (window.ResizeObserver) new ResizeObserver(() => draw()).observe($('#mapBox')); }
 
 /* ===== Fiche d'une case ===== */
 function select(k) { sel = k; document.body.classList.remove('pmin'); $('#grab').textContent = '▾'; renderPanel(); draw(); }
@@ -281,7 +285,7 @@ $('#panel').addEventListener('click', e => {
 function addFind(k) {
   const snap = JSON.stringify(D), c = D.cells[k] ||= blank(), t = today(), v = c.v.find(v => v.d === t && !v.t) || c.v.find(v => v.d === t);
   if (v) { v.n++; v.w += D.avg; } else c.v.push({ d: t, n: 1, w: D.avg, e: true, t: '' });
-  save(); select(k); collapse(); try { navigator.vibrate && navigator.vibrate(40); } catch (e) {}
+  save(); sel = k; renderPanel(); collapse(); draw(); try { navigator.vibrate && navigator.vibrate(40); } catch (e) {}
   toast('🍄 +1 · ' + c.v.filter(x => x.d === t).reduce((a, x) => a + x.n, 0) + ' aujourd\'hui sur cette case', () => { D = JSON.parse(snap); save(); draw(); renderPanel(); });
 }
 
