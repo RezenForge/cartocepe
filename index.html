@@ -7,7 +7,7 @@
 <meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Cartocèpe"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><title>Cartocèpe</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Alegreya+SC:wght@500;700;800&display=swap">
 <style>
 /* ===== Cartocèpe — direction « carnet d'explorateur » : sous-bois, mousse, humus, laiton ===== */
 :root{
@@ -182,22 +182,191 @@ li small{color:var(--ink2);font-weight:500}
 .jrg small{display:block;line-height:1.25}
 .wxd .rg{font-style:normal;font-size:10px;font-weight:700;color:#9a7430;vertical-align:super;margin-left:1px}
 #toast{top:calc(env(safe-area-inset-top) + 74px);bottom:auto}
+
+/* ===== Carnet « donjon » : salle de pierre moussue, éclairée à la torche (fiche de zone + carnet de découvertes) ===== */
+.dg{--txt:#f1e6c9;--mut:#ab9f84;--ember:#eaa53c;--ember2:#ffd27a;--slot:#1b1814;--edge:#0e0c09;--rim:#4a4236;--px:"Alegreya SC",Georgia,"Times New Roman",serif;--num:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  position:relative;color:var(--txt)!important;border:2px solid var(--edge)!important;border-radius:6px!important;
+  background:
+    radial-gradient(120% 70% at 50% -10%,rgba(234,165,60,.13),transparent 60%),
+    radial-gradient(60% 40% at 8% 100%,rgba(95,130,60,.18),transparent 70%),
+    repeating-linear-gradient(0deg,transparent 0 25px,rgba(0,0,0,.28) 25px 27px),
+    repeating-linear-gradient(90deg,transparent 0 52px,rgba(0,0,0,.18) 52px 54px),
+    linear-gradient(180deg,#322c25,#25211b)!important;
+  box-shadow:inset 0 0 0 2px #574c3d,inset 0 0 0 4px #1a1712,inset 0 10px 24px rgba(0,0,0,.35),0 -4px 20px rgba(0,0,0,.55)!important}
+.dg::before{content:'';position:absolute;inset:7px;pointer-events:none;z-index:0;background:
+  radial-gradient(circle,#d6ab55 0 1.7px,#4a3a22 2.2px 3px,transparent 3.4px) 0 0/8px 8px no-repeat,
+  radial-gradient(circle,#d6ab55 0 1.7px,#4a3a22 2.2px 3px,transparent 3.4px) 100% 0/8px 8px no-repeat,
+  radial-gradient(circle,#d6ab55 0 1.7px,#4a3a22 2.2px 3px,transparent 3.4px) 0 100%/8px 8px no-repeat,
+  radial-gradient(circle,#d6ab55 0 1.7px,#4a3a22 2.2px 3px,transparent 3.4px) 100% 100%/8px 8px no-repeat}
+.dg>*{position:relative;z-index:1}
+#panel.dg{padding:11px 13px 8px}
+
+/* rareté de la zone */
+.rar{display:inline-block;padding:2px 7px 2px;border:1px solid currentColor;border-radius:2px;background:rgba(0,0,0,.4);font:800 10.5px/1.3 var(--num);letter-spacing:.1em;text-transform:uppercase;box-shadow:0 0 0 1px rgba(0,0,0,.5)}
+.r0{color:#b2aa98}.r1{color:#a9c98a}.r2{color:#e8a066}.r3{color:#9ee070}.r4{color:#ffd45e;text-shadow:0 0 8px rgba(255,200,80,.6)}
+.rar.r4{animation:torch 2.6s ease-in-out infinite}
+.dg .eye .nv{color:var(--mut)}.dg .eye .nv b{color:var(--txt)}
+.dg .pname{font:700 22px/1.15 var(--px);color:#fff1cf;text-shadow:2px 2px 0 #000;border-bottom:2px dashed rgba(234,165,60,.35)}
+.dg .pname::placeholder{color:#8d826b;font-style:normal}
+.dg .ib.sm{background:rgba(0,0,0,.35);border:2px solid #5c2a20;color:#ef8a6e;border-radius:4px}
+
+/* emplacements d'inventaire */
+.slots{display:grid;grid-template-columns:1fr 1.3fr 1fr;gap:6px;margin:7px 0 4px}
+.slot{display:flex;align-items:center;gap:7px;min-width:0;padding:5px 7px;background:var(--slot);border:2px solid var(--edge);border-radius:4px;box-shadow:inset 0 0 0 1px var(--rim),inset 0 4px 8px rgba(0,0,0,.55)}
+.slot svg{width:26px;height:26px;flex:none;filter:drop-shadow(1px 1px 0 #000)}
+.slot span{min-width:0}
+.slot b{display:block;font:800 18px/1.1 var(--num);font-variant-numeric:tabular-nums;color:#fff3d6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:1px 1px 0 #000}
+.slot small{display:block;margin-top:1px;font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--mut)}
+.lastf{margin:0 2px 6px;font-size:12px;color:var(--mut)}.lastf b{color:var(--ember2);font-weight:700}
+
+/* potentiel : jauge segmentée */
+.dg .vd{background:var(--slot);border:2px solid var(--edge);border-radius:4px;box-shadow:inset 0 0 0 1px var(--rim),inset 0 4px 10px rgba(0,0,0,.5);color:var(--txt);padding:7px 10px 7px 7px;margin:2px 0 8px}
+.dg .vdc{width:50px;height:50px;border-radius:4px;background:#0d0b08;color:var(--tc,#8d826b);border:2px solid var(--tc,#4a4236);font:800 22px/1 var(--num);text-shadow:0 0 8px rgba(0,0,0,.8);box-shadow:inset 0 0 12px rgba(0,0,0,.8)}
+.dg .vdc.t3{animation:torch 2.6s ease-in-out infinite;box-shadow:inset 0 0 12px rgba(0,0,0,.8),0 0 12px rgba(231,180,64,.55)}
+.dg .vdl{color:var(--mut);margin-bottom:3px}
+.gauge{display:flex;gap:2px;margin:0 0 4px}
+.gauge i{flex:1;height:9px;background:#0d0b08;border:1px solid #3a332a;border-radius:1px}
+.gauge i.f{background:var(--tc,#8d826b);border-color:rgba(0,0,0,.6);box-shadow:inset 0 2px 0 rgba(255,255,255,.35),inset 0 -2px 0 rgba(0,0,0,.25)}
+.dg .vdt b.tn{color:var(--tc);font:800 17px/1.2 var(--px);letter-spacing:.02em;text-shadow:1px 1px 0 #000}
+.dg .vdt small{color:var(--mut)}
+@keyframes torch{0%,100%{filter:brightness(1)}45%{filter:brightness(1.18)}60%{filter:brightness(.95)}}
+
+/* boutons de pierre */
+.dg .btn{border-radius:4px;border:2px solid var(--edge);background:linear-gradient(#4d453a,#3a332b);color:#f6ead0;font-weight:700;text-shadow:1px 1px 0 #000;box-shadow:inset 0 2px 0 rgba(255,255,255,.13),inset 0 -3px 0 rgba(0,0,0,.4),0 2px 0 rgba(0,0,0,.45)}
+.dg .btn:active{transform:translateY(2px);box-shadow:inset 0 3px 0 rgba(0,0,0,.45);filter:none}
+.dg .btn.gold{background:linear-gradient(#f4c862,#c6862a);color:#2a1806;text-shadow:0 1px 0 rgba(255,240,200,.45);box-shadow:inset 0 2px 0 rgba(255,255,255,.4),inset 0 -3px 0 rgba(90,50,10,.45),0 2px 0 rgba(0,0,0,.45),0 0 12px rgba(234,165,60,.25)}
+
+/* onglets */
+.dg .ptab,.dg .seg{background:#14110e;border:2px solid var(--edge);border-radius:4px;box-shadow:inset 0 0 0 1px #362f27;padding:3px}
+.dg .ptab button,.dg .seg button{border-radius:3px;color:var(--mut);background:transparent}
+.dg .ptab button.on,.dg .seg button.on{background:linear-gradient(#4d453a,#3a332b);color:var(--ember2);box-shadow:inset 0 -2px 0 var(--ember),inset 0 1px 0 rgba(255,255,255,.12)}
+
+/* contenu des onglets */
+.dg .hint,.dg .wxn,.dg .wxi summary,.dg .wxb small,.dg li small{color:var(--mut)}
+.dg .wxd{background:var(--slot);border:2px solid var(--edge);border-radius:3px;box-shadow:inset 0 0 0 1px #3a332a;color:var(--mut)}
+.dg .wxd b{font:800 16px/1.25 var(--num);font-variant-numeric:tabular-nums;text-shadow:1px 1px 0 #000}
+.dg .wxd.best{border-color:var(--ember);box-shadow:inset 0 0 0 1px var(--ember2),0 0 10px rgba(234,165,60,.45)}
+.dg .wxd .rg{color:var(--ember2)}
+.dg input:not(.pname),.dg textarea{background:#14110e;color:var(--txt);border:2px solid var(--edge);border-radius:3px;box-shadow:inset 0 0 0 1px #3a332a;color-scheme:dark}
+.dg input::placeholder,.dg textarea::placeholder{color:#7d735f}
+.dg li{border-bottom:1px dashed #3d352b}
+.dg .tp[data-pane=hs] li{font:500 13.5px/1.4 var(--num)}.dg .tp[data-pane=hs] li b{color:#fff1cf}
+.dg .lg{font-style:normal;color:var(--ember);margin-right:6px;font-weight:700}
+.dg li button{color:var(--mut)}
+.dg .gal img,.dg .gal .ph0{border:2px solid var(--edge);border-radius:3px;background:var(--slot)}
+
+/* carnet de découvertes */
+#lst .win.dg{padding:16px}
+.dg h2{font:700 22px/1.15 var(--px)!important;color:#fff1cf!important;text-shadow:2px 2px 0 #000}
+.dg h2 small{color:var(--ember)!important;font-family:var(--sans)!important;text-shadow:none}
+.dg .lhd .ib{background:rgba(0,0,0,.35);border:2px solid var(--edge);border-radius:4px;color:var(--txt)}
+#ll .crest{filter:drop-shadow(1px 1px 0 #000)}
+.dg #ll li{background:var(--slot);border:2px solid var(--edge);border-radius:4px;box-shadow:inset 0 0 0 1px var(--rim);color:var(--txt)}
+.dg #ll li:active{background:#2a241d}
+.dg #ll .lt b{color:#fff1cf}
+.dg #ll .bd b{font:800 18px/1 var(--num);color:var(--ember2);text-shadow:1px 1px 0 #000}
+.dg #ll .top{color:var(--ember2)}
+@media (max-height:640px){.slot{padding:3px 6px}.slot svg{width:22px;height:22px}.slot b{font-size:16px}.dg .vdc{width:42px;height:42px;font-size:19px}}
+@media (prefers-reduced-motion:reduce){.rar.r4,.dg .vdc.t3{animation:none}}
+
+/* ===== Refonte donjon : toute l'application ===== */
+:root{--txt:#f1e6c9;--mut:#ab9f84;--ember:#eaa53c;--ember2:#ffd27a;--slot:#1b1814;--edge:#0e0c09;--rim:#4a4236;
+  --px:"Alegreya SC",Georgia,"Times New Roman",serif;--num:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --stone:linear-gradient(#4d453a,#3a332b);--bevel:inset 0 2px 0 rgba(255,255,255,.13),inset 0 -3px 0 rgba(0,0,0,.42),0 2px 0 rgba(0,0,0,.45)}
+body{background:
+  repeating-linear-gradient(0deg,transparent 0 31px,rgba(0,0,0,.25) 31px 33px),
+  repeating-linear-gradient(90deg,transparent 0 63px,rgba(0,0,0,.18) 63px 65px),
+  radial-gradient(120% 60% at 50% 0%,#2a2620 0%,#16130f 75%)}
+
+/* En-tête */
+.bar.dg{padding:6px 8px 6px 12px}
+.bar h1{font:800 22px/1.05 var(--px);color:#fff1cf;text-shadow:2px 2px 0 #000;letter-spacing:.02em}
+.brand small{color:var(--ember);font:800 10px/1.2 var(--num);letter-spacing:.14em}
+.emb svg circle:first-child{fill:#1b1814;stroke:#d6ab55}
+
+/* Boutons de pierre (en-tête, barre d'outils, fenêtres) */
+.ib{border-radius:5px;border:2px solid var(--edge);background:var(--stone);color:var(--txt);box-shadow:var(--bevel)}
+.ib:active{transform:translateY(2px);box-shadow:inset 0 3px 0 rgba(0,0,0,.45);background:var(--stone)}
+.ib.on{background:linear-gradient(#5a4a30,#3f331f);border-color:var(--edge);color:var(--ember2);box-shadow:inset 0 0 0 1px var(--ember),inset 0 -3px 0 rgba(0,0,0,.4),0 0 10px rgba(234,165,60,.35)}
+
+/* Cadre de la carte */
+#mapBox{border:3px solid var(--edge);border-radius:6px;box-shadow:0 0 0 2px #574c3d,0 0 0 4px var(--edge),0 6px 18px rgba(0,0,0,.5);margin:2px 8px 0}
+#mapBox::after{border-radius:3px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.5),inset 0 0 40px rgba(10,6,2,.5)}
+#sc{background:rgba(14,12,9,.82);color:var(--txt);font:800 11px/1.3 var(--num);border-radius:3px 3px 0 0}
+#nr svg circle{fill:rgba(14,12,9,.82);stroke:#d6ab55}
+
+/* Barre d'outils */
+#zb{background:linear-gradient(rgba(58,51,43,.95),rgba(37,33,27,.95));border:2px solid var(--edge);border-radius:6px;box-shadow:inset 0 0 0 1px #5a4f40,0 4px 14px rgba(0,0,0,.55);padding:4px;gap:3px}
+#zb .ib{border:2px solid transparent;border-radius:4px;background:transparent;box-shadow:none;color:#efe2c4}
+#zb .ib:active{background:rgba(0,0,0,.35);box-shadow:inset 0 2px 0 rgba(0,0,0,.4)}
+#zb .ib.on{background:linear-gradient(#5a4a30,#3f331f);border-color:var(--edge);color:var(--ember2);box-shadow:inset 0 0 0 1px var(--ember),0 0 10px rgba(234,165,60,.35)}
+#zb .sep{background:#5a4f40;width:2px;box-shadow:1px 0 0 rgba(0,0,0,.5)}
+
+/* Dock */
+#dock{margin:8px 8px 6px}
+#dock button{border-radius:5px;border:2px solid var(--edge);box-shadow:var(--bevel);text-shadow:1px 1px 0 #000}
+#dock button:active{transform:translateY(2px);box-shadow:inset 0 3px 0 rgba(0,0,0,.45);filter:none}
+#found{background:linear-gradient(#f4c862,#c6862a);color:#2a1806;text-shadow:0 1px 0 rgba(255,240,200,.45);box-shadow:inset 0 2px 0 rgba(255,255,255,.4),inset 0 -3px 0 rgba(90,50,10,.45),0 2px 0 rgba(0,0,0,.45),0 0 14px rgba(234,165,60,.3);font:800 18px var(--num)}
+#visit,#react,#grab{background:var(--stone);color:var(--txt);font:800 16px var(--num)}
+#react.on{background:linear-gradient(#5a4a30,#3f331f);color:var(--ember2);box-shadow:inset 0 0 0 1px var(--ember),0 0 10px rgba(234,165,60,.35)}
+#grab{color:var(--ember2)}
+
+/* Cartouches sur la carte (sentiers, itinéraire, repère) */
+#pm.dg,#rt.dg,#rm.dg{padding:10px 12px;font-size:14px;line-height:1.4;border-left:2px solid var(--edge)!important}
+.dg .eyb{color:var(--ember);font:800 10.5px/1.2 var(--num);letter-spacing:.14em}
+.dg #rts small{color:var(--mut)}
+.pmb button,.tipb button{border-radius:5px;border:2px solid var(--edge);background:var(--stone);color:var(--txt);box-shadow:var(--bevel);text-shadow:1px 1px 0 #000;font-weight:800}
+.pmb button:active{transform:translateY(2px);box-shadow:inset 0 3px 0 rgba(0,0,0,.45);filter:none}
+#pmp,#rmg,#rtn{background:linear-gradient(#f4c862,#c6862a);color:#2a1806;text-shadow:0 1px 0 rgba(255,240,200,.45);box-shadow:inset 0 2px 0 rgba(255,255,255,.4),inset 0 -3px 0 rgba(90,50,10,.45),0 2px 0 rgba(0,0,0,.45)}
+#pmrec.rec{background:linear-gradient(#b8462f,#7e2a1c);box-shadow:var(--bevel),0 0 12px rgba(200,70,40,.45)}
+
+/* Fenêtres (journal, repère, hors connexion) */
+#menu,#lst,#dlm,#mkm{background:rgba(6,5,3,.72)}
+#menu .win.dg,#dlm .win.dg,#mkm .win.dg{padding:16px}
+.dg .mh{color:var(--ember);font:800 10.5px/1 var(--num);letter-spacing:.16em;margin:16px 2px 6px}
+.dg .mh::before{content:'◆ ';color:#6b5d47}
+#menu .dg .btn:not(.gold),#dlm .dg .btn:not(.gold),#mkm .dg .btn:not(.gold):not(#mkd){background:var(--stone);color:var(--txt);border:2px solid var(--edge);box-shadow:var(--bevel)}
+#mkm .dg #mkd{background:linear-gradient(#a33c28,#6e2416)!important;box-shadow:var(--bevel)}
+.dg .sw{background:#0d0b08;box-shadow:inset 0 0 0 1px #3a332a;border-radius:3px}
+.dg .sw::after{background:#8d826b;border-radius:2px;box-shadow:inset 0 1px 0 rgba(255,255,255,.3)}
+.dg .sw.on{background:#3a2a10;box-shadow:inset 0 0 0 1px var(--ember)}
+.dg .sw.on::after{background:var(--ember2);box-shadow:0 0 8px rgba(255,210,122,.6)}
+.dg #jr{background:var(--slot);border:2px solid var(--edge);border-radius:4px;box-shadow:inset 0 0 0 1px var(--rim),inset 0 4px 10px rgba(0,0,0,.5)}
+.dg .jrh svg.i{color:var(--ember)}
+.dg .jrh small{color:var(--ember);font-family:var(--num);font-weight:800}
+.dg .jrh b{font:800 22px/1.2 var(--px);color:#fff1cf;text-shadow:2px 2px 0 #000}
+.dg .jrh i{color:var(--mut);opacity:1}
+.dg .jrp{height:9px;border-radius:1px;background:#0d0b08;border:1px solid #3a332a}
+.dg .jrp i{background:linear-gradient(#ffd27a,#c6862a);box-shadow:0 0 8px rgba(234,165,60,.5)}
+.dg .jrg div{background:#24201a;border:2px solid var(--edge);border-radius:3px;box-shadow:inset 0 0 0 1px #3a332a}
+.dg .jrg b{font:800 18px/1.2 var(--num);color:#fff3d6;text-shadow:1px 1px 0 #000}
+.dg .jrg small{color:var(--mut);opacity:1;font-weight:700}
+.dg .mki{background:var(--slot);border:2px solid var(--edge);border-radius:4px;color:var(--mut);box-shadow:inset 0 0 0 1px #3a332a}
+.dg .mki.on{background:#2e2618;border-color:var(--edge);color:var(--ember2);box-shadow:inset 0 0 0 1px var(--ember),0 0 10px rgba(234,165,60,.35)}
+.dg #mkw{color:var(--mut)!important}
+
+/* Notifications */
+#toast,#dlp{background:linear-gradient(#3a332b,#25211b);color:var(--txt);border:2px solid var(--edge);border-radius:5px;box-shadow:inset 0 0 0 1px #5a4f40,0 8px 20px rgba(0,0,0,.6);font-weight:600}
+#toast button,#dlp button{border:2px solid var(--edge);border-radius:4px;background:linear-gradient(#f4c862,#c6862a);color:#2a1806;font-weight:800}
+#dlb{background:#0d0b08;border:1px solid #3a332a;height:8px;border-radius:1px}#dlbi{background:linear-gradient(#ffd27a,#c6862a)}
+
+.dg .lim{color:#e8b07a}.wxl{margin:6px 2px 0;font-size:12.5px;line-height:1.4;color:#e8b07a}.wxl b{color:var(--txt)}
 </style></head><body>
-<header class="bar win"><span class="emb" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="14.5" fill="none" stroke="currentColor" stroke-width="1" opacity=".55"/><circle cx="16" cy="16" r="10.5" fill="none" stroke="currentColor" stroke-width=".8" opacity=".35"/><path d="M16 4.5l2.2 9.3 9.3 2.2-9.3 2.2L16 27.5l-2.2-9.3L4.5 16l9.3-2.2z" fill="currentColor" opacity=".3"/><path d="M16 4.5l2.2 9.3h-4.4z" fill="#e3c071"/><path d="M16 27.5l-2.2-9.3h4.4z" fill="currentColor" opacity=".8"/><circle cx="16" cy="16" r="1.6" fill="#e3c071"/></svg></span>
+<header class="bar win dg"><span class="emb" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="15" fill="#2f3d27" stroke="currentColor" stroke-width="1.2"/><circle cx="16" cy="16" r="12.6" fill="none" stroke="currentColor" stroke-width=".6" opacity=".45"/><g transform="translate(5.2 4.6) scale(.68)"><path d="M12.2 17.5c-1.6 4.2-2.3 8.2-.9 10.6 1 1.6 3 2.1 4.7 2.1s3.7-.5 4.7-2.1c1.4-2.4.7-6.4-.9-10.6z" fill="#f3e6c4" stroke="#2a1a0d" stroke-width="1.6" stroke-linejoin="round"/><path d="M2.8 17.6C2.8 9.2 8.7 3 16 3s13.2 6.2 13.2 14.6c0 1.6-5.2 2.6-13.2 2.6S2.8 19.2 2.8 17.6z" fill="#9a5522" stroke="#2a1a0d" stroke-width="1.6" stroke-linejoin="round"/><path d="M7 11.4c2.2-3.6 5.4-5 9-5" fill="none" stroke="#fff" stroke-opacity=".4" stroke-width="2" stroke-linecap="round"/></g></svg></span>
   <div class="brand"><h1>Cartocèpe</h1><small id="ssn">Carnet d'exploration</small></div>
   <button class="ib" id="loc" data-ic="loc" aria-label="Ma position"></button><button class="ib" id="mn" data-ic="set" aria-label="Journal et réglages"></button></header>
 <div id="mapBox"><canvas id="cv"></canvas><div id="sc"></div>
   <div id="nr" aria-hidden="true"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="16.5" fill="rgba(17,24,18,.66)" stroke="rgba(227,192,113,.6)"/><text x="18" y="11.6" text-anchor="middle" font-size="8.5" font-weight="700" fill="#e3c071" font-family="system-ui,sans-serif">N</text><path d="M18 13.5l3.6 9H14.4z" fill="#e3c071"/><path d="M18 31l-3.6-8.5h7.2z" fill="#f1e6c9" opacity=".45"/></svg></div>
-  <div id="pm" hidden><div class="eyb">Cartographie des sentiers</div><div id="pmt"></div><div class="pmb"><button id="pmp">📍 Point</button><button id="pmu" aria-label="Annuler le dernier point">↩</button><button id="pme" aria-label="Terminer le chemin">✔</button><button id="pmd" hidden aria-label="Supprimer le chemin">🗑</button><button id="pmx" aria-label="Quitter le mode chemins">✕</button></div><div class="pmb"><button id="pmrec">⏺ Enregistrer</button><button id="pmn" hidden aria-label="Nommer le chemin">✎ Nom</button></div></div>
-  <div id="rt" hidden><div class="eyb">Itinéraire</div><div id="rtt"></div><div id="rts"></div><div class="pmb"><button id="rtn" aria-label="Point suivant">Suivant ›</button><button id="rtg" aria-label="Ouvrir dans Maps">Ouvrir dans Maps</button><button id="rtx" aria-label="Fermer l'itinéraire" style="margin-left:auto">✕</button></div></div>
-  <div id="rm" hidden><div class="eyb">Poser un repère</div><div id="rmt">Touchez la carte pour poser un repère, ou touchez un repère existant pour le modifier.</div><div class="pmb"><button id="rmg">À ma position</button><button id="rmx" aria-label="Quitter le mode repère">✕</button></div></div>
+  <div id="pm" class="dg" hidden><div class="eyb">Cartographie des sentiers</div><div id="pmt"></div><div class="pmb"><button id="pmp">📍 Point</button><button id="pmu" aria-label="Annuler le dernier point">↩</button><button id="pme" aria-label="Terminer le chemin">✔</button><button id="pmd" hidden aria-label="Supprimer le chemin">🗑</button><button id="pmx" aria-label="Quitter le mode chemins">✕</button></div><div class="pmb"><button id="pmrec">⏺ Enregistrer</button><button id="pmn" hidden aria-label="Nommer le chemin">✎ Nom</button></div></div>
+  <div id="rt" class="dg" hidden><div class="eyb">Itinéraire</div><div id="rtt"></div><div id="rts"></div><div class="pmb"><button id="rtn" aria-label="Point suivant">Suivant ›</button><button id="rtg" aria-label="Ouvrir dans Maps">Ouvrir dans Maps</button><button id="rtx" aria-label="Fermer l'itinéraire" style="margin-left:auto">✕</button></div></div>
+  <div id="rm" class="dg" hidden><div class="eyb">Poser un repère</div><div id="rmt">Touchez la carte pour poser un repère, ou touchez un repère existant pour le modifier.</div><div class="pmb"><button id="rmg">À ma position</button><button id="rmx" aria-label="Quitter le mode repère">✕</button></div></div>
   <div id="zb"><button class="ib" id="gr" data-ic="grid" aria-label="Afficher ou cacher la grille"></button><button class="ib" id="pt" data-ic="trail" aria-label="Cartographier les sentiers"></button><button class="ib" id="rtb" data-ic="compass" aria-label="Itinéraire vers mes zones"></button><button class="ib" id="lb" data-ic="book" aria-label="Carnet de découvertes"></button><i class="sep"></i><button class="ib" id="fit" data-ic="fit" aria-label="Voir toutes mes zones"></button><button class="ib" id="zo" data-ic="minus" aria-label="Dézoomer"></button><button class="ib" id="zi" data-ic="plus" aria-label="Zoomer"></button></div></div>
 <div id="dock"><button id="found" aria-label="Ajouter un cèpe">+1<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" aria-hidden="true"><path d="M12.2 17.5c-1.6 4.2-2.3 8.2-.9 10.6 1 1.6 3 2.1 4.7 2.1s3.7-.5 4.7-2.1c1.4-2.4.7-6.4-.9-10.6z" fill="#f3e6c4" stroke="#3b2412" stroke-width="1.8" stroke-linejoin="round"/><path d="M2.8 17.6C2.8 9.2 8.7 3 16 3s13.2 6.2 13.2 14.6c0 1.6-5.2 2.6-13.2 2.6S2.8 19.2 2.8 17.6z" fill="#9a5522" stroke="#3b2412" stroke-width="1.8" stroke-linejoin="round"/><path d="M7 11.4c2.2-3.6 5.4-5 9-5" fill="none" stroke="#fff" stroke-opacity=".38" stroke-width="2" stroke-linecap="round"/></svg></button><button id="visit" data-ic="foot" aria-label="Ajouter une visite">+1</button><button id="react" data-ic="flag" aria-label="Poser un repère"></button><button id="grab" aria-label="Réduire ou ouvrir la fiche">▾</button></div>
-<div id="panel" class="win"></div>
-<div id="mkm"><div class="win"><h2 id="mkt">Nouveau repère</h2><div class="hint" id="mkw" style="padding:0"></div>
+<div id="panel" class="win dg"></div>
+<div id="mkm"><div class="win dg"><h2 id="mkt">Nouveau repère</h2><div class="hint" id="mkw" style="padding:0"></div>
   <div id="mkg"></div><textarea id="mkn" placeholder="Note : ce que vous avez vu, à retenir…" maxlength="500" style="min-height:76px"></textarea>
-  <button class="btn gold" id="mks">Enregistrer</button><button class="btn" id="mkv" hidden></button><button class="btn" id="mkd" hidden style="background:#8b2d22">Supprimer</button><button class="btn" id="mkc" style="background:var(--paper3);color:var(--ink);border-color:var(--line)">Annuler</button></div></div>
-<div id="menu"><div class="win"><h2>Journal d'exploration</h2><div id="jr"></div>
+  <button class="btn gold" id="mks">Enregistrer</button><button class="btn" id="mkv" hidden></button><button class="btn" id="mkd" hidden style="background:#8b2d22">Supprimer</button><button class="btn" id="mkc">Annuler</button></div></div>
+<div id="menu"><div class="win dg"><h2>Journal d'exploration</h2><div id="jr"></div>
   <div class="mh">Carnet</div>
   <button class="btn" id="imp">Importer un carnet (JSON)</button>
   <button class="btn" id="exp">Exporter le carnet (JSON)</button>
@@ -216,7 +385,7 @@ li small{color:var(--ink2);font-weight:500}
   <div class="hint" id="info"></div>
   <button class="btn" id="rf">Actualiser l'application</button>
   <button class="btn gold" id="mc">Fermer</button><input type="file" id="fi" accept=".json,application/json" hidden></div></div>
-<div id="lst"><div class="win">
+<div id="lst"><div class="win dg">
   <div class="lhd"><h2 id="lh">Carnet de découvertes</h2><button class="ib" id="lc" aria-label="Fermer">✕</button></div>
   <div class="seg"><button data-s="recent" class="on">Récentes</button><button data-s="best">Les plus fructueuses</button></div>
   <input id="lq" type="search" placeholder="Rechercher une zone…">
@@ -224,7 +393,7 @@ li small{color:var(--ink2);font-weight:500}
 <div id="pv"><div class="pvb"><button class="ib" id="pvd" data-ic="trash" aria-label="Supprimer la photo"></button><button class="ib" id="pvx" aria-label="Fermer">✕</button></div><img id="pvi" alt="Photo"></div>
 <div id="toast"><span id="tm"></span><button id="tu" hidden>Annuler</button></div>
 <div id="dlp" hidden><span id="dlt"></span><button id="dlc">Arrêter</button><div id="dlb"><i id="dlbi"></i></div></div>
-<div id="dlm"><div class="win"><h2>Carte hors connexion</h2><div class="hint" id="dlh"></div>
+<div id="dlm"><div class="win dg"><h2>Carte hors connexion</h2><div class="hint" id="dlh"></div>
   <button class="btn" data-z="15" data-t="Léger · jusqu'au zoom 15"></button>
   <button class="btn gold" data-z="16" data-t="Standard · jusqu'au zoom 16"></button>
   <button class="btn" data-z="17" data-t="Détaillé · jusqu'au zoom 17"></button>
@@ -253,6 +422,12 @@ const ICO = {
 };
 document.querySelectorAll('[data-ic]').forEach(b => b.insertAdjacentHTML('beforeend', ICO[b.dataset.ic] || ''));
 /* Rang d'une zone (selon les découvertes) et blason correspondant */
+const SLOT = {
+  cep: '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M12.2 17.5c-1.6 4.2-2.3 8.2-.9 10.6 1 1.6 3 2.1 4.7 2.1s3.7-.5 4.7-2.1c1.4-2.4.7-6.4-.9-10.6z" fill="#f3e6c4" stroke="#140e08" stroke-width="2" stroke-linejoin="round"/><path d="M2.8 17.6C2.8 9.2 8.7 3 16 3s13.2 6.2 13.2 14.6c0 1.6-5.2 2.6-13.2 2.6S2.8 19.2 2.8 17.6z" fill="#a65c26" stroke="#140e08" stroke-width="2" stroke-linejoin="round"/><path d="M7 11.4c2.2-3.6 5.4-5 9-5" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="2.2" stroke-linecap="round"/></svg>',
+  sack: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 2.8h6l-1.6 3.2h-2.8z" fill="#8a6a3a" stroke="#140e08" stroke-width="1.3" stroke-linejoin="round"/><path d="M10.4 6C6 8 4 12 4.5 16c.4 3.2 3.3 5 7.5 5s7.1-1.8 7.5-5c.5-4-1.5-8-6-10z" fill="#b8894b" stroke="#140e08" stroke-width="1.4" stroke-linejoin="round"/><path d="M9.3 6.1h5.4" stroke="#5a3d1e" stroke-width="1.8"/><path d="M8 12.5c.6-1.6 1.6-2.6 3-3.2" stroke="#f3dca8" stroke-opacity=".5" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg>',
+  boot: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h6.2v8.4l4.6 2.2c1.5.7 2.2 1.8 2.2 3.3V19H5.4c-.5-4.8.9-6.9 1.6-9z" fill="#7d5b3a" stroke="#140e08" stroke-width="1.4" stroke-linejoin="round"/><path d="M5.4 18.6H20v2.4H5.4z" fill="#3a2a1a" stroke="#140e08" stroke-width="1.2"/><path d="M7.4 6h5.6" stroke="#c9a46a" stroke-width="1.2"/></svg>'
+};
+const gauge = s => `<span class="gauge" aria-hidden="true">${[...Array(10)].map((_, i) => `<i${i < Math.round(s / 10) ? ' class="f"' : ''}></i>`).join('')}</span>`;
 const RANKS = [{ n: 'Zone repérée', c: '#8b857a' }, { n: 'Zone explorée', c: '#5f7350' }, { n: 'Coin à cèpes', c: '#87481f' }, { n: 'Coin fertile', c: '#466f24' }, { n: 'Coin légendaire', c: '#a87a0e' }];
 const rankK = c => { const n = c ? c.v.reduce((a, v) => a + v.n, 0) : 0; return n >= 30 ? 4 : n >= 10 ? 3 : n >= 1 ? 2 : c && c.v.length ? 1 : 0; };
 const crest = (k, s = 30) => `<svg class="crest" width="${s}" height="${s}" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2.5l11 4v8.2c0 7-4.6 12.2-11 14.8C9.6 26.9 5 21.7 5 14.7V6.5z" fill="${k ? RANKS[k].c : 'rgba(255,255,255,.4)'}" stroke="${k ? 'rgba(0,0,0,.35)' : RANKS[0].c}" stroke-width="1.6"${k ? '' : ' stroke-dasharray="2.5 2"'}/>${[...Array(k)].map((_, i) => `<path d="M10.6 ${8.6 + i * 3.7}l5.4 3.1 5.4-3.1" fill="none" stroke="#fff6dd" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>`).join('')}</svg>`;
@@ -434,7 +609,9 @@ function draw() {
   if (forOn && Z >= 13) {      // forêts non propices aux cèpes (pin maritime pur, peupleraies…) grisées ; les autres restent telles quelles
     const cov = fx && x0 >= fx.bb[0] && x1 <= fx.bb[2] && y0 >= fx.bb[1] && y1 <= fx.bb[3] && Math.abs(Math.log2(mpp / fx.mpp)) <= 1.5;
     if (fx) { g.save(); g.fillStyle = 'rgba(105,105,105,.62)'; g.strokeStyle = 'rgba(60,60,60,.7)'; g.lineWidth = 1;
-      for (const f of fx.feats) { if (f.b[2] < x0 || f.b[0] > x1 || f.b[3] < y0 || f.b[1] > y1) continue; g.beginPath();
+      const finds = Object.values(D.cells).filter(c => c.x != null && cnt(c) > 0);      // vos trouvailles priment sur la carte IGN (données parfois anciennes ou imprécises)
+      for (const f of fx.feats) { if (f.b[2] < x0 || f.b[0] > x1 || f.b[3] < y0 || f.b[1] > y1) continue;
+        if (finds.some(c => c.x >= f.b[0] && c.x <= f.b[2] && c.y >= f.b[1] && c.y <= f.b[3] && inPoly(f.poly, c.x, c.y))) continue; g.beginPath();
         for (const ring of f.poly) { ring.forEach((p, i) => i ? g.lineTo(sx(p[0]), sy(p[1])) : g.moveTo(sx(p[0]), sy(p[1]))); g.closePath(); }
         g.fill('evenodd'); g.stroke(); }
       g.restore(); }
@@ -531,11 +708,12 @@ function renderPanel() {
   if (!sel) { p.innerHTML = ''; return; }
   const c = D.cells[sel] || blank(), [la, lo] = toLL(...ctr(sel)), tot = c.v.reduce((a, v) => a + v.w, 0);
   const rk = rankK(c), RK = RANKS[rk], last = c.v.filter(v => v.n > 0).reduce((a, v) => v.d > a ? v.d : a, ''), n = cnt(c);
-  const hist = c.v.map((v, i) => [v, i]).sort((a, b) => b[0].d.localeCompare(a[0].d)).map(([v, i]) => `<li><span><b>${fmtD(v.d)}</b> · ${v.n ? v.n + ' cèpe' + (v.n > 1 ? 's' : '') + ' · ' + (v.e ? '≈' : '') + fmtW(v.w) : 'sans découverte'}${v.t ? '<br><small>' + esc(v.t) + '</small>' : ''}</span><span style="display:flex;flex:none"><button data-act="edit" data-i="${i}" aria-label="Modifier">✎</button><button data-act="del" data-i="${i}" aria-label="Supprimer">✕</button></span></li>`).join('');
-  p.innerHTML = `<div class="eye" style="color:${RK.c}"><span>${RK.n}</span><span id="nvt" class="nv">${navTxt(sel)}</span></div>
+  const hist = c.v.map((v, i) => [v, i]).sort((a, b) => b[0].d.localeCompare(a[0].d)).map(([v, i]) => `<li><span><i class="lg">›</i><b>${fmtD(v.d)}</b> · ${v.n ? v.n + ' cèpe' + (v.n > 1 ? 's' : '') + ' · ' + (v.e ? '≈' : '') + fmtW(v.w) : 'sans découverte'}${v.t ? '<br><small>' + esc(v.t) + '</small>' : ''}</span><span style="display:flex;flex:none"><button data-act="edit" data-i="${i}" aria-label="Modifier">✎</button><button data-act="del" data-i="${i}" aria-label="Supprimer">✕</button></span></li>`).join('');
+  p.innerHTML = `<div class="eye"><span class="rar r${rk}">${RK.n}</span><span id="nvt" class="nv">${navTxt(sel)}</span></div>
     <div class="ph">${crest(rk, 32)}<input class="pname" data-f="name" placeholder="Nommer cette zone…" value="${esc(c.name)}">${rec(c) ? `<button class="ib sm" data-act="delcell" aria-label="Supprimer cette zone">${ICO.trash}</button>` : ''}</div>
-    <div class="stats"><span><b>${n}</b> cèpe${n > 1 ? 's' : ''}</span><span><b>${fmtW(tot)}</b></span><span><b>${c.v.length}</b> visite${c.v.length > 1 ? 's' : ''}</span>${last ? `<span class="ls">dernière découverte ${ago(last)}</span>` : ''}</div>
-    <div id="wxb" class="vd"><span class="vdc">…</span><span class="vdt"><span class="vdl">Potentiel de pousse</span>Lecture du ciel…</span></div>
+    <div class="slots"><div class="slot">${SLOT.cep}<span><b>${n}</b><small>cèpe${n > 1 ? 's' : ''}</small></span></div><div class="slot">${SLOT.sack}<span><b>${fmtW(tot)}</b><small>récolte</small></span></div><div class="slot">${SLOT.boot}<span><b>${c.v.length}</b><small>visite${c.v.length > 1 ? 's' : ''}</small></span></div></div>
+    ${last ? `<div class="lastf">Dernière découverte <b>${ago(last)}</b></div>` : ''}
+    <div id="wxb" class="vd"><span class="vdc">…</span><span class="vdt"><span class="vdl">Potentiel de pousse</span>${gauge(0)}Lecture du ciel…</span></div>
     <div class="acts"><button class="btn gold" data-act="quick" title="≈ ${D.avg} g">+1 cèpe</button><button class="btn" data-act="addtoggle">+ Visite</button><button class="btn" data-act="go">${ICO.compass}Y aller</button></div>
     <div id="addv" class="row"><input type="date" id="vd" max="${today()}" value="${today()}"><input type="number" id="vn" min="0" placeholder="Cèpes" inputmode="numeric"><input type="number" id="vw" min="0" placeholder="Poids g" inputmode="numeric">
       <input class="full" id="vt" placeholder="Note de visite (facultatif)"><button class="btn gold full" data-act="add">Consigner la visite</button></div>
@@ -554,8 +732,11 @@ const ftCache = new Map();
 async function forestType(k) {
   if (ftCache.has(k)) return ftCache.get(k);
   const [x, y] = ctr(k), r = 4, bb = [x - r, y - r, x + r, y + r].map(v => v.toFixed(1)).join(',');
-  const res = await fetch(`https://data.geopf.fr/wfs/ows?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=${encodeURIComponent('LANDCOVER.FORESTINVENTORY.V2:formation_vegetale')}&OUTPUTFORMAT=${encodeURIComponent('application/json')}&COUNT=1&BBOX=${bb},EPSG:3857`);
-  if (!res.ok) throw new Error('wfs'); const j = await res.json(), pr = (j.features && j.features[0] && j.features[0].properties) || null;
+  const res = await fetch(`https://data.geopf.fr/wfs/ows?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=${encodeURIComponent('LANDCOVER.FORESTINVENTORY.V2:formation_vegetale')}&OUTPUTFORMAT=${encodeURIComponent('application/json')}&SRSNAME=EPSG:3857&COUNT=30&BBOX=${bb},EPSG:3857`);
+  if (!res.ok) throw new Error('wfs'); const j = await res.json(), fs = (j.features || []).filter(f => f.geometry);
+  /* le filtre BBOX du service renvoie aussi les peuplements voisins : on garde celui qui contient vraiment le point (comme pour le grisage de la carte) */
+  const parts = f => f.geometry.type === 'Polygon' ? [f.geometry.coordinates] : f.geometry.type === 'MultiPolygon' ? f.geometry.coordinates : [];
+  const hit = fs.find(f => parts(f).some(p => inPoly(p, x, y))), pr = hit ? hit.properties : null;
   ftCache.set(k, pr); return pr;
 }
 async function showFt(k) {
@@ -565,8 +746,8 @@ async function showFt(k) {
     const g = n => { const key = Object.keys(pr).find(x => x.toLowerCase() === n); return key && pr[key] != null ? String(pr[key]) : ''; };
     const tfv = g('tfv') || g('tfv_g11') || g('code_tfv') || 'Forêt', ess = g('essence'), low = (tfv + ' ' + ess).toLowerCase();
     const ic = /conif|pin|épicéa|sapin|mélèze/.test(low) ? (/feuill|chêne|hêtre|châtaign/.test(low) ? '🌲🌳' : '🌲') : '🌳';
-    const bad = cepeBad(pr), good = /chêne|hêtre|châtaign|épicéa|pin|sapin|mélèze|feuillus|conifères|mixte/.test(low);
-    put(`${ic} <b>${esc(tfv)}</b>${ess && !low.startsWith(ess.toLowerCase()) && !tfv.toLowerCase().includes(ess.toLowerCase()) ? ' · ' + esc(ess) : ''}<br><small>${bad ? '⚠️ Peu propice aux cèpes' : good ? '🍄 Essence favorable au cèpe' : 'Essence à vérifier sur place'} · IGN</small>`);
+    const finds = cnt(D.cells[k]) > 0, bad = cepeBad(pr), good = /chêne|hêtre|châtaign|épicéa|pin|sapin|mélèze|feuillus|conifères|mixte/.test(low);
+    put(`${ic} <b>${esc(tfv)}</b>${ess && !low.startsWith(ess.toLowerCase()) && !tfv.toLowerCase().includes(ess.toLowerCase()) ? ' · ' + esc(ess) : ''}<br><small>${bad && finds ? '⚠️ Classé peu propice par l\'IGN, mais vous y avez trouvé des cèpes : ce peuplement n\'est pas grisé' : bad ? '⚠️ Peu propice aux cèpes' : good ? '🍄 Essence favorable au cèpe' : 'Essence à vérifier sur place'} · IGN</small>`);
   } catch (e) { put('🌲 Type de forêt indisponible (connexion ?)'); }
 }
 
@@ -693,10 +874,12 @@ async function showWx(k) {
     const best = s.reduce((a, b) => b.score > a.score ? b : a), day = x => new Date(x + 'T00:00').toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric' });
     const avgS = (i, j) => s.slice(i, j).reduce((a, x) => a + x.score, 0) / Math.max(1, s.slice(i, j).length), dT = avgS(4, 8) - avgS(0, 3), trend = dT >= 8 ? '↗ en hausse' : dT <= -8 ? '↘ en baisse' : '→ stable';
     const ago2 = since <= 0 ? "aujourd'hui" : since === 1 ? 'hier' : 'il y a ' + since + ' j', T = tierOf(best.score), ok = best.score >= 30;
-    put(`<div class="wxg">${s.map((x, i) => { const t = tierOf(x.score); return `<div class="wxd${x === best && ok ? ' best' : ''}" title="${t.n}"><small>${i ? new Date(x.date + 'T00:00').toLocaleDateString('fr-FR', { weekday: 'narrow' }) + ' ' + x.date.slice(8) : 'auj.'}</small><b style="color:${t.c}">${x.score}${x.rg < .8 ? '<em class="rg" title="Repousse">↻</em>' : ''}</b><small>${x.p >= 1 ? Math.round(x.p) + ' mm' : '–'}</small><i style="width:${Math.max(4, x.score)}%;background:${t.b}"></i></div>`; }).join('')}</div>
-      <details class="wxi"><summary>Comment lire l'indice</summary><div class="wxn">Probabilité de fructification (0 à 100) calculée chaque jour : humidité du sol (pluie − évapotranspiration sur 21 jours, pluies de J-7 à J-15 comptées en priorité) × température (idéal 12-20 °C) × chaleur × gel × air humide × vent × ciel couvert. Les 7 jours à venir utilisent les prévisions. Niveaux : Dormant (&lt; 30), Prometteur (30-49), Favorable (50-69), Exceptionnel (70+). ↻ = la zone est encore en repousse après une récolte (~8 j). Pluie 14 j passés : ${Math.round(past)} mm · températures moy. 7 j : ${tm7.toFixed(1)} °C.<br><b>Détail du jour :</b> ${(f => f ? `pluie pondérée ${Math.round(f.wr)} mm (dont ${Math.round(f.r715)} mm à J-7…J-15), utile ${Math.round(f.net)} mm → sol ${Math.round(f.soil * 100)} % · temp. ${f.tm.toFixed(1)} °C → ${Math.round(f.tS * 100)} % · chaleur ${Math.round(f.hot * 100)} % · gel ${Math.round(f.frost * 100)} % · air (HR ${Math.round(f.rh)} %) ${Math.round(f.air * 100)} % · vent ${Math.round(f.ws)} km/h → ${Math.round(f.wind * 100)} % · nuages ${Math.round(f.cc)} % → ${Math.round(f.cloud * 100)} % · repousse ${Math.round(s[0].rg * 100)} %${D.cal ? ` · 🎯 calibré (${D.cal.n} visites)` : ''}${f.ff > 0 ? ` · 🌲 forêt ${Math.round(f.ff * 100)} % (sol plus humide)` : ''}` : '')(s[0].f)}</div></details>`,
-      `<span class="vdc${best.score >= 70 ? ' t3' : ''}" style="--tc:${T.b}">${ok ? best.score : '–'}</span><span class="vdt"><span class="vdl">Potentiel de pousse ${pips(best.score)}</span><b>${T.n}</b> · ${ok ? day(best.date) : 'aucun jour favorable cette semaine'} <small>${trend}</small>` + (since <= 8 ? `<br><small>Zone en repousse · récolte ${ago2}</small>` : '') + '</span>');
-  } catch (e) { put('<div class="hint">Météo indisponible (connexion ?)</div>', '<span class="vdc">?</span><span class="vdt"><span class="vdl">Potentiel de pousse</span>Météo indisponible (connexion ?)</span>'); }
+    const lim = (f => { if (!f) return ''; const sat = (D.cal && D.cal.sat) || 35, L = [[f.soil, `sol trop sec : ${Math.round(f.net)} mm de pluie utile sur 3 semaines (≈ ${sat} mm pour un sol bien humide)`, `sol trop sec (${Math.round(f.net)} mm utiles / ${sat})`], [f.tS, f.tm < 12 ? `trop froid (${f.tm.toFixed(1)} °C en moyenne sur 7 j)` : `trop chaud (${f.tm.toFixed(1)} °C en moyenne sur 7 j)`, f.tm < 12 ? `trop froid (${f.tm.toFixed(1)} °C)` : `trop chaud (${f.tm.toFixed(1)} °C)`], [f.hot, 'fortes chaleurs', 'fortes chaleurs'], [f.frost, 'gelées récentes', 'gelées récentes']].sort((a, b) => a[0] - b[0])[0];
+      return L[0] < .85 ? L : null; })(s[0].f);      // ce qui bride le plus l'indice aujourd'hui
+    put(`<div class="wxg">${s.map((x, i) => { const t = tierOf(x.score); return `<div class="wxd${x === best && ok ? ' best' : ''}" title="${t.n}"><small>${i ? new Date(x.date + 'T00:00').toLocaleDateString('fr-FR', { weekday: 'narrow' }) + ' ' + x.date.slice(8) : 'auj.'}</small><b style="color:${t.b}">${x.score}${x.rg < .8 ? '<em class="rg" title="Repousse">↻</em>' : ''}</b><small>${x.p >= 1 ? Math.round(x.p) + ' mm' : '–'}</small><i style="width:${Math.max(4, x.score)}%;background:${t.b}"></i></div>`; }).join('')}</div>
+      ${lim ? `<div class="wxl">Aujourd'hui <b>${s[0].score}</b>/100 · frein principal : ${lim[1]}</div>` : ''}<details class="wxi"><summary>Comment lire l'indice</summary><div class="wxn">Probabilité de fructification (0 à 100) calculée chaque jour : humidité du sol (pluie − évapotranspiration sur 21 jours, pluies de J-7 à J-15 comptées en priorité) × température (idéal 12-20 °C) × chaleur × gel × air humide × vent × ciel couvert. Les 7 jours à venir utilisent les prévisions. Niveaux : Dormant (&lt; 30), Prometteur (30-49), Favorable (50-69), Exceptionnel (70+). ↻ = la zone est encore en repousse après une récolte (~8 j). Pluie 14 j passés : ${Math.round(past)} mm · températures moy. 7 j : ${tm7.toFixed(1)} °C.<br><b>Détail du jour :</b> ${(f => f ? `pluie pondérée ${Math.round(f.wr)} mm (dont ${Math.round(f.r715)} mm à J-7…J-15), utile ${Math.round(f.net)} mm → sol ${Math.round(f.soil * 100)} % · temp. ${f.tm.toFixed(1)} °C → ${Math.round(f.tS * 100)} % · chaleur ${Math.round(f.hot * 100)} % · gel ${Math.round(f.frost * 100)} % · air (HR ${Math.round(f.rh)} %) ${Math.round(f.air * 100)} % · vent ${Math.round(f.ws)} km/h → ${Math.round(f.wind * 100)} % · nuages ${Math.round(f.cc)} % → ${Math.round(f.cloud * 100)} % · repousse ${Math.round(s[0].rg * 100)} %${D.cal ? ` · 🎯 calibré (${D.cal.n} visites)` : ''}${f.ff > 0 ? ` · 🌲 forêt ${Math.round(f.ff * 100)} % (sol plus humide)` : ''}` : '')(s[0].f)}</div></details>`,
+      `<span class="vdc${best.score >= 70 ? ' t3' : ''}" style="--tc:${T.b}">${ok ? best.score : '–'}</span><span class="vdt" style="--tc:${T.b}"><span class="vdl">Potentiel de pousse</span>${gauge(best.score)}<b class="tn">${T.n}</b> · ${ok ? day(best.date) : 'aucun jour favorable cette semaine'} <small>${trend}</small>` + (since <= 8 ? `<br><small>Zone en repousse · récolte ${ago2}</small>` : '') + (lim && s[0].score < 50 ? `<br><small class="lim">Frein : ${lim[2]}</small>` : '') + '</span>');
+  } catch (e) { put('<div class="hint">Météo indisponible (connexion ?)</div>', '<span class="vdc">?</span><span class="vdt"><span class="vdl">Potentiel de pousse</span>' + gauge(0) + 'Météo indisponible (connexion ?)</span>'); }
 }
 
 $('#panel').addEventListener('input', e => { const f = e.target.dataset.f; if (!f || !sel) return; (D.cells[sel] ||= blank())[f] = e.target.value; save(); draw(); });
@@ -886,7 +1069,7 @@ function renderList() {
   $('#lh').innerHTML = `Carnet de découvertes<small>${all.length} coin${all.length > 1 ? 's' : ''} à cèpes · ${all.reduce((a, x) => a + x.n, 0)} cèpes</small>`;
   document.querySelectorAll('.seg button').forEach(b => b.classList.toggle('on', b.dataset.s === lsort));
   const podium = ['1er', '2e', '3e'];
-  $('#ll').innerHTML = it.map((x, i) => { const k = rankK(x.c); return `<li data-k="${x.k}">${crest(k, 30)}<span class="lt"><b>${esc(x.label)}</b><br><small>${lsort === 'best' && !q && i < 3 ? `<span class="top">${podium[i]}</span> · ` : ''}${RANKS[k].n} · ${ago(x.last)}</small></span><span class="bd"><b>${x.n}</b> <small>cèpes</small><br><small>${fmtW(x.w)}</small></span></li>`; }).join('')
+  $('#ll').innerHTML = it.map((x, i) => { const k = rankK(x.c); return `<li data-k="${x.k}">${crest(k, 30)}<span class="lt"><b>${esc(x.label)}</b><br><small>${lsort === 'best' && !q && i < 3 ? `<span class="top">${podium[i]}</span> · ` : ''}<span class="r${k}">${RANKS[k].n}</span> · ${ago(x.last)}</small></span><span class="bd"><b>${x.n}</b> <small>cèpes</small><br><small>${fmtW(x.w)}</small></span></li>`; }).join('')
     || `<li class="hint" style="cursor:default">${all.length ? 'Aucun résultat.' : 'Aucune découverte consignée pour l\'instant.'}</li>`;
 }
 $('#lb').onclick = () => { $('#lq').value = ''; renderList(); $('#lst').classList.add('open'); };
@@ -976,16 +1159,20 @@ function drawPaths(sx, sy) {
     if (n === 2) return path.lineTo(q[1][0], q[1][1]);
     for (let i = 1; i < n - 1; i++) { if (jn(p.pts[i])) { path.lineTo(q[i][0], q[i][1]); continue; } path.quadraticCurveTo(q[i][0], q[i][1], (q[i][0] + q[i + 1][0]) / 2, (q[i][1] + q[i + 1][1]) / 2); }
     path.lineTo(q[n - 1][0], q[n - 1][1]); };
-  const all = new Path2D(), selP = new Path2D(); ps.forEach(p => { trace(all, p); if (p.id === P.sel) trace(selP, p); });
+  const all = new Path2D(), own = ps.map(p => { const q = new Path2D(); trace(q, p); all.addPath(q); return q; }), selI = ps.findIndex(p => p.id === P.sel);
   const jpts = [...cnt].filter(([, c]) => c > 1).map(([k]) => k.split(',').map(Number));
   const real = V.mpp * Math.cos(toLL(V.cx, V.cy)[0] * Math.PI / 180), w = Math.max(3.5, Math.min(15, 2.6 / real));      // largeur ≈ 2,6 m réels, lisible à tout zoom
   const blob = (r, col) => { if (!jpts.length) return; g.beginPath(); jpts.forEach(([x, y]) => { g.moveTo(sx(x) + r, sy(y)); g.arc(sx(x), sy(y), r, 0, 7); }); g.fillStyle = col; g.fill(); };      // petit élargissement aux carrefours
-  /* Couches communes à tous les chemins : chaque couche est dessinée d'un seul trait, donc les bords ne se recoupent jamais aux jonctions */
-  g.lineWidth = w + 7; g.strokeStyle = 'rgba(15,10,4,.32)'; g.stroke(all); blob((w + 7) / 2 * 1.25, 'rgba(15,10,4,.32)');      // ombre douce
-  g.lineWidth = w + 3; g.strokeStyle = '#4b3520'; g.stroke(all); blob((w + 3) / 2 * 1.3, '#4b3520');                               // bordure de terre sombre
-  g.lineWidth = w; g.strokeStyle = '#a98656'; g.stroke(all); blob(w / 2 * 1.3, '#a98656');                                         // terre battue
-  if (P.sel) { g.lineWidth = w; g.strokeStyle = 'rgba(227,192,113,.9)'; g.stroke(selP); }                                           // chemin sélectionné : teinte laiton
-  g.lineWidth = Math.max(1.2, w * .32); g.strokeStyle = 'rgba(232,214,168,.55)'; g.stroke(all);                                    // trace usée au centre
+  const layers = (paths, junc) => paths.forEach((q, i) => {      // bordure, terre battue, teinte de sélection, trace usée
+    g.lineWidth = w + 3; g.strokeStyle = '#4b3520'; g.stroke(q); if (junc) blob((w + 3) / 2 * 1.3, '#4b3520');
+    g.lineWidth = w; g.strokeStyle = '#a98656'; g.stroke(q); if (junc) blob(w / 2 * 1.3, '#a98656');
+    if (junc ? selI >= 0 : i === selI) { g.lineWidth = w; g.strokeStyle = 'rgba(227,192,113,.9)'; g.stroke(junc ? own[selI] : q); }
+    g.lineWidth = Math.max(1.2, w * .32); g.strokeStyle = 'rgba(232,214,168,.55)'; g.stroke(q); });
+  g.lineWidth = w + 7; g.strokeStyle = 'rgba(15,10,4,.32)'; g.stroke(all); blob((w + 7) / 2 * 1.25, 'rgba(15,10,4,.32)');      // ombre douce commune
+  /* 1. Chaque sentier avec sa propre bordure : deux sentiers voisins restent distincts, même côte à côte */
+  layers(own, false);
+  /* 2. Autour des carrefours seulement, toutes les couches sont redessinées d'un seul trait : les sentiers qui se rejoignent fusionnent sans couture */
+  if (jpts.length) { g.save(); g.beginPath(); const R = w * 4 + 8; jpts.forEach(([x, y]) => { g.moveTo(sx(x) + R, sy(y)); g.arc(sx(x), sy(y), R, 0, 7); }); g.clip(); layers([all], true); g.restore(); }
   if (P.on) ps.forEach(p => p.pts.forEach(([x, y], i) => { const e = i === 0 || i === p.pts.length - 1, j = cnt.get(x + ',' + y) > 1; g.beginPath(); g.arc(sx(x), sy(y), j ? 6 : e ? 4.5 : 3, 0, 7); g.fillStyle = j ? '#fff6e0' : p.id === P.sel ? '#e3c071' : '#f1e6c9'; g.fill(); g.lineWidth = j ? 2.5 : 1.5; g.strokeStyle = j ? '#e3c071' : '#3a2a1a'; g.stroke(); }));
   if (fa > .6 && V.mpp < 12) { g.font = '700 12px system-ui,sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineWidth = 4; g.lineJoin = 'round';
     ps.forEach(p => { if (!p.name) return; const m = p.pts[p.pts.length >> 1], x = sx(m[0]), y = sy(m[1]) - 10 - w / 2; g.strokeStyle = 'rgba(20,14,8,.85)'; g.strokeText(p.name, x, y); g.fillStyle = '#fff6e0'; g.fillText(p.name, x, y); }); }
