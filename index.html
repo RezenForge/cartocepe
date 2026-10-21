@@ -503,6 +503,7 @@ body{background:
   <button class="btn" id="cmb"></button>
   <button class="btn" id="fob"></button>
   <button class="btn" id="fogb"></button>
+  <button class="btn" id="compb"></button>
   <button class="btn" id="fs"></button>
   <button class="btn" id="wk"></button>
   <div class="mh">Indice de pousse</div>
@@ -1304,11 +1305,37 @@ function trackHd(x, y, acc, gh, gs) {
   const d = rdist([HD.ax, HD.ay], [x, y]);
   if (d >= Math.max(5, Math.min(acc * .7, 20))) { setHd(Math.atan2(x - HD.ax, y - HD.ay) * 180 / Math.PI); HD.ax = x; HD.ay = y; }      // on ne tranche qu'après un vrai déplacement, pas sur le bruit du GPS
 }
+/* ===== Boussole du téléphone : la flèche indique où pointe le téléphone, même à l'arrêt =====
+   Android : orientation absolue (par rapport au nord) ; iPhone : cap magnétique fourni par Safari (autorisation demandée au premier usage).
+   Si le capteur ne répond pas, la flèche revient à la direction de marche. Redessin limité (~10 images/s et seulement si le cap bouge) pour la batterie. */
+var CP = { on: false, h: null, t: 0, last: 0, drawn: null, warn: 0 };
+var compOn = (() => { try { return localStorage.getItem('cartocepe-comp') !== '0'; } catch (e) { return true; } })();
+function compEvt(e) {
+  let h = null;
+  if (e.webkitCompassHeading != null && isFinite(e.webkitCompassHeading)) { h = e.webkitCompassHeading;
+    if (e.webkitCompassAccuracy > 35 && Date.now() - CP.warn > 90000) { CP.warn = Date.now(); toast('🧭 Boussole imprécise : décrivez un grand 8 avec le téléphone'); } }
+  else if ((e.absolute || e.type === 'deviceorientationabsolute') && e.alpha != null) h = 360 - e.alpha;
+  if (h == null || !isFinite(h)) return;
+  const so = (screen.orientation && screen.orientation.angle) || window.orientation || 0; h = (h + so + 360) % 360;      // téléphone tenu à l'horizontale
+  if (CP.h == null) CP.h = h; else { const d = ((h - CP.h + 540) % 360) - 180; CP.h = (CP.h + d * .3 + 360) % 360; }      // lissage : la flèche ne tremble pas
+  CP.t = Date.now(); const now = performance.now();
+  if ((CP.drawn == null || Math.abs(((CP.h - CP.drawn + 540) % 360) - 180) > 1.5) && now - CP.last > 90) { CP.last = now; CP.drawn = CP.h; if (me) schedule(); updNav(); }
+}
+function compStart() {      // à appeler depuis un toucher (exigence de l'iPhone pour l'autorisation)
+  if (CP.on || !compOn) return; CP.on = true;
+  const go = () => { addEventListener('ondeviceorientationabsolute' in window ? 'deviceorientationabsolute' : 'deviceorientation', compEvt);
+    setTimeout(() => { if (CP.on && CP.h == null) { compStop(); toast('Boussole indisponible sur cet appareil : la flèche suit vos déplacements'); } }, 4000); };
+  try { if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+      DeviceOrientationEvent.requestPermission().then(r => { if (r === 'granted') go(); else { CP.on = false; toast('Boussole refusée : la flèche suivra vos déplacements'); } }).catch(() => { CP.on = false; }); return; } } catch (e) {}
+  go();
+}
+function compStop() { removeEventListener('deviceorientationabsolute', compEvt); removeEventListener('deviceorientation', compEvt); CP.on = false; CP.h = null; CP.drawn = null; schedule(); updNav(); }
+const compLive = () => CP.h != null && Date.now() - CP.t < 3000;
 function drawMe(x, y, mpp) {
-  const r = Math.max(10, me.acc / mpp), age = HD.h == null ? Infinity : Date.now() - HD.t, fresh = age < 45000;
+  const cl = compLive(), HH = cl ? CP.h : HD.h, r = Math.max(10, me.acc / mpp), age = HH == null ? Infinity : cl ? 0 : Date.now() - HD.t, fresh = age < 45000;      // boussole si disponible, sinon direction de marche
   g.save();
   g.beginPath(); g.arc(x, y, r, 0, 7); g.fillStyle = 'rgba(234,165,60,.13)'; g.fill(); g.lineWidth = 1.2; g.strokeStyle = 'rgba(255,210,122,.55)'; g.stroke();      // précision du GPS
-  if (HD.h != null) { const a = HD.h * Math.PI / 180 - Math.PI / 2, sp = .5, R = 58;      // cône de vision dans la direction de marche
+  if (HH != null) { const a = HH * Math.PI / 180 - Math.PI / 2, sp = cl ? .42 : .5, R = cl ? 70 : 58;      // cône de vision dans la direction de marche
     const gr = g.createRadialGradient(x, y, 8, x, y, R); gr.addColorStop(0, `rgba(255,210,122,${fresh ? .55 : .25})`); gr.addColorStop(1, 'rgba(255,210,122,0)');
     g.beginPath(); g.moveTo(x, y); g.arc(x, y, R, a - sp, a + sp); g.closePath(); g.fillStyle = gr; g.fill(); }
   g.beginPath(); g.arc(x, y, 13.5, 0, 7); g.fillStyle = '#0e0b08'; g.fill();      // jeton du joueur : pierre, cerclage laiton
@@ -1316,7 +1343,7 @@ function drawMe(x, y, mpp) {
   g.beginPath(); g.arc(x, y, 10, 0, 7); const st = g.createLinearGradient(x, y - 10, x, y + 10); st.addColorStop(0, '#4d453a'); st.addColorStop(1, '#221d18'); g.fillStyle = st; g.fill();
   g.translate(x, y);
   const em = g.createLinearGradient(0, -8, 0, 6); em.addColorStop(0, '#fff0b8'); em.addColorStop(1, '#e8962c');
-  if (HD.h != null) { g.rotate(HD.h * Math.PI / 180); g.globalAlpha = fresh ? 1 : .55;
+  if (HH != null) { g.rotate(HH * Math.PI / 180); g.globalAlpha = fresh ? 1 : .55;
     g.beginPath(); g.moveTo(0, -8.2); g.lineTo(6, 6); g.lineTo(0, 2.6); g.lineTo(-6, 6); g.closePath(); g.fillStyle = em; g.fill(); g.lineWidth = 1.4; g.strokeStyle = '#0e0b08'; g.stroke(); }
   else { g.beginPath(); g.moveTo(0, -5.5); g.lineTo(5, 0); g.lineTo(0, 5.5); g.lineTo(-5, 0); g.closePath(); g.fillStyle = em; g.fill(); g.lineWidth = 1.4; g.strokeStyle = '#0e0b08'; g.stroke(); }      // à l'arrêt, sans direction connue : losange
   g.restore();
@@ -1330,13 +1357,13 @@ function onPos(p) { setTimeout(() => P.on && pmUpdate(), 0); if (samp) { const [
 }
 var gpsWarn = 0;
 function startLoc() {
-  if (!navigator.geolocation) return toast('Géolocalisation indisponible');
+  if (!navigator.geolocation) return toast('Géolocalisation indisponible'); compStart();
   $('#loc').classList.add('on'); toast('Recherche de votre position…');
   wakeSync(); watch = navigator.geolocation.watchPosition(onPos, err => {
     if (err.code === 1) { stopLoc(); return toast('Position refusée : ouvrez la page en https:// et autorisez-la'); }
     if (Date.now() - gpsWarn > 60000) { gpsWarn = Date.now(); toast('📡 Signal GPS faible : la localisation continue de chercher'); } }, { enableHighAccuracy: true, maximumAge: 5000, timeout: 20000 });      // délai dépassé ou signal perdu : on continue d'écouter
 }
-function stopLoc() { if (watch !== null) navigator.geolocation.clearWatch(watch); watch = null; if (RC.on) { RC.on = false; if (P.cur) finishPath(); } wakeSync(); hereK = null; me = null; HD = { ax: null, ay: null, h: null, t: 0 }; pending = false; $('#loc').classList.remove('on'); schedule(); }
+function stopLoc() { if (watch !== null) navigator.geolocation.clearWatch(watch); watch = null; if (RC.on) { RC.on = false; if (P.cur) finishPath(); } wakeSync(); compStop(); hereK = null; me = null; HD = { ax: null, ay: null, h: null, t: 0 }; pending = false; $('#loc').classList.remove('on'); schedule(); }
 $('#loc').onclick = () => watch === null ? startLoc() : (stopLoc(), toast('Localisation arrêtée'));
 const askGps = kind => { pending = kind; if (watch === null) startLoc(); else toast('Position pas encore trouvée…'); };
 $('#found').onclick = () => { const [k, pos] = target(); if (k || pos) return addFind(k, pos); askGps('find'); };
@@ -1430,6 +1457,8 @@ async function scan() {      // télécharge les communes qui couvrent l'écran 
   } finally { scanning = false; }
 }
 const cmLabel = () => { $('#cmb').innerHTML = sw('Limites des communes', commOn); };
+const compLabel = () => $('#compb').innerHTML = sw('Boussole du téléphone (flèche orientée même à l\'arrêt)', compOn);
+$('#compb').onclick = () => { compOn = !compOn; try { localStorage.setItem('cartocepe-comp', compOn ? '1' : '0'); } catch (e) {} compLabel(); if (compOn && watch !== null) compStart(); else if (!compOn) compStop(); toast(compOn ? '🧭 Boussole activée' : 'Boussole désactivée : la flèche suit vos déplacements'); }; compLabel();
 const fogLabel = () => $('#fogb').innerHTML = sw('Brouillard de guerre (zones non explorées voilées)', fogOn);
 $('#fogb').onclick = () => { fogOn = !fogOn; try { localStorage.setItem('cartocepe-fogon', fogOn ? '1' : '0'); } catch (e) {} fogLabel(); schedule(); toast(fogOn ? '🌫️ Brouillard activé : seules les zones parcourues sont dévoilées' : 'Brouillard masqué (vos zones explorées restent en mémoire)'); }; fogLabel();
 const foLabel = () => $('#fob').innerHTML = sw('Griser les forêts peu propices', forOn);
@@ -1855,13 +1884,18 @@ if (!Object.keys(D.cells).length) {      // ancien carnet présent sur cet appar
 if (Object.keys(D.cells).length) fitData(); else { [V.cx, V.cy] = toM(46.6, 2.5); V.mpp = 1500; }
 /* ===== Réactions : repères avec icône et note (icônes dessinées en SVG) ===== */
 var MKE = null, mkLast = 'pin';
+const MK_FULL = 6, MK_HIDE = 15;      // repères pleinement visibles jusqu'à 6 m/pixel, effacés progressivement, invisibles au-delà de 15 m/pixel
+const markAlpha = () => RM ? 1 : Math.max(0, Math.min(1, (MK_HIDE - V.mpp) / (MK_HIDE - MK_FULL)));      // toujours visibles en mode repère
 function drawMarks(sx, sy) {
+  const ma = markAlpha(); if (ma <= 0) return;
   (D.marks || []).forEach(m => { const im = MKI[m.t]; if (!im || !im.complete) return; const df = FX.length && fxOf('drop', m.id), dp = df ? Math.min(1, Math.max(0, fxP(df))) : 1, x = sx(m.x), y = sy(m.y) - (1 - EZ.bounce(dp)) * 70, s = 34;
-    g.globalAlpha = Math.min(1, dp * 4); g.drawImage(im, x - s / 2, y - s, s, s); g.globalAlpha = 1;      // nouveau repère : tombe et rebondit
+    g.globalAlpha = Math.min(1, dp * 4) * ma; g.drawImage(im, x - s / 2, y - s, s, s); g.globalAlpha = ma;      // nouveau repère : tombe et rebondit
     if (m.note) { const nx = x + 12, ny = y - s + 5; g.beginPath(); g.moveTo(nx - 4, ny - 4.5); g.lineTo(nx + 4, ny - 4.5); g.lineTo(nx + 4, ny + 4.5); g.lineTo(nx - 4, ny + 4.5); g.closePath(); g.fillStyle = '#f1e2b8'; g.fill(); g.lineWidth = 1.6; g.strokeStyle = '#0e0b08'; g.stroke();      // petit parchemin : ce repère a une note
       g.beginPath(); g.moveTo(nx - 2.2, ny - 1.6); g.lineTo(nx + 2.2, ny - 1.6); g.moveTo(nx - 2.2, ny + 1.4); g.lineTo(nx + 1.2, ny + 1.4); g.lineWidth = 1.1; g.strokeStyle = '#6b4a22'; g.stroke(); } });
+  g.globalAlpha = 1;
 }
 function markAt(px, py) {
+  if (markAlpha() < .5) return null;      // repères masqués au dézoom : on ne peut pas les toucher
   const W = cv.clientWidth, H = cv.clientHeight; let best = null, bd = 1e9;
   (D.marks || []).forEach(m => { const x = (m.x - V.cx) / V.mpp + W / 2, y = H / 2 - (m.y - V.cy) / V.mpp, dx = Math.abs(px - x), d = Math.hypot(dx, py - (y - 14)); if (dx <= 19 && py >= y - 36 && py <= y + 8 && d < bd) { best = m; bd = d; } });
   return best;
@@ -1909,7 +1943,9 @@ function longSpot(px, py) {      // appui long sur la carte : pose un point exac
 function navTxt(k) {
   const [x, y] = ctr(k), [la, lo] = toLL(x, y); if (!me) return la.toFixed(5) + ', ' + lo.toFixed(5);
   const d = rdist([x, y], [me.x, me.y]); if (d < 4) return 'Vous y \u00eates (\u00b1' + Math.round(me.acc) + ' m)';
-  const i = Math.round(((Math.atan2(x - me.x, y - me.y) * 180 / Math.PI + 360) % 360) / 45) % 8;
+  const bz = (Math.atan2(x - me.x, y - me.y) * 180 / Math.PI + 360) % 360, i = Math.round(bz / 45) % 8;
+  if (compLive()) { const rl = ((bz - CP.h + 540) % 360) - 180, a = Math.abs(rl), sd = rl > 0 ? 'droite' : 'gauche';      // par rapport à l'endroit où pointe le téléphone
+    return '<b>' + (d < 1000 ? Math.round(d) + ' m' : (d / 1000).toFixed(1) + ' km') + '</b> ' + (a < 15 ? '⬆ droit devant' : a < 50 ? (rl > 0 ? '↗' : '↖') + ' un peu à ' + sd : a < 130 ? (rl > 0 ? '➡' : '⬅') + ' à ' + sd : '⬇ derrière vous') + ' (±' + Math.round(me.acc) + ' m)'; }
   return '<b>' + (d < 1000 ? Math.round(d) + ' m' : (d / 1000).toFixed(1) + ' km') + '</b> ' + ['\u2191', '\u2197', '\u2192', '\u2198', '\u2193', '\u2199', '\u2190', '\u2196'][i] + ' ' + ['nord', 'nord-est', 'est', 'sud-est', 'sud', 'sud-ouest', 'ouest', 'nord-ouest'][i] + ' (\u00b1' + Math.round(me.acc) + ' m)';
 }
 function updNav() { const e = $('#nvt'); if (e && sel && D.cells[sel]) e.innerHTML = navTxt(sel); }
