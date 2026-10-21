@@ -163,7 +163,7 @@ li small{color:var(--ink2);font-weight:500}
 #ll .lt{flex:1;min-width:0}#ll .lt b{font-size:14px}
 #ll .bd{text-align:right;white-space:nowrap}#ll .bd b{font-size:15px}
 #ll .top{color:#9a7430;font-weight:700}
-#mkg{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin:8px 0}
+#mkg{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin:8px 0}.mki span{min-height:2.3em;display:flex;align-items:center}
 .mki{display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 2px;border:1px solid var(--line);border-radius:10px;background:var(--paper3);font-size:10px;line-height:1.15;text-align:center;color:var(--ink2)}
 .mki.on{border-color:var(--brass);background:#f5e6bd;box-shadow:0 0 0 1.5px var(--brass);color:var(--ink)}
 .mki svg{width:36px;height:36px}
@@ -473,14 +473,36 @@ function mergeCell(k, c, pos) {      // fusionne sans doublon (importer deux foi
 }
 const cleanPaths = a => (Array.isArray(a) ? a : []).filter(p => p && /^[\w-]+$/.test(String(p.id)) && Array.isArray(p.pts)).map(p => ({ id: String(p.id), name: String(p.name || '').slice(0, 60), pts: p.pts.filter(q => Array.isArray(q) && isFinite(q[0]) && isFinite(q[1])).map(q => [+q[0], +q[1]]) })).filter(p => p.pts.length >= 2);
 function mergePaths(a) { const have = new Set((D.paths ||= []).map(p => p.id)); cleanPaths(a).forEach(p => { if (!have.has(p.id)) D.paths.push(p); }); }
-var MK = { park: ['Parking', '#3d6a86'], pin: ['Repère', '#a8432f'], oak: ['Chêne', '#4f6b3a'], no: ['Pas intéressant', '#6e6a62'], yes: ['Intéressant', '#c4962f'] };
-var MKG = {
-  park: '<text x="16" y="17.2" font-size="14.5" font-weight="800" text-anchor="middle" fill="#fff" font-family="Arial,Helvetica,sans-serif">P</text>',
-  pin: '<circle cx="16" cy="12.2" r="4.6" fill="#fff"/><circle cx="16" cy="12.2" r="1.8" fill="#a8432f"/>',
-  oak: '<rect x="14.9" y="13.4" width="2.3" height="5.2" fill="#fff"/><circle cx="12.3" cy="12.3" r="3.4" fill="#fff"/><circle cx="19.7" cy="12.3" r="3.4" fill="#fff"/><circle cx="16" cy="8.9" r="3.8" fill="#fff"/>',
-  no: '<path d="M12 8.2L20 16.2M20 8.2L12 16.2" stroke="#fff" stroke-width="2.9" stroke-linecap="round"/>',
-  yes: '<polygon fill="#fff" points="' + [...Array(10)].map((_, k) => { const a = -Math.PI / 2 + k * Math.PI / 5, r = k % 2 ? 3 : 7.2; return (16 + r * Math.cos(a)).toFixed(1) + ',' + (12.4 + r * Math.sin(a)).toFixed(1); }).join(' ') + '"/>' };
-var mkSvg = t => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M16 30.5C16 30.5 4.6 19.2 4.6 12.2a11.4 11.4 0 0 1 22.8 0C27.4 19.2 16 30.5 16 30.5z" fill="${MK[t][1]}" stroke="rgba(0,0,0,.5)" stroke-width="3.6" stroke-linejoin="round"/><path d="M16 30.5C16 30.5 4.6 19.2 4.6 12.2a11.4 11.4 0 0 1 22.8 0C27.4 19.2 16 30.5 16 30.5z" fill="${MK[t][1]}" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/>${MKG[t]}</svg>`;
+/* ===== Repères : balises de carte façon RPG (socle de pierre, gemme colorée, cerclage laiton) ===== */
+var MK = {
+  pin: ['Repère', '#c23b3b'], yes: ['Intéressant', '#d4a23a'], chest: ['Coin secret', '#7d55b8'], no: ['Pas intéressant', '#5f5b55'], girolle: ['Girolles', '#e3892c'],
+  oak: ['Chêne', '#4f8a35'], chat: ['Châtaignier', '#8f5a24'], pine: ['Pin', '#2f6e4e'], toxic: ['Toxique', '#a82d36'], water: ["Point d'eau", '#2b8fc4'],
+  park: ['Parking', '#3f64a8'], danger: ['Danger', '#e0b22a'], hunt: ['Chasse', '#d0611e'], private: ['Privé', '#7a6a58']
+};
+var W_ = 'fill="#fff"', S_ = 'fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round"';
+var MKG = {      // pictogrammes centrés sur la gemme (16, 13)
+  pin: `<path d="M16 7.6l5.4 5.4-5.4 5.4-5.4-5.4z" ${W_}/><path d="M16 10.4l2.6 2.6-2.6 2.6-2.6-2.6z" fill="#c23b3b"/>`,
+  yes: `<polygon ${W_} points="${[...Array(10)].map((_, k) => { const a = -Math.PI / 2 + k * Math.PI / 5, r = k % 2 ? 2.7 : 6.2; return (16 + r * Math.cos(a)).toFixed(1) + ',' + (13.4 + r * Math.sin(a)).toFixed(1); }).join(' ')}"/>`,
+  chest: `<path d="M10.5 12.2c0-2.4 2.4-3.9 5.5-3.9s5.5 1.5 5.5 3.9z" ${W_}/><rect x="10.5" y="12.8" width="11" height="5.6" rx=".6" ${W_}/><rect x="15" y="11.6" width="2" height="3.2" rx=".4" fill="#7d55b8"/>`,
+  no: `<path d="M12.2 9.2l7.6 7.6M19.8 9.2l-7.6 7.6" ${S_} stroke-width="2.8"/>`,
+  girolle: `<path d="M9.8 9.4c2 1.6 10.4 1.6 12.4 0-.3 2.6-3.4 4.4-4.9 5.2l-.3 4h-2l-.3-4c-1.5-.8-4.6-2.6-4.9-5.2z" ${W_}/>`,
+  oak: `<rect x="15" y="14.6" width="2" height="4.4" ${W_}/><circle cx="12.6" cy="12.8" r="3.1" ${W_}/><circle cx="19.4" cy="12.8" r="3.1" ${W_}/><circle cx="16" cy="9.6" r="3.4" ${W_}/><circle cx="16" cy="13.4" r="3" ${W_}/>`,
+  chat: `<path d="M16 7.8c3.3 1.7 5 4.4 5 7.2 0 1.8-2.2 2.9-5 2.9s-5-1.1-5-2.9c0-2.8 1.7-5.5 5-7.2z" ${W_}/><path d="M11.6 15.4c1.4.7 7.4.7 8.8 0" stroke="#8f5a24" stroke-width="1.3" fill="none"/>`,
+  pine: `<path d="M16 7.2l3.6 4.6h-1.8l3 4H11.2l3-4h-1.8z" ${W_}/><rect x="15.1" y="15.6" width="1.8" height="3.2" ${W_}/>`,
+  toxic: `<path d="M9.6 13.6c0-3.6 2.9-5.8 6.4-5.8s6.4 2.2 6.4 5.8z" ${W_}/><rect x="14.8" y="13.6" width="2.4" height="5" rx=".6" ${W_}/><circle cx="13.4" cy="11" r="1" fill="#a82d36"/><circle cx="17.6" cy="10.2" r=".9" fill="#a82d36"/><circle cx="19.2" cy="12.4" r=".8" fill="#a82d36"/>`,
+  water: `<path d="M16 7.4c2.4 3.2 4.4 5.6 4.4 8 0 2.4-2 4-4.4 4s-4.4-1.6-4.4-4c0-2.4 2-4.8 4.4-8z" ${W_}/><path d="M14.2 15.6c.2 1 .9 1.6 1.8 1.8" stroke="#2b8fc4" stroke-width="1.2" fill="none" stroke-linecap="round"/>`,
+  park: `<text x="16" y="17.6" font-size="13" font-weight="800" text-anchor="middle" fill="#fff" font-family="Arial,Helvetica,sans-serif">P</text>`,
+  danger: `<path d="M16 7.6l6.2 10.8H9.8z" fill="#1b140a" stroke="#1b140a" stroke-width="1" stroke-linejoin="round"/><path d="M16 11v3.6" stroke="#e0b22a" stroke-width="1.8" stroke-linecap="round"/><circle cx="16" cy="16.6" r="1" fill="#e0b22a"/>`,
+  hunt: `<circle cx="16" cy="13" r="4.6" ${S_} stroke-width="1.8"/><path d="M16 6.8v3M16 16.2v3M9.8 13h3M19.2 13h3" ${S_} stroke-width="1.8"/>`,
+  private: `<path d="M11 9.2v9M16 8v10.2M21 9.2v9M10 11.6h12M10 15.6h12" ${S_} stroke-width="1.7"/>`
+};
+var mkSvg = t => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><defs><radialGradient id="g${t}" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#fff" stop-opacity=".45"/><stop offset=".35" stop-color="${MK[t][1]}"/><stop offset="1" stop-color="${MK[t][1]}"/></radialGradient><linearGradient id="s${t}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a5044"/><stop offset="1" stop-color="#2a241d"/></linearGradient></defs>
+  <ellipse cx="16" cy="30.6" rx="4.2" ry="1.2" fill="#000" fill-opacity=".45"/>
+  <path d="M16 30.4L10 23.6C6.6 21 4.6 17.4 4.6 13.2a11.4 11.4 0 0 1 22.8 0c0 4.2-2 7.8-5.4 10.4z" fill="url(#s${t})" stroke="#0e0b08" stroke-width="2.2" stroke-linejoin="round"/>
+  <path d="M16 28.2l-1.6-2.4h3.2z" fill="#d6ab55"/>
+  <circle cx="16" cy="13" r="9.1" fill="#d6ab55"/><circle cx="16" cy="13" r="9.1" fill="none" stroke="#0e0b08" stroke-width=".8"/>
+  <circle cx="16" cy="13" r="7.7" fill="url(#g${t})" stroke="#0e0b08" stroke-opacity=".55" stroke-width=".8"/>
+  ${MKG[t]}</svg>`;
 var MKI = {}; Object.keys(MK).forEach(t => { const im = new Image(); im.onload = () => schedule(); im.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(mkSvg(t)); MKI[t] = im; });
 var SPOT = { min: 24, max: 46, ref: 30 };      // taille de l'icône en px : suit le zoom de près (≈ ref mètres de large), plafonnée à max, puis ne rapetisse plus sous min
 var spotSz = () => Math.max(SPOT.min, Math.min(SPOT.max, SPOT.ref / (V.mpp * Math.cos(toLL(V.cx, V.cy)[0] * Math.PI / 180))));
@@ -1330,9 +1352,10 @@ if (Object.keys(D.cells).length) fitData(); else { [V.cx, V.cy] = toM(46.6, 2.5)
 /* ===== Réactions : repères avec icône et note (icônes dessinées en SVG) ===== */
 var MKE = null, mkLast = 'pin';
 function drawMarks(sx, sy) {
-  (D.marks || []).forEach(m => { const im = MKI[m.t]; if (!im || !im.complete) return; const x = sx(m.x), y = sy(m.y), s = 32;
+  (D.marks || []).forEach(m => { const im = MKI[m.t]; if (!im || !im.complete) return; const x = sx(m.x), y = sy(m.y), s = 34;
     g.drawImage(im, x - s / 2, y - s, s, s);
-    if (m.note) { g.beginPath(); g.arc(x + 12, y - s + 4, 4.2, 0, 7); g.fillStyle = '#fff'; g.fill(); g.lineWidth = 1.4; g.strokeStyle = '#3b2412'; g.stroke(); g.beginPath(); g.arc(x + 12, y - s + 4, 1.6, 0, 7); g.fillStyle = '#3b2412'; g.fill(); } });
+    if (m.note) { const nx = x + 12, ny = y - s + 5; g.beginPath(); g.moveTo(nx - 4, ny - 4.5); g.lineTo(nx + 4, ny - 4.5); g.lineTo(nx + 4, ny + 4.5); g.lineTo(nx - 4, ny + 4.5); g.closePath(); g.fillStyle = '#f1e2b8'; g.fill(); g.lineWidth = 1.6; g.strokeStyle = '#0e0b08'; g.stroke();      // petit parchemin : ce repère a une note
+      g.beginPath(); g.moveTo(nx - 2.2, ny - 1.6); g.lineTo(nx + 2.2, ny - 1.6); g.moveTo(nx - 2.2, ny + 1.4); g.lineTo(nx + 1.2, ny + 1.4); g.lineWidth = 1.1; g.strokeStyle = '#6b4a22'; g.stroke(); } });
 }
 function markAt(px, py) {
   const W = cv.clientWidth, H = cv.clientHeight; let best = null, bd = 1e9;
