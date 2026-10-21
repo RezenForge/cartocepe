@@ -487,16 +487,39 @@ body{background:
 .edb button[hidden]{display:none}#eddl{background:linear-gradient(#a33c28,#6e2416)!important}
 #pmed{flex:1}#pmed.on{background:linear-gradient(#f4c862,#c6862a);color:#2a1806;text-shadow:none}
 #pmmag{min-width:52px;opacity:.55}#pmmag.on{opacity:1;box-shadow:inset 0 0 0 1px var(--ember),var(--bevel)}
-#pm.ed #pmt{font-size:12.5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}#pmed{flex:1;min-width:0}#pmn{padding:0 10px}
+#pmed{flex:1;min-width:0}#pmn{padding:0 10px}
 #pmdraw{flex:1;min-width:0;padding:0 8px!important}#pmdraw.on{background:linear-gradient(#f4c862,#c6862a);color:#2a1806;text-shadow:none}#pm.ed #pmed{flex:.8}
 #pm .pmb button{white-space:nowrap}
+#edsm{position:absolute;z-index:7;padding:8px;max-width:calc(100% - 16px);border-radius:6px!important;animation:pop .25s cubic-bezier(.2,.9,.3,1.2) both}#edsm[hidden]{display:none}.edmh{font:800 10.5px/1.2 var(--num);letter-spacing:.12em;text-transform:uppercase;color:var(--ember);margin:0 2px 6px}#esdel{background:linear-gradient(#a33c28,#6e2416)!important}
+
+/* ===== Cartouche des sentiers ===== */
+#pmt .pmh{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-bottom:4px}
+#pmt .pmh b{margin-right:3px;font:800 15px/1.2 var(--px);color:#fff1cf;text-shadow:1px 1px 0 #000;letter-spacing:.02em}
+#pmt .pms{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:5px}
+.pc{display:inline-flex;align-items:center;padding:2px 8px;border-radius:3px;background:#14110e;border:1px solid #3a332a;font:800 12px/1.5 var(--num);color:var(--txt);white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.pc.nm{color:var(--ember2)}.pc.tm{color:#ff9b85;font-variant-numeric:tabular-nums}
+.pc.gq{font-size:11px;margin-left:auto}.pc.q0{color:var(--mut)}.pc.q1{color:#9ee070;border-color:rgba(158,224,112,.45)}.pc.q2{color:#ffd27a;border-color:rgba(255,210,122,.45)}.pc.q3{color:#ff8a6e;border-color:rgba(255,138,110,.5)}
+#pmt .pmhelp{font-size:12px;line-height:1.35;color:var(--mut)}
+#pm.ed #pmt .pmhelp,#pm #pmt .pmhelp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.recdot{display:inline-block;width:10px;height:10px;margin-right:7px;border-radius:50%;background:#ff4b3a;box-shadow:0 0 8px #ff4b3a;vertical-align:1px;animation:recb 1.2s ease-in-out infinite}
+@keyframes recb{50%{opacity:.35}}
+#pmsm{padding:0 10px!important}#pmls{min-width:48px}
+#pls{position:fixed;inset:0;background:rgba(6,5,3,.72);display:none;align-items:center;justify-content:center;padding:12px;z-index:20}
+#pls.open{display:flex;animation:fadeIn .2s ease both}#pls .win{width:100%;max-width:420px;max-height:84dvh;display:flex;flex-direction:column;padding:16px;overflow:hidden}
+#pls.open .win{animation:pop .38s cubic-bezier(.2,.9,.3,1.15) both}
+#pll{flex:1;min-height:0;overflow:auto;margin:0}
+#pll li{cursor:pointer;padding:9px 10px;margin-bottom:6px;gap:10px;background:var(--slot);border:2px solid var(--edge);border-radius:4px;box-shadow:inset 0 0 0 1px var(--rim);color:var(--txt)}
+#pls.open #pll li{animation:rise .3s cubic-bezier(.2,.85,.25,1) both}
+#pll .pli{flex:none;width:36px;height:36px;display:grid;place-items:center;border-radius:4px;background:#0d0b08;border:2px solid #3a332a;color:var(--ember2)}
+#pll .lt{flex:1;min-width:0}#pll .lt b{color:#fff1cf}#pll small{color:var(--mut)}#pll .bd b{font:800 16px var(--num);color:var(--ember2)}
 </style></head><body>
 <header class="bar win dg"><span class="emb" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="15" fill="#2f3d27" stroke="currentColor" stroke-width="1.2"/><circle cx="16" cy="16" r="12.6" fill="none" stroke="currentColor" stroke-width=".6" opacity=".45"/><g transform="translate(5.2 4.6) scale(.68)"><path d="M12.2 17.5c-1.6 4.2-2.3 8.2-.9 10.6 1 1.6 3 2.1 4.7 2.1s3.7-.5 4.7-2.1c1.4-2.4.7-6.4-.9-10.6z" fill="#f3e6c4" stroke="#2a1a0d" stroke-width="1.6" stroke-linejoin="round"/><path d="M2.8 17.6C2.8 9.2 8.7 3 16 3s13.2 6.2 13.2 14.6c0 1.6-5.2 2.6-13.2 2.6S2.8 19.2 2.8 17.6z" fill="#9a5522" stroke="#2a1a0d" stroke-width="1.6" stroke-linejoin="round"/><path d="M7 11.4c2.2-3.6 5.4-5 9-5" fill="none" stroke="#fff" stroke-opacity=".4" stroke-width="2" stroke-linecap="round"/></g></svg></span>
   <div class="brand"><h1>Cartocèpe</h1><small id="ssn">Carnet d'exploration</small></div>
   <button class="ib" id="encb" data-ic="tome" aria-label="Encyclopédie des champignons"></button><button class="ib" id="loc" data-ic="loc" aria-label="Ma position"></button><button class="ib" id="mn" data-ic="set" aria-label="Journal et réglages"></button></header>
 <div id="mapBox"><canvas id="cv"></canvas><div id="sc"></div>
   <div id="nr" aria-hidden="true"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="16.5" fill="rgba(17,24,18,.66)" stroke="rgba(227,192,113,.6)"/><text x="18" y="11.6" text-anchor="middle" font-size="8.5" font-weight="700" fill="#e3c071" font-family="system-ui,sans-serif">N</text><path d="M18 13.5l3.6 9H14.4z" fill="#e3c071"/><path d="M18 31l-3.6-8.5h7.2z" fill="#f1e6c9" opacity=".45"/></svg></div>
-  <div id="pm" class="dg" hidden><div class="eyb">Cartographie des sentiers</div><div id="pmt"></div><div class="pmb"><button id="pmp">📍 Point</button><button id="pmu" aria-label="Annuler le dernier point">↩</button><button id="pme" aria-label="Terminer le chemin">✔</button><button id="pmd" hidden aria-label="Supprimer le chemin">🗑</button><button id="pmx" aria-label="Quitter le mode chemins">✕</button></div><div class="pmb"><button id="pmrec">⏺ Enregistrer</button><button id="pmn" hidden aria-label="Nommer le chemin">✎ Nom</button><button id="pmdraw" hidden>✏ Tracer</button><button id="pmed">✎ Éditer</button><button id="pmmag" aria-label="Aimantation des points">🧲</button></div></div>
+  <div id="pm" class="dg" hidden><div id="pmt"></div><div class="pmb"><button id="pmp">📍 Point</button><button id="pmu" aria-label="Annuler le dernier point">↩</button><button id="pme" aria-label="Terminer le chemin">✔</button><button id="pmsm" hidden aria-label="Lisser le sentier">〰 Lisser</button><button id="pmls" aria-label="Mes sentiers">📋</button><button id="pmd" hidden aria-label="Supprimer le sentier">🗑</button><button id="pmx" aria-label="Quitter le mode chemins">✕</button></div><div class="pmb"><button id="pmrec">⏺ Enregistrer</button><button id="pmn" hidden aria-label="Nommer le chemin">✎ Nom</button><button id="pmdraw" hidden>✏ Tracer</button><button id="pmed">✎ Éditer</button><button id="pmmag" aria-label="Aimantation des points">🧲</button></div></div>
+  <div id="edsm" class="dg" hidden><div class="edmh">Tronçon de sentier</div><div class="edb"><button id="esadd">➕ Ajouter un point</button><button id="esdel">✂ Supprimer</button><button id="esx" aria-label="Fermer">✕</button></div></div>
   <div id="edm" class="dg" hidden><div id="edmt"></div><div class="edb"><button id="eddl">🗑 Supprimer</button><button id="eddt" hidden>✂ Détacher</button><button id="edsp">✂ Couper ici</button><button id="edx" aria-label="Fermer">✕</button></div></div>
   <div id="rt" class="dg" hidden><div class="eyb">Itinéraire</div><div id="rtt"></div><div id="rts"></div><div class="pmb"><button id="rtn" aria-label="Point suivant">Suivant ›</button><button id="rtg" aria-label="Ouvrir dans Maps">Ouvrir dans Maps</button><button id="rtx" aria-label="Fermer l'itinéraire" style="margin-left:auto">✕</button></div></div>
   <div id="rm" class="dg" hidden><div class="eyb">Poser un repère</div><div id="rmt">Touchez la carte pour poser un repère, ou touchez un repère existant pour le modifier.</div><div class="pmb"><button id="rmg">À ma position</button><button id="rmx" aria-label="Quitter le mode repère">✕</button></div></div>
@@ -538,6 +561,9 @@ body{background:
   <div class="esrch"><input id="encq" type="search" placeholder="Cèpe, amanite, volve…" autocomplete="off" aria-label="Rechercher un champignon ou un terme"><div id="encac" hidden></div></div>
   <div id="encf" class="seg"><button data-k="all" class="on">Tout</button><button data-k="ok">Comestibles</button><button data-k="bad">Toxiques</button><button data-k="mo">☠ Mortels</button><button data-k="gl">Jargon</button></div>
   <ul id="encl"></ul><div id="encv" hidden></div></div></div>
+<div id="pls"><div class="win dg"><div class="lhd"><h2 id="plh">Mes sentiers</h2><button class="ib" id="plx" aria-label="Fermer">✕</button></div>
+  <div class="seg" id="pls-s"><button data-s="recent" class="on">Récents</button><button data-s="long">Les plus longs</button><button data-s="name">Par nom</button></div>
+  <ul id="pll"></ul></div></div>
 <div id="toast"><span id="tm"></span><button id="tu" hidden>Annuler</button></div>
 <div id="dlp" hidden><span id="dlt"></span><button id="dlc">Arrêter</button><div id="dlb"><i id="dlbi"></i></div></div>
 <div id="dlm"><div class="win dg"><h2>Carte hors connexion</h2><div class="hint" id="dlh"></div>
@@ -619,7 +645,7 @@ function mergeCell(k, c, pos) {      // fusionne sans doublon (importer deux foi
   if (c.name && !a.name.split(' / ').includes(c.name)) a.name = a.name ? a.name + ' / ' + c.name : c.name;
   if (c.note && !a.note.includes(c.note)) a.note = a.note ? a.note + '\n' + c.note : c.note;
 }
-const cleanPaths = a => (Array.isArray(a) ? a : []).filter(p => p && /^[\w-]+$/.test(String(p.id)) && Array.isArray(p.pts)).map(p => ({ id: String(p.id), name: String(p.name || '').slice(0, 60), pts: p.pts.filter(q => Array.isArray(q) && isFinite(q[0]) && isFinite(q[1])).map(q => [+q[0], +q[1]]) })).filter(p => p.pts.length >= 2);
+const cleanPaths = a => (Array.isArray(a) ? a : []).filter(p => p && /^[\w-]+$/.test(String(p.id)) && Array.isArray(p.pts)).map(p => ({ id: String(p.id), name: String(p.name || '').slice(0, 60), d: /^\d{4}-\d\d-\d\d$/.test(p.d) ? p.d : '', pts: p.pts.filter(q => Array.isArray(q) && isFinite(q[0]) && isFinite(q[1])).map(q => [+q[0], +q[1]]) })).filter(p => p.pts.length >= 2);
 function mergePaths(a) { const have = new Set((D.paths ||= []).map(p => p.id)); cleanPaths(a).forEach(p => { if (!have.has(p.id)) D.paths.push(p); }); }
 /* ===== Repères : balises de carte façon RPG (socle de pierre, gemme colorée, cerclage laiton) ===== */
 var MK = {
@@ -933,7 +959,7 @@ $('#zi').onclick = () => zoomAt(1.6); $('#zo').onclick = () => zoomAt(1 / 1.6);
 { const ptr = new Map(); let tap = null, pinch = 0; const dist = () => { const [a, b] = [...ptr.values()]; return Math.hypot(a.x - b.x, a.y - b.y); };
   cv.addEventListener('pointerdown', e => { if (edDown(e)) return; fly++; ptr.set(e.pointerId, { x: e.clientX, y: e.clientY }); if (ptr.size === 1) { tap = { x: e.clientX, y: e.clientY, mv: false }; const t0 = tap; setTimeout(() => { if (tap === t0 && !t0.mv && ptr.size === 1 && !P.on && !RM) { t0.mv = true; longSpot(t0.x, t0.y); } }, 550); } else { if (tap) tap.mv = true; pinch = dist(); } });
   addEventListener('pointermove', e => { if (ED.drag && edMove(e)) return; const p = ptr.get(e.pointerId); if (!p) return; const dx = e.clientX - p.x, dy = e.clientY - p.y; p.x = e.clientX; p.y = e.clientY;
-    if (ptr.size === 1 && tap) { if (!tap.mv && Math.hypot(e.clientX - tap.x, e.clientY - tap.y) > 8) tap.mv = true; if (tap.mv) { V.cx -= dx * V.mpp; V.cy += dy * V.mpp; schedule(); } }
+    if (ptr.size === 1 && tap) { if (tap.mv) lastPan = Date.now(); if (!tap.mv && Math.hypot(e.clientX - tap.x, e.clientY - tap.y) > 8) tap.mv = true; if (tap.mv) { V.cx -= dx * V.mpp; V.cy += dy * V.mpp; schedule(); } }
     else if (ptr.size === 2 && pinch) { const [a, b] = [...ptr.values()], d = dist(); zoomAt(d / pinch, (a.x + b.x) / 2, (a.y + b.y) / 2); pinch = d; } });
   const end = e => { if (ED.drag && edUp(e)) return; if (!ptr.has(e.pointerId)) return; const solo = ptr.size === 1; ptr.delete(e.pointerId);
     if (solo && e.type === 'pointerup' && tap && !tap.mv) multiTap(e);
@@ -1212,18 +1238,32 @@ $('#wk').onclick = () => { wakeOn = !wakeOn; try { localStorage.setItem('cartoce
 const fmtDist = m => m >= 1000 ? (m / 1000).toFixed(1).replace('.', ',') + ' km' : Math.round(m) + ' m';
 const pathLen = p => { let t = 0; for (let i = 1; i < p.pts.length; i++) t += rdist(p.pts[i - 1], p.pts[i]); return t; };
 function recTick() {      // un point tous les ~10 m (plus si le GPS est imprécis), jamais si la précision dépasse 30 m
-  if (!RC.on || !me || me.acc > 30) return; const last = P.cur ? P.cur.pts[P.cur.pts.length - 1] : P.start, gp = { x: me.x, y: me.y, acc: me.acc };
+  if (!RC.on || !me || me.acc > 30) return;
+  if (!RC.f) RC.f = { x: me.x, y: me.y, acc: me.acc };      // lissage : chaque position compte d'autant plus qu'elle est précise (gomme le zigzag du GPS)
+  else { const k = Math.max(.3, Math.min(.85, 7 / Math.max(3, me.acc))); RC.f.x += (me.x - RC.f.x) * k; RC.f.y += (me.y - RC.f.y) * k; RC.f.acc = me.acc; }
+  const last = P.cur ? P.cur.pts[P.cur.pts.length - 1] : P.start, gp = { x: RC.f.x, y: RC.f.y, acc: me.acc };
   if (!last) { placePt(gp, true); return pmUpdate(); }
-  if (rdist(last, [me.x, me.y]) < Math.max(10, Math.min(me.acc * .8, 25))) return;
+  if (rdist(last, [gp.x, gp.y]) < Math.max(10, Math.min(me.acc * .8, 25))) return;
   placePt(gp, true); pmUpdate();
 }
+/* Simplification (Douglas-Peucker) : retire les points inutiles d'un tracé GPS sans toucher aux carrefours ni aux extrémités */
+function simplifyPath(p, tolM = 2.5) {
+  const n0 = p.pts.length; if (n0 < 3) return 0; const tol = tolM / cosAt(p.pts[0][1]), keep = new Uint8Array(n0); keep[0] = keep[n0 - 1] = 1;
+  const shared = new Set(); (D.paths || []).forEach(o => { if (o !== p) o.pts.forEach(v => shared.add(v[0] + ',' + v[1])); });
+  p.pts.forEach((v, i) => { if (shared.has(v[0] + ',' + v[1])) keep[i] = 1; });
+  const dp = (a, b) => { let md = 0, mi = -1; for (let i = a + 1; i < b; i++) { const d = segProj(p.pts[i], p.pts[a], p.pts[b]).d; if (d > md) { md = d; mi = i; } } if (md > tol) { keep[mi] = 1; dp(a, mi); dp(mi, b); } };
+  let a = 0; for (let i = 1; i < n0; i++) if (keep[i]) { dp(a, i); a = i; }
+  p.pts = p.pts.filter((_, i) => keep[i]); bbC.delete(p); return n0 - p.pts.length;
+}
+setInterval(() => { if (RC.on && P.on) pmUpdate(); }, 1000);      // chronomètre de l'enregistrement
 function recToggle() {
   if (RC.on) { RC.on = false; const p = P.cur; wakeSync();
     if (!p) { P.start = null; P.sa = null; pmUpdate(); draw(); return toast('⏹ Enregistrement arrêté : aucun déplacement'); }
-    finishPath(); const nm = prompt('Nom du chemin (facultatif)', ''); if (nm && nm.trim()) { p.name = nm.trim().slice(0, 60); save(); }
-    P.sel = p.id; pmUpdate(); draw(); return toast('⏹ ' + fmtDist(pathLen(p)) + ' enregistrés'); }
+    P.cur = null; P.start = null; P.sa = null; P.adds = []; RC.f = null; const n0 = p.pts.length, rm = simplifyPath(p); save();
+    const nm = prompt('Nom du sentier (facultatif)', ''); if (nm && nm.trim()) { p.name = nm.trim().slice(0, 60); save(); }
+    P.sel = p.id; pmUpdate(); draw(); return toast('⏹ ' + fmtDist(pathLen(p)) + ' enregistrés' + (rm ? ` · tracé lissé (${n0} → ${p.pts.length} points)` : '')); }
   if (!me) { if (watch === null) startLoc(); return toast('Position en attente : réessayez dans un instant'); }
-  RC.on = true; wakeSync(); if (me.acc > 30) toast('Précision faible (±' + Math.round(me.acc) + ' m) : les points se poseront dès que le signal s\'améliore'); else toast('⏺ Enregistrement : marchez, l\'écran reste allumé');
+  RC.on = true; RC.t0 = Date.now(); RC.f = null; wakeSync(); if (me.acc > 30) toast('Précision faible (±' + Math.round(me.acc) + ' m) : les points se poseront dès que le signal s\'améliore'); else toast('⏺ Enregistrement : marchez, l\'écran reste allumé');
   recTick(); pmUpdate();
 }
 
@@ -1365,9 +1405,10 @@ function onPos(p) { setTimeout(() => P.on && pmUpdate(), 0); if (samp) { const [
   if (first) { flyXY(x, y, V.mpp > 4 ? 1.5 : V.mpp, 900); fxRing(x, y, '#ffd27a', 12, 60, 1100, 500, 2.5); fxRing(x, y, '#ffd27a', 12, 60, 1100, 850, 2); }
   if (pending) { const p = pending; pending = false; p === 'visit' ? addVisit(hereK, [me.x, me.y]) : addFind(hereK, [me.x, me.y]); }
   recTick(); routeTick();
+  if (RC.on && me && Date.now() - lastPan > 8000) { const W = cv.clientWidth, H = cv.clientHeight, dx = (me.x - V.cx) / V.mpp, dy = (V.cy - me.y) / V.mpp; if (Math.abs(dx) > W * .3 || Math.abs(dy) > H * .25) flyXY(me.x, me.y, V.mpp, 700); }      // enregistrement : la carte vous suit
   schedule();
 }
-var gpsWarn = 0;
+var gpsWarn = 0, lastPan = 0;
 function startLoc() {
   if (!navigator.geolocation) return toast('Géolocalisation indisponible'); compStart();
   $('#loc').classList.add('on'); toast('Recherche de votre position…');
@@ -1523,16 +1564,29 @@ function drawPaths(sx, sy) {
   /* 2. Autour des carrefours seulement, toutes les couches sont redessinées d'un seul trait : les sentiers qui se rejoignent fusionnent sans couture */
   if (jpts.length) { g.save(); g.beginPath(); const R = w * 4 + 8; jpts.forEach(([x, y]) => { g.moveTo(sx(x) + R, sy(y)); g.arc(sx(x), sy(y), R, 0, 7); }); g.clip(); layers([all], true); g.restore(); }
   if (P.on) ps.forEach(p => p.pts.forEach(([x, y], i) => { const e = i === 0 || i === p.pts.length - 1, j = cnt.get(x + ',' + y) > 1, hs = ED.on && p.id === P.sel, dr = ED.drag && ED.drag.p === p && ED.drag.i === i; g.beginPath(); g.arc(sx(x), sy(y), dr ? 11 : hs ? (j ? 9 : 7.5) : ED.on ? (j ? 7 : 4.5) : j ? 6 : e ? 4.5 : 3, 0, 7); g.fillStyle = j ? '#fff6e0' : p.id === P.sel ? '#e3c071' : '#f1e6c9'; g.fill(); g.lineWidth = j ? 2.5 : 1.5; g.strokeStyle = j ? '#e3c071' : '#3a2a1a'; g.stroke(); }));
+  if (ED.on && ED.seg) { const a = ED.seg.p.pts[ED.seg.i - 1], b = ED.seg.p.pts[ED.seg.i]; if (a && b) { g.save(); g.setLineDash([8, 6]); g.lineCap = 'round'; g.lineWidth = w + 4; g.strokeStyle = 'rgba(255,95,80,.9)'; g.beginPath(); g.moveTo(sx(a[0]), sy(a[1])); g.lineTo(sx(b[0]), sy(b[1])); g.stroke(); g.restore(); } }
   if (fa > .6 && V.mpp < 12) { g.font = '700 12px system-ui,sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineWidth = 4; g.lineJoin = 'round';
     ps.forEach(p => { if (!p.name) return; const m = p.pts[p.pts.length >> 1], x = sx(m[0]), y = sy(m[1]) - 10 - w / 2; g.strokeStyle = 'rgba(20,14,8,.85)'; g.strokeText(p.name, x, y); g.fillStyle = '#fff6e0'; g.fillText(p.name, x, y); }); }
   g.globalAlpha = 1;
   if (P.start) { const x = sx(P.start[0]), y = sy(P.start[1]); g.beginPath(); g.arc(x, y, 10, 0, 7); g.lineWidth = 3; g.strokeStyle = 'rgba(255,255,255,.9)'; g.stroke(); g.beginPath(); g.arc(x, y, 5, 0, 7); g.fillStyle = 'rgba(255,120,40,.9)'; g.fill(); }
   g.restore();
 }
+const clock = ms => { const t = Math.floor(ms / 1000), h = Math.floor(t / 3600), m = Math.floor(t / 60) % 60, s = t % 60; return (h ? h + ':' + pad(m) : m) + ':' + pad(s); };
 function pmUpdate() {
-  const n = (D.paths || []).length, sp = (D.paths || []).find(p => p.id === P.sel), totLen = (D.paths || []).reduce((a, p) => a + pathLen(p), 0), gps = me ? ' · GPS ±' + Math.round(me.acc) + ' m' : ' · GPS en attente';
-  if (ED.on) { const sp = (D.paths || []).find(p => p.id === P.sel); $('#pmt').textContent = ED.draw ? `✏ Tracé : ${ED.draw.n} point(s)${ED.draw.p ? ' · ' + fmtDist(pathLen(ED.draw.p)) : ''}. Touchez la carte pour poser un point ; près d'un point existant, il s'y relie. ↩ annule le dernier.` : sp ? `✎ « ${sp.name || 'Sans nom'} » : glissez un point pour le déplacer (lâchez-le sur un autre pour les relier), touchez la ligne pour ajouter un point, touchez un point pour ses options.` : '✎ Édition : touchez un sentier pour le choisir, ou ✏ Tracer pour en dessiner un nouveau.'; $('#pmd').hidden = !P.sel; $('#pmn').hidden = !P.sel; $('#pt').classList.add('on'); $('#pm').hidden = !P.on; return; }
-  $('#pmt').textContent = (P.cur ? `${RC.on ? '⏺ Enregistrement' : '🥾 Chemin en cours'} : ${P.cur.pts.length} points · ${fmtDist(pathLen(P.cur))}. ${RC.on ? 'Marchez, les points se posent tout seuls.' : 'Marchez, puis 📍 Point (virage ou fin), ✔ pour finir.'}` : P.start ? `📍 Départ posé. Marchez en ligne droite, puis 📍 Point.` : (sp ? `🥾 « ${sp.name || 'Sans nom'} » · ${fmtDist(pathLen(sp))}. ` : `🥾 ${n} chemin(s) · ${fmtDist(totLen)}. `) + `📍 Point pose un départ ; ⏺ enregistre en marchant ; touchez une ligne pour repartir de là.`) + gps;
+  const ps = D.paths || [], n = ps.length, sp = ps.find(p => p.id === P.sel), totLen = ps.reduce((a, p) => a + pathLen(p), 0);
+  const gq = !me ? ['q0', 'GPS…'] : me.acc <= 8 ? ['q1', '±' + Math.round(me.acc) + ' m'] : me.acc <= 20 ? ['q2', '±' + Math.round(me.acc) + ' m'] : ['q3', '±' + Math.round(me.acc) + ' m'];
+  const chip = (t, c = '') => `<span class="pc ${c}">${t}</span>`, name = p => esc(p.name || 'Sans nom');
+  let st, stats, help;
+  if (ED.on && ED.draw) { st = '✏ Tracé manuel'; stats = chip(ED.draw.n + ' pt' + (ED.draw.n > 1 ? 's' : '')) + (ED.draw.p ? chip(fmtDist(pathLen(ED.draw.p))) : ''); help = 'Touchez la carte pour poser un point · près d\'un point existant, il s\'y relie · ↩ annule'; }
+  else if (ED.on) { st = '✎ Édition'; stats = sp ? chip('« ' + name(sp) + ' »', 'nm') + chip(fmtDist(pathLen(sp)) + ' · ' + sp.pts.length + ' pts') : chip(n + ' sentier' + (n > 1 ? 's' : '')); help = sp ? 'Glissez un point · touchez la ligne (ajouter / supprimer un tronçon) · touchez un point (options)' : 'Touchez un sentier pour le modifier, ou ✏ Tracer pour en dessiner un'; }
+  else if (RC.on) { st = '<i class="recdot"></i>Enregistrement'; stats = chip(clock(Date.now() - (RC.t0 || Date.now())), 'tm') + (P.cur ? chip(fmtDist(pathLen(P.cur))) + chip(P.cur.pts.length + ' pts') : chip('en attente du 1er point')); help = me && me.acc > 30 ? 'Signal trop faible : les points reprendront dès qu\'il s\'améliore' : 'Marchez : un point se pose tous les ~10 m, la carte vous suit'; }
+  else if (P.cur) { st = '🥾 Tracé en cours'; stats = chip(fmtDist(pathLen(P.cur))) + chip(P.cur.pts.length + ' pts'); help = '📍 à chaque virage (3 s immobile), ✔ pour finir, ↩ annule le dernier point'; }
+  else if (P.start) { st = '📍 Départ posé'; stats = ''; help = 'Marchez jusqu\'au prochain virage, puis 📍 Point'; }
+  else { st = '🥾 Sentiers'; stats = sp ? chip('« ' + name(sp) + ' »', 'nm') + chip(fmtDist(pathLen(sp))) : chip(n + ' sentier' + (n > 1 ? 's' : '')) + chip(fmtDist(totLen)); help = '📍 pose un départ · ⏺ enregistre en marchant · touchez une ligne pour repartir de là'; }
+  $('#pmt').innerHTML = `<div class="pmh"><b>${st}</b>${stats}${ED.on ? '' : `<span class="pc gq ${gq[0]}">📡 ${gq[1]}</span>`}</div><div class="pmhelp">${help}</div>`;
+  $('#pmls').hidden = !!(ED.draw || RC.on || P.cur);
+  if (ED.on) { $('#pmd').hidden = !P.sel; $('#pmn').hidden = !P.sel; $('#pmsm').hidden = !P.sel || !!ED.draw; $('#pt').classList.add('on'); $('#pm').hidden = !P.on; return; }
+  $('#pmsm').hidden = true;
   $('#pmd').hidden = !P.sel; $('#pmn').hidden = !(P.sel || P.cur); $('#pmrec').textContent = RC.on ? '⏹ Arrêter' + (P.cur ? ' · ' + P.cur.pts.length + ' pts' : '') : '⏺ Enregistrer'; $('#pmrec').classList.toggle('rec', RC.on); $('#pt').classList.toggle('on', P.on); $('#pm').hidden = !P.on;
 }
 const segProj = (p, a, b) => { const dx = b[0] - a[0], dy = b[1] - a[1], l2 = dx * dx + dy * dy, t = l2 ? Math.max(0, Math.min(1, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / l2)) : 0, q = [a[0] + t * dx, a[1] + t * dy]; return { q, t, d: Math.hypot(p[0] - q[0], p[1] - q[1]) }; };
@@ -1577,7 +1631,7 @@ function placePt(me, quiet) {
   X.sort((a, b) => a.t - b.t); nj += X.length;
   const mids = X.map(x => [x.v[0], x.v[1]]), acc = ' (±' + Math.round(me.acc) + ' m)', jt = nj ? ' · 🔀 ' + nj + ' carrefour' + (nj > 1 ? 's' : '') : '';
   if (P.cur) { P.cur.pts.push(...mids, q); P.adds.push(mids.length + 1); T('📍 Point ' + P.cur.pts.length + acc + jt); }
-  else if (P.start) { P.cur = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), pts: [P.start, ...mids, q] }; P.adds = [mids.length + 1]; (D.paths ||= []).push(P.cur); P.start = null; P.sel = null; T('🥾 Chemin tracé' + acc + jt); }
+  else if (P.start) { P.cur = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), d: today(), pts: [P.start, ...mids, q] }; P.adds = [mids.length + 1]; (D.paths ||= []).push(P.cur); P.start = null; P.sel = null; T('🥾 Chemin tracé' + acc + jt); }
   else { P.start = q; P.sa = hit ? hit.p.id : null; T(hit ? '📍 Départ posé sur un trait (carrefour)' + acc + ' : marchez, puis rappuyez' : '📍 Départ posé' + acc + ' : marchez, puis rappuyez'); }
   fxRing(q[0], q[1], '#ffd27a', 4, 22, 550, 0, 2.5); save(); pmUpdate(); draw();
 }
@@ -1601,7 +1655,7 @@ function undoPathPt() {
 function finishPath() { if (!P.cur && !P.start) return toast('Aucun chemin en cours'); P.cur = null; P.start = null; P.sel = null; P.sa = null; P.adds = []; pmUpdate(); draw(); toast('✔ Chemin terminé'); }
 function delPath() {
   if (!P.sel) return; const snap = JSON.stringify(D.paths || []), id = P.sel; D.paths = D.paths.filter(p => p.id !== id); if (P.cur && P.cur.id === id) P.cur = null; P.sel = null; P.start = null; P.sa = null;
-  save(); pmUpdate(); draw(); toast('Chemin supprimé', () => { D.paths = JSON.parse(snap); save(); draw(); renderPanel(); pmUpdate(); });
+  save(); pmUpdate(); draw(); toast('Sentier supprimé', () => { D.paths = JSON.parse(snap); save(); draw(); pmUpdate(); });
 }
 function pathTap(px, py) {      // toucher une ligne : la sélectionne et pose le départ (sur un sommet proche, sinon au milieu du trait = futur carrefour)
   const W = cv.clientWidth, H = cv.clientHeight, sx = x => (x - V.cx) / V.mpp + W / 2, sy = y => H / 2 - (y - V.cy) / V.mpp, wx = x => V.cx + (x - W / 2) * V.mpp, wy = y => V.cy - (y - H / 2) * V.mpp;
@@ -1629,7 +1683,7 @@ function edBackup() { edSnap = JSON.stringify(D.paths || []); }
 function edCommit(msg) { const snap = edSnap; (D.paths || []).forEach(p => bbC.delete(p)); save(); fogSeed(); pmUpdate(); draw(); if (msg) toast(msg, () => { D.paths = JSON.parse(snap); P.sel = null; save(); pmUpdate(); draw(); }); }
 function edDown(e) {      // renvoie vrai si le doigt a saisi un point (la carte ne doit alors pas défiler)
   if (!P.on || !ED.on || ED.draw) return false; const r = cv.getBoundingClientRect(), h = edHit(e.clientX - r.left, e.clientY - r.top); if (!h) return false;
-  edMenu(null); const S0 = edScr(), v0 = h.p.pts[h.i]; ED.drag = { id: e.pointerId, p: h.p, i: h.i, x: e.clientX, y: e.clientY, ox: S0.sx(v0[0]) - (e.clientX - r.left), oy: S0.sy(v0[1]) - (e.clientY - r.top), moved: false, twins: edTwins(v0) }; P.sel = h.p.id; edBackup(); pmUpdate(); draw(); return true;
+  edMenu(null); edSegMenu(null); const S0 = edScr(), v0 = h.p.pts[h.i]; ED.drag = { id: e.pointerId, p: h.p, i: h.i, x: e.clientX, y: e.clientY, ox: S0.sx(v0[0]) - (e.clientX - r.left), oy: S0.sy(v0[1]) - (e.clientY - r.top), moved: false, twins: edTwins(v0) }; P.sel = h.p.id; edBackup(); pmUpdate(); draw(); return true;
 }
 function edMove(e) {
   const d = ED.drag; if (!d || e.pointerId !== d.id) return false;
@@ -1667,7 +1721,7 @@ $('#edsp').onclick = () => {      // couper le sentier en deux à ce point
 };
 $('#edx').onclick = () => edMenu(null);
 function edToggle(on) {
-  ED.on = on ?? !ED.on; ED.drag = null; edMenu(null); if (ED.on) { if (RC.on) recToggle(); P.cur = null; P.start = null; P.sa = null; P.adds = []; }
+  ED.on = on ?? !ED.on; ED.drag = null; edMenu(null); edSegMenu(null); if (ED.on) { if (RC.on) recToggle(); P.cur = null; P.start = null; P.sa = null; P.adds = []; }
   if (!ED.on && ED.draw) edDrawToggle(false); ['pmp', 'pmu', 'pme', 'pmrec'].forEach(id => $('#' + id).hidden = ED.on); $('#pmdraw').hidden = !ED.on; $('#pmed').classList.toggle('on', ED.on); $('#pm').classList.toggle('ed', ED.on); $('#pmed').textContent = ED.on ? '✔ Fin' : '✎ Éditer';
   pmUpdate(); draw(); if (ED.on) toast('✎ Édition : glissez un point pour le déplacer, touchez-le pour plus d\'options');
 }
@@ -1676,10 +1730,25 @@ $('#pmed').onclick = () => edToggle(); $('#pmmag').onclick = () => { P.mag = !P.
 function edPick(px, py) {      // en édition, toucher une ligne la sélectionne (sans poser de départ)
   const S = edScr(); let best = null, bd = 22;
   (D.paths || []).forEach(p => { for (let i = 1; i < p.pts.length; i++) { const r = segProj([px, py], [S.sx(p.pts[i - 1][0]), S.sy(p.pts[i - 1][1])], [S.sx(p.pts[i][0]), S.sy(p.pts[i][1])]); if (r.d < bd) { bd = r.d; best = { p, i, q: r.q }; } } });
-  if (best && best.p.id === P.sel) {      // toucher le sentier déjà choisi : un point s'ajoute à cet endroit
-    edBackup(); const q = rp1([S.wx(best.q[0]), S.wy(best.q[1])]); junction(best.p, best.i - 1, q); fxRing(q[0], q[1], '#ffd27a', 4, 20, 450, 0, 2.5); edMenu(null); return edCommit('➕ Point ajouté : glissez-le pour former un virage'); }
-  P.sel = best ? best.p.id : null; edMenu(null); pmUpdate(); draw();
+  edMenu(null);
+  if (best && best.p.id === P.sel) return edSegMenu({ p: best.p, i: best.i, q: rp1([S.wx(best.q[0]), S.wy(best.q[1])]), x: px, y: py });      // toucher le sentier choisi : menu du tronçon
+  edSegMenu(null); P.sel = best ? best.p.id : null; pmUpdate(); draw();
 }
+
+/* Menu d'un tronçon (portion de sentier entre deux points) : ajouter un point, ou supprimer le tronçon */
+function edSegMenu(s) {
+  ED.seg = s; const m = $('#edsm'); if (!s) { m.hidden = true; return draw(); }
+  m.hidden = false; const x = Math.max(8, Math.min(cv.clientWidth - m.offsetWidth - 8, s.x - m.offsetWidth / 2)), y = s.y - m.offsetHeight - 22 < 8 ? s.y + 22 : s.y - m.offsetHeight - 22;
+  m.style.left = x + 'px'; m.style.top = y + 'px'; draw();
+}
+$('#esx').onclick = () => edSegMenu(null);
+$('#esadd').onclick = () => { const s = ED.seg; if (!s) return; edBackup(); junction(s.p, s.i - 1, s.q); fxRing(s.q[0], s.q[1], '#ffd27a', 4, 20, 450, 0, 2.5); edSegMenu(null); edCommit('➕ Point ajouté : glissez-le pour former un virage'); };
+$('#esdel').onclick = () => {      // supprimer le tronçon : le sentier est coupé en deux à cet endroit (un morceau d'un seul point disparaît)
+  const s = ED.seg; if (!s) return; edBackup(); const p = s.p, L = p.pts.slice(0, s.i), Rr = p.pts.slice(s.i), a = p.pts[s.i - 1], b = p.pts[s.i];
+  if (L.length >= 2 && Rr.length >= 2) { p.pts = L; D.paths.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name: p.name, pts: Rr.map(q => [q[0], q[1]]) }); }
+  else if (L.length >= 2) p.pts = L; else if (Rr.length >= 2) p.pts = Rr; else D.paths = D.paths.filter(x => x !== p);
+  fxRing((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, 'rgba(255,110,90,.9)', 4, 26, 500); P.sel = D.paths.includes(p) ? p.id : null; edSegMenu(null); edCommit('✂ Tronçon supprimé');
+};
 /* Tracé manuel : chaque toucher pose un point ; près d'un point ou d'un trait existant (aimantation active), il s'y relie */
 function edDrawTap(px, py) {
   const S = edScr(); let q = rp1([S.wx(px), S.wy(py)]), how = '';
@@ -1690,7 +1759,7 @@ function edDrawTap(px, py) {
       if (hit) { const j = junction(hit.p, hit.i - 1, hit.q); q = [j[0], j[1]]; how = ' · carrefour créé'; } } }
   if (last && edSame(q, last)) return;
   if (!own && !ED.draw.first) { ED.draw.first = q; P.start = q; }
-  else if (!own) { ED.draw.p = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name: '', pts: [ED.draw.first, q] }; (D.paths ||= []).push(ED.draw.p); P.sel = ED.draw.p.id; P.start = null; }
+  else if (!own) { ED.draw.p = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name: '', d: today(), pts: [ED.draw.first, q] }; (D.paths ||= []).push(ED.draw.p); P.sel = ED.draw.p.id; P.start = null; }
   else own.pts.push(q);
   ED.draw.n++; fxRing(q[0], q[1], how ? '#fff6e0' : '#ffd27a', 4, 20, 450, 0, 2.5); (D.paths || []).forEach(p => bbC.delete(p)); save(); pmUpdate(); draw(); if (how) toast('📍 Point ' + ED.draw.n + how);
 }
@@ -1704,8 +1773,27 @@ $('#pmdraw').onclick = () => edDrawToggle(!ED.draw);
 $('#pmu').addEventListener('click', e => { if (!ED.draw) return; e.stopImmediatePropagation(); const d = ED.draw;      // annuler le dernier point du tracé
   if (d.p) { d.p.pts.pop(); d.n--; if (d.p.pts.length < 2) { D.paths = D.paths.filter(p => p !== d.p); d.first = d.p.pts[0]; P.start = d.first; d.p = null; } }
   else if (d.first) { d.first = null; P.start = null; d.n = 0; } save(); pmUpdate(); draw(); }, true);
-$('#pt').onclick = () => { P.on = !P.on; if (!P.on && ED.on) edToggle(false); if (P.on) { if (watch === null) startLoc(); } else { P.cur = null; P.start = null; P.sel = null; P.sa = null; P.adds = []; } pmUpdate(); draw(); };
-$('#pmp').onclick = addPathPt; $('#pmu').onclick = undoPathPt; $('#pme').onclick = finishPath; $('#pmd').onclick = delPath; $('#pmx').onclick = () => { if (RC.on) recToggle(); $('#pt').click(); };
+
+/* ----- Mes sentiers : liste, tri, accès direct ----- */
+let plSort = 'recent';
+function plRender() {
+  const ps = (D.paths || []).map(p => ({ p, l: pathLen(p) })), tot = ps.reduce((a, x) => a + x.l, 0);
+  ps.sort(plSort === 'long' ? (a, b) => b.l - a.l : plSort === 'name' ? (a, b) => (a.p.name || '~').localeCompare(b.p.name || '~', 'fr') : (a, b) => (b.p.d || '').localeCompare(a.p.d || '') || b.p.id.localeCompare(a.p.id));
+  $('#plh').innerHTML = `Mes sentiers<small>${ps.length} sentier${ps.length > 1 ? 's' : ''} · ${fmtDist(tot)}</small>`;
+  document.querySelectorAll('#pls-s button').forEach(b => b.classList.toggle('on', b.dataset.s === plSort));
+  $('#pll').innerHTML = ps.map(({ p, l }) => `<li data-id="${p.id}"><span class="pli">${ICO.trail}</span><span class="lt"><b>${esc(p.name || 'Sans nom')}</b><br><small>${p.d ? 'Tracé ' + ago(p.d) + ' · ' : ''}${p.pts.length} points</small></span><span class="bd"><b>${fmtDist(l)}</b></span></li>`).join('') || '<li class="hint" style="cursor:default">Aucun sentier pour l\'instant : ⏺ Enregistrer ou ✎ Éditer → ✏ Tracer.</li>';
+}
+$('#pmls').onclick = () => { plRender(); $('#pls').classList.add('open'); };
+$('#plx').onclick = () => $('#pls').classList.remove('open'); $('#pls').onclick = e => { if (e.target.id === 'pls') $('#pls').classList.remove('open'); };
+$('#pls-s').onclick = e => { const b = e.target.closest('button'); if (!b) return; plSort = b.dataset.s; plRender(); };
+$('#pll').onclick = e => { const li = e.target.closest('li[data-id]'); if (!li) return; const p = (D.paths || []).find(x => x.id === li.dataset.id); if (!p) return;
+  $('#pls').classList.remove('open'); P.sel = p.id; P.start = null; P.sa = null; const b = pathBB(p), W = cv.clientWidth, H = cv.clientHeight;
+  flyXY((b[0] + b[2]) / 2, (b[1] + b[3]) / 2 - (b[3] - b[1]) * .15, Math.max(.6, (b[2] - b[0]) / (W * .8), (b[3] - b[1]) / (H * .45)), 650); pmUpdate(); draw(); };
+/* ----- Lisser un sentier existant (édition) ----- */
+$('#pmsm').onclick = () => { const p = (D.paths || []).find(x => x.id === P.sel); if (!p) return; edBackup(); const n0 = p.pts.length, rm = simplifyPath(p, 3);
+  if (!rm) return toast('Ce sentier est déjà propre : aucun point superflu'); edCommit(`〰 Sentier lissé : ${n0} → ${p.pts.length} points`); };
+$('#pt').onclick = () => { if (P.on && RC.on) recToggle(); P.on = !P.on; if (!P.on && ED.on) edToggle(false); if (P.on) { if (watch === null) startLoc(); } else { P.cur = null; P.start = null; P.sel = null; P.sa = null; P.adds = []; } pmUpdate(); draw(); };
+$('#pmp').onclick = addPathPt; $('#pmu').onclick = undoPathPt; $('#pme').onclick = finishPath; $('#pmd').onclick = delPath; $('#pmx').onclick = () => $('#pt').click();
 $('#pmrec').onclick = recToggle;
 $('#pmn').onclick = () => { const id = P.sel || (P.cur && P.cur.id), p = (D.paths || []).find(x => x.id === id); if (!p) return; const nm = prompt('Nom du chemin', p.name || ''); if (nm === null) return; p.name = nm.trim().slice(0, 60); save(); pmUpdate(); draw(); };
 pmUpdate();
