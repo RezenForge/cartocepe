@@ -351,10 +351,138 @@ body{background:
 #dlb{background:#0d0b08;border:1px solid #3a332a;height:8px;border-radius:1px}#dlbi{background:linear-gradient(#ffd27a,#c6862a)}
 
 .dg .lim{color:#e8b07a}.wxl{margin:6px 2px 0;font-size:12.5px;line-height:1.4;color:#e8b07a}.wxl b{color:var(--txt)}
+
+/* ===== Animations de l'interface ===== */
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes pop{0%{opacity:0;transform:translateY(18px) scale(.94)}70%{opacity:1;transform:translateY(-2px) scale(1.01)}100%{opacity:1;transform:none}}
+@keyframes panelIn{0%{opacity:0;transform:translateY(40px)}100%{opacity:1;transform:none}}
+@keyframes seg{0%{transform:scaleY(0);opacity:0}60%{transform:scaleY(1.25);opacity:1}100%{transform:none;opacity:1}}
+@keyframes grow{from{transform:scaleX(0)}to{transform:none}}
+@keyframes bump{0%{transform:none}30%{transform:scale(1.12) rotate(-2deg)}55%{transform:scale(.96)}80%{transform:scale(1.03)}100%{transform:none}}
+@keyframes shine{0%,78%{transform:translateX(-130%) skewX(-18deg)}100%{transform:translateX(230%) skewX(-18deg)}}
+@keyframes toastIn{0%{opacity:0;transform:translate(-50%,-16px) scale(.94)}65%{opacity:1;transform:translate(-50%,3px) scale(1.01)}100%{opacity:1;transform:translate(-50%,0)}}
+@keyframes glint{0%,100%{box-shadow:inset 0 0 0 1px var(--ember),0 0 8px rgba(234,165,60,.3)}50%{box-shadow:inset 0 0 0 1px var(--ember2),0 0 16px rgba(234,165,60,.6)}}
+
+/* fiche de zone : glisse depuis le bas, puis ses éléments apparaissent l'un après l'autre */
+#panel.pin{animation:panelIn .42s cubic-bezier(.2,.85,.25,1) both}
+#panel.pin>*{animation:rise .42s cubic-bezier(.2,.85,.25,1) both}
+#panel.pin>*:nth-child(2){animation-delay:.04s}#panel.pin>*:nth-child(3){animation-delay:.08s}#panel.pin>*:nth-child(4){animation-delay:.12s}
+#panel.pin>*:nth-child(5){animation-delay:.16s}#panel.pin>*:nth-child(6){animation-delay:.2s}#panel.pin>*:nth-child(7){animation-delay:.24s}#panel.pin>*:nth-child(8){animation-delay:.28s}#panel.pin>*:nth-child(9){animation-delay:.32s}
+#panel.pin .slot{animation:pop .45s cubic-bezier(.2,.9,.3,1.2) both}#panel.pin .slot:nth-child(2){animation-delay:.07s}#panel.pin .slot:nth-child(3){animation-delay:.14s}
+/* jauge du potentiel : les segments s'allument un à un ; tuiles météo en cascade */
+.gauge i.f{transform-origin:50% 100%;animation:seg .32s cubic-bezier(.2,.9,.3,1.3) both}
+.gauge i.f:nth-child(2){animation-delay:.04s}.gauge i.f:nth-child(3){animation-delay:.08s}.gauge i.f:nth-child(4){animation-delay:.12s}.gauge i.f:nth-child(5){animation-delay:.16s}
+.gauge i.f:nth-child(6){animation-delay:.2s}.gauge i.f:nth-child(7){animation-delay:.24s}.gauge i.f:nth-child(8){animation-delay:.28s}.gauge i.f:nth-child(9){animation-delay:.32s}.gauge i.f:nth-child(10){animation-delay:.36s}
+.dg .vdc{animation:pop .4s cubic-bezier(.2,.9,.3,1.25) both}
+.dg .vdc.t3{animation:pop .4s cubic-bezier(.2,.9,.3,1.25) both,torch 2.6s ease-in-out .4s infinite}
+#panel.pin .wxd{animation:rise .35s cubic-bezier(.2,.85,.25,1) both}
+#panel.pin .wxd:nth-child(2){animation-delay:.03s}#panel.pin .wxd:nth-child(3){animation-delay:.06s}#panel.pin .wxd:nth-child(4){animation-delay:.09s}#panel.pin .wxd:nth-child(5){animation-delay:.12s}
+#panel.pin .wxd:nth-child(6){animation-delay:.15s}#panel.pin .wxd:nth-child(7){animation-delay:.18s}#panel.pin .wxd:nth-child(8){animation-delay:.21s}
+.wxd.best{animation:glint 2.4s ease-in-out infinite}
+/* changement d'onglet */
+.tp.on{animation:fadeIn .25s ease both}
+.ptab button,.seg button{transition:background .2s,color .2s,box-shadow .2s}
+#addv.on{animation:rise .3s cubic-bezier(.2,.85,.25,1) both}
+
+/* fenêtres : fond qui s'assombrit, panneau de pierre qui surgit */
+#menu.open,#lst.open,#dlm.open,#mkm.open{animation:fadeIn .2s ease both}
+#menu.open .win,#lst.open .win,#dlm.open .win,#mkm.open .win{animation:pop .38s cubic-bezier(.2,.9,.3,1.15) both}
+#lst.open #ll li{animation:rise .32s cubic-bezier(.2,.85,.25,1) both}
+#lst.open #ll li:nth-child(2){animation-delay:.04s}#lst.open #ll li:nth-child(3){animation-delay:.08s}#lst.open #ll li:nth-child(4){animation-delay:.12s}#lst.open #ll li:nth-child(5){animation-delay:.16s}#lst.open #ll li:nth-child(n+6){animation-delay:.2s}
+#menu.open .jrp i{transform-origin:0 50%;animation:grow 1.1s cubic-bezier(.2,.85,.25,1) .25s both}
+#menu.open .jrg div{animation:pop .4s cubic-bezier(.2,.9,.3,1.2) both}
+#menu.open .jrg div:nth-child(2){animation-delay:.05s}#menu.open .jrg div:nth-child(3){animation-delay:.1s}#menu.open .jrg div:nth-child(4){animation-delay:.15s}#menu.open .jrg div:nth-child(5){animation-delay:.2s}#menu.open .jrg div:nth-child(6){animation-delay:.25s}
+#mkm.open .mki{animation:pop .35s cubic-bezier(.2,.9,.3,1.25) both}
+#mkm.open .mki:nth-child(n+6){animation-delay:.05s}#mkm.open .mki:nth-child(n+11){animation-delay:.1s}
+.mki svg{transition:transform .2s cubic-bezier(.2,.9,.3,1.4)}.mki.on svg{transform:translateY(-3px) scale(1.12)}
+
+/* cartouches sur la carte et notifications */
+#pm:not([hidden]),#rt:not([hidden]),#rm:not([hidden]){animation:rise .32s cubic-bezier(.2,.85,.25,1) both}
+#toast.show{animation:toastIn .38s cubic-bezier(.2,.9,.3,1.2) both}
+#dlp:not([hidden]){animation:fadeIn .25s ease both}#dlbi{transition:width .3s ease}
+
+/* boutons : rebond au gain, reflet qui balaie le bouton doré, interrupteurs souples */
+#dock button.bump{animation:bump .45s cubic-bezier(.2,.9,.3,1.2)}
+#found{position:relative;overflow:hidden}
+#found::after{content:'';position:absolute;top:0;bottom:0;left:0;width:45%;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);transform:translateX(-130%) skewX(-18deg);animation:shine 7s ease-in-out 3s infinite}
+.ib,#dock button,.dg .btn,.pmb button{transition:transform .12s ease,box-shadow .12s ease,filter .12s ease,background .2s}
+.dg .sw::after{transition:left .25s cubic-bezier(.2,.9,.3,1.4),background .2s,box-shadow .2s}
+#grab{transition:color .2s}
+
+/* préférence « réduire les animations » du téléphone : tout est coupé */
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+#toast{width:max-content;max-width:min(92vw,420px)}
+
+/* ===== Encyclopédie : grimoire de pierre ===== */
+#encm{position:fixed;inset:0;background:rgba(6,5,3,.72);display:none;align-items:center;justify-content:center;padding:10px;z-index:22}
+#encm.open{display:flex;animation:fadeIn .2s ease both}
+#encm .win{width:100%;max-width:460px;height:92dvh;display:flex;flex-direction:column;padding:14px 14px 10px;overflow:hidden}
+#encm.open .win{animation:pop .38s cubic-bezier(.2,.9,.3,1.15) both}
+.ehd{display:flex;align-items:flex-start;gap:8px}.ehd h2{flex:1;margin:0}
+.ehd .ib{width:38px;height:38px;flex:none}
+.dg .esrch{position:relative;z-index:6;margin:10px 0 8px}
+#encq{margin:0;padding-left:38px;min-height:46px;font-size:16px}
+.esrch::before{content:'';position:absolute;left:12px;top:50%;width:14px;height:14px;margin-top:-9px;border:2.2px solid var(--ember);border-radius:50%;pointer-events:none;z-index:2}
+.esrch::after{content:'';position:absolute;left:24px;top:50%;width:7px;height:2.4px;margin-top:5px;background:var(--ember);transform:rotate(45deg);pointer-events:none;z-index:2}
+#encac{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:5;max-height:55dvh;overflow:auto;background:#1b1814;border:2px solid var(--edge);border-radius:5px;box-shadow:inset 0 0 0 1px var(--rim),0 12px 28px rgba(0,0,0,.65);animation:rise .18s ease both}
+#encac[hidden]{display:none}
+#encac button{display:flex;align-items:center;gap:10px;width:100%;padding:9px 10px;border:0;border-bottom:1px solid #2e2821;background:transparent;color:var(--txt);text-align:left;font-size:14px}
+#encac button:active{background:#2e2618}
+#encac b{display:block;font-weight:700}#encac small{display:block;font-size:12px;color:var(--mut)}
+#encac mark,#encl mark{background:none;color:var(--ember2);text-decoration:underline;text-decoration-color:rgba(255,210,122,.5);text-underline-offset:2px}
+.ach{padding:7px 10px 4px;font:800 10px/1 var(--num);letter-spacing:.14em;text-transform:uppercase;color:var(--ember)}
+.eic{flex:none;width:28px;height:28px;display:grid;place-items:center;border-radius:4px;background:#0d0b08;border:2px solid var(--ec,#5a4f40);color:var(--ec,#ab9f84);font:800 14px/1 var(--num)}
+.eic.gl{--ec:#c9a46a;color:#e8c98a}.eic.wk{--ec:#8aa0b8;color:#c9d6e4;font-family:Georgia,serif}
+#encf{display:flex;gap:4px;overflow-x:auto;margin-bottom:8px;padding:3px;scrollbar-width:none}
+#encf button{flex:none;padding:8px 11px;font-size:12.5px;white-space:nowrap}
+#encl{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;margin:0;padding:0 1px}
+#encl li{display:flex;align-items:center;gap:10px;padding:7px 8px;margin-bottom:6px;cursor:pointer;background:var(--slot);border:2px solid var(--edge);border-radius:4px;box-shadow:inset 0 0 0 1px var(--rim);color:var(--txt)}
+#encl li:active{background:#2a241d}
+#encm.open #encl li{animation:rise .3s cubic-bezier(.2,.85,.25,1) both}
+.eth{flex:none;width:52px;height:52px;border-radius:3px;overflow:hidden;display:grid;place-items:center;background:#0d0b08;border:2px solid #3a332a}
+.eth svg{width:30px;height:30px;opacity:.55}.eth img{width:100%;height:100%;object-fit:cover;animation:fadeIn .4s ease both}
+.eth.gl{color:#e8c98a;font-size:22px}.eth.big{width:46px;height:46px}
+.ett{flex:1;min-width:0}.ett b{display:block;font-size:15px;color:#fff1cf}.ett small{display:block;font-size:12px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ebd{display:inline-block;margin-top:3px;padding:1px 7px;border:1px solid var(--ec);border-radius:2px;background:rgba(0,0,0,.4);color:var(--ec);font:800 10px/1.5 var(--num);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+#encv{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding:0 2px 6px;animation:rise .3s cubic-bezier(.2,.85,.25,1) both}
+#encv[hidden],#encl[hidden]{display:none}
+.eback{border:0;background:none;color:var(--ember2);font-weight:700;padding:6px 0 8px;font-size:14px}
+.eimg{position:relative;aspect-ratio:16/10;border:3px solid var(--edge);border-radius:4px;overflow:hidden;background:#0d0b08;box-shadow:0 0 0 2px #574c3d,inset 0 0 20px rgba(0,0,0,.8)}
+.eimg img{width:100%;height:100%;object-fit:cover;display:block;animation:fadeIn .5s ease both}
+.eimg0{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--mut);font-size:12px;background:linear-gradient(110deg,#14110e 30%,#221d17 50%,#14110e 70%) 0 0/250% 100%;animation:shimmer 1.6s linear infinite}
+.eimg0 svg{width:44px;height:44px;opacity:.4}
+@keyframes shimmer{to{background-position:-250% 0}}
+.ecr{position:absolute;right:0;bottom:0;padding:2px 6px;background:rgba(0,0,0,.65);color:#d8ccb0;font-size:10px;text-decoration:none;border-top-left-radius:4px}
+.eph{display:flex;align-items:center;gap:10px;margin:12px 0 4px}.eph>div{flex:1;min-width:0}
+.eph h3{margin:2px 0 0;font:800 23px/1.15 var(--px);color:#fff1cf;text-shadow:2px 2px 0 #000}
+.ekd{font:800 10px/1 var(--num);letter-spacing:.14em;text-transform:uppercase;color:var(--ember)}
+.elat{color:var(--mut);font-size:14px}
+.esec{margin:14px 0 5px;font:800 10.5px/1 var(--num);letter-spacing:.14em;text-transform:uppercase;color:var(--ember)}
+.esec::before{content:'◆ ';color:#6b5d47}.eon{color:#9ee070}
+#encv p{margin:0;font-size:14.5px;line-height:1.5;color:var(--txt)}
+.edef{font-size:16px!important}
+.emo{display:grid;grid-template-columns:repeat(12,1fr);gap:3px}
+.emo i{font-style:normal;text-align:center;padding:5px 0;font:800 11px/1 var(--num);color:#6b604c;background:#0d0b08;border:1px solid #3a332a;border-radius:2px}
+.emo i.f{color:#1f1a11;background:linear-gradient(#ffd27a,#c6862a);border-color:rgba(0,0,0,.5)}
+.emo i.now{box-shadow:0 0 0 2px #fff1cf}
+.econf{display:flex;flex-direction:column;gap:6px}
+.econf button,.echips button{display:flex;align-items:center;gap:10px;text-align:left;padding:8px;border:2px solid var(--edge);border-radius:4px;background:var(--slot);box-shadow:inset 0 0 0 1px var(--rim);color:var(--txt)}
+.econf b{margin-right:6px;color:#fff1cf}.econf small{display:block;margin-top:2px;font-size:12.5px;color:var(--mut)}
+.echips{display:flex;flex-wrap:wrap;gap:6px}.echips button{padding:6px 9px;font-size:13px}.echips .eic{width:22px;height:22px;font-size:11px}
+.epre{margin-top:12px;padding:9px 11px;border-left:3px solid var(--ember);background:rgba(234,165,60,.08);font-size:14px;line-height:1.45}
+.epre.danger{border-color:#ff5f5f;background:rgba(255,80,80,.1);color:#ffd9d0}
+.eal{margin-top:10px!important;font-size:13px!important;color:var(--mut)!important}
+.ewx{font-size:13.5px!important;color:#d9ceb2!important}
+.elink{display:inline-block;margin-top:6px;color:var(--ember2);font-weight:700;font-size:13.5px;text-decoration:none}
+.glk{color:var(--ember2);text-decoration:underline dotted;text-underline-offset:3px;cursor:pointer}
+.ewarn{margin:16px 0 4px;padding:9px 11px;border:2px solid #6e2416;border-radius:4px;background:rgba(160,40,25,.18);color:#ffd9d0;font-size:12.5px;line-height:1.45}
+.egl .ett small{white-space:normal}
 </style></head><body>
 <header class="bar win dg"><span class="emb" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="15" fill="#2f3d27" stroke="currentColor" stroke-width="1.2"/><circle cx="16" cy="16" r="12.6" fill="none" stroke="currentColor" stroke-width=".6" opacity=".45"/><g transform="translate(5.2 4.6) scale(.68)"><path d="M12.2 17.5c-1.6 4.2-2.3 8.2-.9 10.6 1 1.6 3 2.1 4.7 2.1s3.7-.5 4.7-2.1c1.4-2.4.7-6.4-.9-10.6z" fill="#f3e6c4" stroke="#2a1a0d" stroke-width="1.6" stroke-linejoin="round"/><path d="M2.8 17.6C2.8 9.2 8.7 3 16 3s13.2 6.2 13.2 14.6c0 1.6-5.2 2.6-13.2 2.6S2.8 19.2 2.8 17.6z" fill="#9a5522" stroke="#2a1a0d" stroke-width="1.6" stroke-linejoin="round"/><path d="M7 11.4c2.2-3.6 5.4-5 9-5" fill="none" stroke="#fff" stroke-opacity=".4" stroke-width="2" stroke-linecap="round"/></g></svg></span>
   <div class="brand"><h1>Cartocèpe</h1><small id="ssn">Carnet d'exploration</small></div>
-  <button class="ib" id="loc" data-ic="loc" aria-label="Ma position"></button><button class="ib" id="mn" data-ic="set" aria-label="Journal et réglages"></button></header>
+  <button class="ib" id="encb" data-ic="tome" aria-label="Encyclopédie des champignons"></button><button class="ib" id="loc" data-ic="loc" aria-label="Ma position"></button><button class="ib" id="mn" data-ic="set" aria-label="Journal et réglages"></button></header>
 <div id="mapBox"><canvas id="cv"></canvas><div id="sc"></div>
   <div id="nr" aria-hidden="true"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="16.5" fill="rgba(17,24,18,.66)" stroke="rgba(227,192,113,.6)"/><text x="18" y="11.6" text-anchor="middle" font-size="8.5" font-weight="700" fill="#e3c071" font-family="system-ui,sans-serif">N</text><path d="M18 13.5l3.6 9H14.4z" fill="#e3c071"/><path d="M18 31l-3.6-8.5h7.2z" fill="#f1e6c9" opacity=".45"/></svg></div>
   <div id="pm" class="dg" hidden><div class="eyb">Cartographie des sentiers</div><div id="pmt"></div><div class="pmb"><button id="pmp">📍 Point</button><button id="pmu" aria-label="Annuler le dernier point">↩</button><button id="pme" aria-label="Terminer le chemin">✔</button><button id="pmd" hidden aria-label="Supprimer le chemin">🗑</button><button id="pmx" aria-label="Quitter le mode chemins">✕</button></div><div class="pmb"><button id="pmrec">⏺ Enregistrer</button><button id="pmn" hidden aria-label="Nommer le chemin">✎ Nom</button></div></div>
@@ -374,6 +502,7 @@ body{background:
   <div class="mh">Carte</div>
   <button class="btn" id="cmb"></button>
   <button class="btn" id="fob"></button>
+  <button class="btn" id="fogb"></button>
   <button class="btn" id="fs"></button>
   <button class="btn" id="wk"></button>
   <div class="mh">Indice de pousse</div>
@@ -391,6 +520,11 @@ body{background:
   <input id="lq" type="search" placeholder="Rechercher une zone…">
   <ul id="ll"></ul></div></div>
 <div id="pv"><div class="pvb"><button class="ib" id="pvd" data-ic="trash" aria-label="Supprimer la photo"></button><button class="ib" id="pvx" aria-label="Fermer">✕</button></div><img id="pvi" alt="Photo"></div>
+<div id="encm"><div class="win dg">
+  <div class="ehd"><h2>Encyclopédie<small>Bestiaire et jargon du cueilleur</small></h2><button class="ib" id="encx" aria-label="Fermer">✕</button></div>
+  <div class="esrch"><input id="encq" type="search" placeholder="Cèpe, amanite, volve…" autocomplete="off" aria-label="Rechercher un champignon ou un terme"><div id="encac" hidden></div></div>
+  <div id="encf" class="seg"><button data-k="all" class="on">Tout</button><button data-k="ok">Comestibles</button><button data-k="bad">Toxiques</button><button data-k="mo">☠ Mortels</button><button data-k="gl">Jargon</button></div>
+  <ul id="encl"></ul><div id="encv" hidden></div></div></div>
 <div id="toast"><span id="tm"></span><button id="tu" hidden>Annuler</button></div>
 <div id="dlp" hidden><span id="dlt"></span><button id="dlc">Arrêter</button><div id="dlb"><i id="dlbi"></i></div></div>
 <div id="dlm"><div class="win dg"><h2>Carte hors connexion</h2><div class="hint" id="dlh"></div>
@@ -410,6 +544,7 @@ const ICO = {
   compass: SV('<circle cx="12" cy="12" r="9"/><path d="M15.6 8.4l-2.1 5.1-5.1 2.1 2.1-5.1z" fill="currentColor" fill-opacity=".22"/><circle cx="12" cy="12" r=".9" fill="currentColor"/>'),
   book: SV('<path d="M5 5.2A2.2 2.2 0 0 1 7.2 3H18v14.5H7.2A2.2 2.2 0 0 0 5 19.7z"/><path d="M5 19.7A2.2 2.2 0 0 0 7.2 22H18v-4.5M9 7.5h5.5M9 10.5h4"/>'),
   fit: SV('<path d="M4 9V5h4M20 9V5h-4M4 15v4h4M20 15v4h-4"/><circle cx="12" cy="12" r="2.4"/>'),
+  tome: SV('<path d="M3 5.6c3.1-1.4 6.1-1.3 9 .6 2.9-1.9 5.9-2 9-.6V19c-3.1-1.4-6.1-1.3-9 .6-2.9-1.9-5.9-2-9-.6z"/><path d="M12 6.2v13.4"/><path d="M5.6 9.8c.6-1.6 2.2-2.2 3.8-1.6M14.6 9.8c.6-1.6 2.2-2.2 3.8-1.6" stroke-width="1.4"/>'),
   minus: SV('<path d="M6 12h12"/>'), plus: SV('<path d="M12 6v12M6 12h12"/>'),
   grid: SV('<path d="M4 4h16v16H4zM4 12h16M12 4v16"/>'),
   foot: SV('<path d="M8.4 3c1.7 0 2.6 1.9 2.6 4.1S10.1 11 8.6 11 6 9.4 6 7.2 6.8 3 8.4 3zM6.4 12.6h4.2l-.3 2.3a1.9 1.9 0 0 1-3.6-.1zM15.6 8c1.6 0 2.4 1.9 2.4 4.1s-.9 3.9-2.4 3.9-2.6-1.6-2.6-3.8S14 8 15.6 8zM13.4 17.6h4.2l-.3 2.3a1.9 1.9 0 0 1-3.6-.1z" fill="currentColor" stroke="none"/>'),
@@ -440,7 +575,7 @@ function journal() {      // journal d'exploration : bilan de toutes les sorties
   const days = new Set(cs.flatMap(c => c.v.map(v => v.d))).size, km = (D.paths || []).reduce((a, p) => a + pathLen(p), 0), yrs = new Set(cs.flatMap(c => c.v.filter(v => v.n > 0).map(v => v.d.slice(0, 4)))).size;
   const T = [[0, 'Promeneur'], [10, 'Cueilleur'], [50, 'Pisteur'], [150, 'Coureur des bois'], [400, 'Maître des sous-bois']], t = T.filter(x => n >= x[0]).pop(), nx = T.find(x => x[0] > n), pc = nx ? (n - t[0]) / (nx[0] - t[0]) * 100 : 100;
   const tile = (v, l) => `<div><b>${v}</b><small>${l}</small></div>`;
-  return `<div class="jrh">${ICO.compass}<div><small>Rang d'explorateur${yrs ? ' · ' + yrs + ' saison' + (yrs > 1 ? 's' : '') : ''}</small><b>${t[1]}</b><i>${nx ? `Encore ${nx[0] - n} cèpe${nx[0] - n > 1 ? 's' : ''} avant « ${nx[1]} »` : 'Rang le plus élevé atteint'}</i></div></div>
+  return `<div class="jrh">${ICO.compass}<div><small>Rang d'explorateur${yrs ? ' · ' + yrs + ' saison' + (yrs > 1 ? 's' : '') : ''}</small><b>${t[1]}</b><i>${nx ? `Encore ${nx[0] - n} cèpe${nx[0] - n > 1 ? 's' : ''} avant « ${nx[1]} »` : 'Rang le plus élevé atteint'}</i><i>🌫️ ${(h => h >= 10 ? Math.round(h) : h.toFixed(1).replace('.', ','))(fogHa())} ha dévoilés</i></div></div>
     <div class="jrp"><i style="width:${Math.round(pc)}%"></i></div>
     <div class="jrg">${tile(ex, 'zones explorées')}${tile(coins, 'coins à cèpes')}${tile(days, 'sorties')}${tile(n, 'cèpes trouvés')}${tile(fmtW(w), 'récoltés')}${tile(fmtDist(km), 'de sentiers')}</div>`;
 }
@@ -538,10 +673,10 @@ function importData(d) {
   let msg;
   if (d && Array.isArray(d.maps)) { const r = fromOld(d.maps); msg = `${r.n} case(s) converties` + (r.merged ? `, ${r.merged} fusionnée(s) avec une voisine` : '') + (r.skipped ? ` · ${r.skipped} carte(s) sans coordonnées ignorée(s)` : ''); }
   else if (d && d.cells && d.geo) { const r = fromOld([d]); msg = r.n + ' case(s) converties'; }
-  else if (d && d.cells && d.grid === 50) { Object.entries(d.cells).forEach(([k, c]) => mergeCell(k, c)); mergePaths(d.paths); mergeMarks(d.marks); msg = 'Carnet importé';
+  else if (d && d.cells && d.grid === 50) { Object.entries(d.cells).forEach(([k, c]) => mergeCell(k, c)); mergePaths(d.paths); mergeMarks(d.marks); if (Array.isArray(d.fog)) d.fog.forEach(q => Array.isArray(q) && fogReveal(+q[0], +q[1])); msg = 'Carnet importé';
     if (d.photos && typeof d.photos === 'object') Promise.all(Object.entries(d.photos).filter(([id, u]) => /^[\w-]+$/.test(id) && typeof u === 'string' && u.startsWith('data:image/')).map(([id, u]) => pPut(id, u).catch(() => {}))).then(() => renderPanel()); }
   else return toast('Fichier non reconnu');
-  save(); fitData(); draw(); renderPanel(); toast('📂 ' + msg);
+  fogSeed(); fogSave(); save(); fitData(); draw(); renderPanel(); toast('📂 ' + msg);
 }
 
 /* ===== Carte (canvas) : tuiles satellite + cases ===== */
@@ -621,6 +756,103 @@ async function fxLoad(x0, y0, x1, y1, mpp) {
 }
 const fetchT = (u, ms = 15000, o = {}) => { const ac = new AbortController(), t = setTimeout(() => ac.abort(), ms); return fetch(u, { ...o, signal: ac.signal }).finally(() => clearTimeout(t)); };
 const schedule = () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; draw(); }); };
+/* ===== Effets animés de la carte : uniquement déclenchés par une action (aucune boucle permanente, économe en batterie) ===== */
+const RMO = matchMedia('(prefers-reduced-motion: reduce)');
+var FX = [], fxRaf = 0;
+const EZ = {
+  out: p => 1 - (1 - p) ** 3,
+  back: p => { const c = 1.9; return 1 + (c + 1) * (p - 1) ** 3 + c * (p - 1) ** 2; },
+  bounce: p => { const n = 7.5625, d = 2.75; if (p < 1 / d) return n * p * p; if (p < 2 / d) return n * (p -= 1.5 / d) * p + .75; if (p < 2.5 / d) return n * (p -= 2.25 / d) * p + .9375; return n * (p -= 2.625 / d) * p + .984375; }
+};
+function fxa(o) { if (RMO.matches) return; o.t0 = performance.now() + (o.delay || 0); FX.push(o); if (!fxRaf) fxRaf = requestAnimationFrame(fxLoop); }
+function fxLoop(now) { fxRaf = 0; FX = FX.filter(f => now - f.t0 < f.dur); draw(); if (FX.length) fxRaf = requestAnimationFrame(fxLoop); }
+const fxP = f => (performance.now() - f.t0) / f.dur;      // progression 0 → 1 (négative tant que l'effet attend son délai)
+const fxOf = (k, key) => FX.find(f => f.k === k && f.key === key);
+const sparks = (n, col) => [...Array(n)].map((_, i) => ({ a: -Math.PI / 2 + (i / n - .5) * 2.6 + (Math.random() - .5) * .5, v: 22 + Math.random() * 26, r: 1.6 + Math.random() * 2.2, c: col[i % col.length] }));
+/* « +1 » qui s'envole avec une gerbe d'étincelles */
+function fxGain(x, y, text, big) { fxa({ k: 'gain', x, y, text, big, dur: 1150, parts: sparks(big ? 14 : 7, big ? ['#ffd27a', '#fff1c4', '#eaa53c'] : ['#e8e0c8', '#c9b78f']) }); }
+function fxRing(x, y, col, r0, r1, dur = 700, delay = 0, w = 3) { fxa({ k: 'ring', x, y, col, r0, r1, dur, delay, w }); }
+function drawFX(sx, sy) {
+  if (!FX.length) return; g.save(); g.textAlign = 'center'; g.textBaseline = 'middle';
+  for (const f of FX) { const p = fxP(f); if (p < 0 || p > 1 || f.x == null) continue; const x = sx(f.x), y = sy(f.y) - (f.oy || 0);
+    if (f.k === 'ring') { g.globalAlpha = (1 - p) * .9; g.beginPath(); g.arc(x, y, f.r0 + (f.r1 - f.r0) * EZ.out(p), 0, 7); g.lineWidth = f.w * (1 - p * .6); g.strokeStyle = f.col; g.stroke(); }
+    if (f.k === 'gain') {
+      for (const s of f.parts) { const e = EZ.out(p), px = x + Math.cos(s.a) * s.v * e, py = y - 18 + Math.sin(s.a) * s.v * e + 26 * p * p;      // étincelles retombant doucement
+        g.globalAlpha = 1 - p; g.beginPath(); g.arc(px, py, s.r * (1 - p * .7), 0, 7); g.fillStyle = s.c; g.fill(); }
+      const sc = p < .18 ? EZ.back(p / .18) : 1, ty = y - 26 - 34 * EZ.out(p);
+      g.globalAlpha = p < .65 ? 1 : 1 - (p - .65) / .35; g.font = `800 ${Math.round((f.big ? 22 : 15) * sc)}px system-ui,sans-serif`; g.lineWidth = 4; g.lineJoin = 'round';
+      g.strokeStyle = '#140e08'; g.strokeText(f.text, x, ty); g.fillStyle = f.big ? '#ffd27a' : '#f1e6c9'; g.fillText(f.text, x, ty); }
+  }
+  g.restore();
+}
+/* Recentrage animé de la carte sur un point du monde */
+function flyXY(tx, ty, m1, dur = 600) {
+  if (RMO.matches) { V.cx = tx; V.cy = ty; V.mpp = m1; return schedule(); }
+  const x0 = V.cx, y0 = V.cy, m0 = V.mpp, t0 = performance.now(), id = ++fly;
+  const step = now => { if (id !== fly) return; const p = Math.min(1, (now - t0) / dur), e = 1 - (1 - p) ** 3;
+    V.cx = x0 + (tx - x0) * e; V.cy = y0 + (ty - y0) * e; V.mpp = Math.exp(Math.log(m0) + (Math.log(m1) - Math.log(m0)) * e); draw(); if (p < 1) requestAnimationFrame(step); };
+  requestAnimationFrame(step);
+}
+/* Compteurs qui défilent dans la fiche à l'ouverture d'une zone */
+function countUp() {
+  if (RMO.matches) return; const els = [...document.querySelectorAll('#panel [data-cu]')]; if (!els.length) return; const t0 = performance.now();
+  const step = now => { const p = Math.min(1, (now - t0) / 700), e = EZ.out(p);
+    els.forEach(el => { if (!el.isConnected) return; const v = +el.dataset.cu; el.textContent = el.dataset.w ? fmtW(v * e) : Math.round(v * e); });
+    if (p < 1) requestAnimationFrame(step); };
+  requestAnimationFrame(step);
+}
+/* ===== Brouillard de guerre : la carte reste voilée là où vous n'êtes jamais passé =====
+   Mémoire = points explorés (coordonnées Mercator), un nouveau point seulement s'il n'y en a aucun à moins de 5 m.
+   Chaque point dévoile un cercle de 15 m réels (bord adouci). Désactiver le mode masque la brume sans rien effacer. */
+const FOG_R = 15, FOG_KEY = 'cartocepe-fog', fogB = 25;
+var fogOn = (() => { try { return localStorage.getItem('cartocepe-fogon') !== '0'; } catch (e) { return true; } })();
+var FOG = { pts: [], h: new Map() }, fogT = 0, fogCv = null, fogBrush = null, fogSaveT = 0;
+const cosAt = y => Math.cos(toLL(0, y)[0] * Math.PI / 180);
+function fogAddPt(x, y) { const q = [Math.round(x * 10) / 10, Math.round(y * 10) / 10], k = Math.floor(q[0] / fogB) + ',' + Math.floor(q[1] / fogB); FOG.pts.push(q); let a = FOG.h.get(k); if (!a) FOG.h.set(k, a = []); a.push(q); }
+function fogHas(x, y, m) {      // un point exploré à moins de m mètres réels ?
+  const r = m / cosAt(y), r2 = r * r;
+  for (let i = Math.floor((x - r) / fogB); i <= Math.floor((x + r) / fogB); i++) for (let j = Math.floor((y - r) / fogB); j <= Math.floor((y + r) / fogB); j++) {
+    const a = FOG.h.get(i + ',' + j); if (a) for (const q of a) if ((q[0] - x) ** 2 + (q[1] - y) ** 2 < r2) return true; }
+  return false;
+}
+function fogReveal(x, y) { if (!isFinite(x) || !isFinite(y) || fogHas(x, y, 5)) return false; fogAddPt(x, y); return true; }
+function fogSave() { clearTimeout(fogSaveT); fogSaveT = setTimeout(() => { fogSaveT = 0; try { localStorage.setItem(FOG_KEY, JSON.stringify(FOG.pts)); } catch (e) {} }, 1500); }
+addEventListener('pagehide', () => { if (fogSaveT) { clearTimeout(fogSaveT); try { localStorage.setItem(FOG_KEY, JSON.stringify(FOG.pts)); } catch (e) {} } });
+function fogLoad() { try { const a = JSON.parse(localStorage.getItem(FOG_KEY) || '[]'); if (Array.isArray(a)) a.forEach(q => { if (Array.isArray(q) && isFinite(q[0]) && isFinite(q[1])) fogAddPt(+q[0], +q[1]); }); } catch (e) {} }
+function fogSeed() {      // ce qui est déjà connu (zones, repères, sentiers) est dévoilé d'office
+  let n = 0; const add = (x, y) => { if (fogReveal(x, y)) n++; };
+  Object.values(D.cells).forEach(c => { if (c.x != null) add(c.x, c.y); }); (D.marks || []).forEach(m => add(m.x, m.y));
+  (D.paths || []).forEach(p => { for (let i = 1; i < p.pts.length; i++) { const a = p.pts[i - 1], b = p.pts[i], s = Math.max(1, Math.ceil(rdist(a, b) / 6)); for (let k = 0; k <= s; k++) add(a[0] + (b[0] - a[0]) * k / s, a[1] + (b[1] - a[1]) * k / s); } });
+  if (n) fogSave(); return n;
+}
+function fogGps(x, y, acc) {      // appelé à chaque position GPS
+  if (acc > 35) return; const far = FOG.pts.length && !fogHas(x, y, FOG_R * 3);
+  if (fogReveal(x, y)) { fogSave(); if (far && fogOn && Date.now() - fogT > 120000) { fogT = Date.now(); toast('🌫️ Terre inconnue : le brouillard se lève'); fxRing(x, y, 'rgba(200,215,225,.8)', 8, 60, 1000, 0, 2.5); } }
+}
+function fogHa() {      // surface dévoilée, en hectares (grille de 5 m)
+  const set = new Set(), c = 5;
+  for (const q of FOG.pts) { const k = cosAt(q[1]), cs = c / k, n = Math.ceil(FOG_R / c); const i0 = Math.round(q[0] / cs), j0 = Math.round(q[1] / cs);
+    for (let i = -n; i <= n; i++) for (let j = -n; j <= n; j++) if (i * i + j * j <= n * n) set.add((i0 + i) + ',' + (j0 + j)); }
+  return set.size * c * c / 10000;
+}
+function drawFog(sx, sy, W, H, x0, x1, y0, y1, mpp) {
+  if (!fogOn) return; const dpr = .5;      // la brume est floue par nature : calculée en basse résolution (16 fois moins de pixels), puis étirée
+  if (!fogCv) fogCv = document.createElement('canvas');
+  const fw = Math.ceil(W * dpr), fh = Math.ceil(H * dpr); if (fogCv.width !== fw || fogCv.height !== fh) { fogCv.width = fw; fogCv.height = fh; }
+  if (!fogBrush) { fogBrush = document.createElement('canvas'); fogBrush.width = fogBrush.height = 128; const b = fogBrush.getContext('2d'), gr = b.createRadialGradient(64, 64, 0, 64, 64, 64);
+    gr.addColorStop(0, 'rgba(0,0,0,1)'); gr.addColorStop(.7, 'rgba(0,0,0,1)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); b.fillStyle = gr; b.fillRect(0, 0, 128, 128); }      // pinceau : centre net (15 m), bord dégradé
+  const f = fogCv.getContext('2d'); f.setTransform(dpr, 0, 0, dpr, 0, 0); f.globalCompositeOperation = 'source-over'; f.clearRect(0, 0, W, H);
+  const mist = f.createLinearGradient(0, 0, W, H); mist.addColorStop(0, 'rgba(24,28,30,.64)'); mist.addColorStop(.5, 'rgba(16,18,20,.68)'); mist.addColorStop(1, 'rgba(26,30,32,.64)');
+  f.fillStyle = mist; f.fillRect(0, 0, W, H);
+  f.globalCompositeOperation = 'destination-out';
+  const rr = Math.max(1.5, FOG_R / .7 / cosAt(V.cy) / mpp), m = rr * mpp;
+  const draw1 = q => f.drawImage(fogBrush, sx(q[0]) - rr, sy(q[1]) - rr, rr * 2, rr * 2);
+  const ni = Math.floor((x1 + m) / fogB) - Math.floor((x0 - m) / fogB) + 1, nj = Math.floor((y1 + m) / fogB) - Math.floor((y0 - m) / fogB) + 1;
+  if (ni * nj < FOG.h.size) { for (let i = Math.floor((x0 - m) / fogB); i <= Math.floor((x1 + m) / fogB); i++) for (let j = Math.floor((y0 - m) / fogB); j <= Math.floor((y1 + m) / fogB); j++) { const a = FOG.h.get(i + ',' + j); if (a) a.forEach(draw1); } }
+  else for (const q of FOG.pts) if (q[0] > x0 - m && q[0] < x1 + m && q[1] > y0 - m && q[1] < y1 + m) draw1(q);
+  if (me && fogOn) draw1([me.x, me.y]);      // votre position est toujours dévoilée
+  g.save(); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high'; g.drawImage(fogCv, 0, 0, fogCv.width / dpr, fogCv.height / dpr); g.restore();
+}
 function draw() {
   const dpr = devicePixelRatio || 1, W = cv.clientWidth, H = cv.clientHeight; if (!W) return;
   if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
@@ -642,14 +874,17 @@ function draw() {
         g.fill('evenodd'); g.stroke(); }
       g.restore(); }
     if (!cov && !fxBusy && Date.now() - fxFail > 30000 && !fxTimer) fxTimer = setTimeout(() => { fxTimer = 0; if (forOn) fxLoad(V.cx - cv.clientWidth / 2 * V.mpp, V.cy - cv.clientHeight / 2 * V.mpp, V.cx + cv.clientWidth / 2 * V.mpp, V.cy + cv.clientHeight / 2 * V.mpp, V.mpp); }, 500); }
+  drawFog(sx, sy, W, H, x0, x1, y0, y1, mpp);
   if (commOn) drawComm(0, sx, sy, W, x0, x1, y0, y1, mpp);
   drawPaths(sx, sy); drawRoute(sx, sy); const ps = spotSz();
   g.textAlign = 'center'; g.textBaseline = 'middle';
   Object.entries(D.cells).forEach(([k, c]) => {      // un point = ses coordonnées exactes ; le centre du rond EST la position
     if (!rec(c) || c.x == null) return; const x = sx(c.x), y = sy(c.y); if (x < -40 || x > W + 40 || y < -40 || y > H + 60) return;
-    const n = cnt(c), im = n ? SPI.on : SPI.off;
+    const n = cnt(c), im = n ? SPI.on : SPI.off, pf = FX.length && fxOf('pop', k), sc = pf ? Math.max(.01, EZ.back(Math.min(1, Math.max(0, fxP(pf))))) : 1;
+    if (sc !== 1) { g.save(); g.translate(x, y); g.scale(sc, sc); g.translate(-x, -y); }      // nouvelle zone : jaillit du sol
     if (im && im.complete && im.naturalWidth) g.drawImage(im, x - ps / 2, y - ps, ps, ps);      // le pied du cèpe est posé sur la position exacte
     if (n) { const bx = x + ps * .36, by = y - ps * .2, br = Math.max(8, ps * .24); g.beginPath(); g.arc(bx, by, br, 0, 7); g.fillStyle = '#2a2018'; g.fill(); g.lineWidth = 1.6; g.strokeStyle = '#e3c071'; g.stroke(); g.fillStyle = '#f6ecd2'; g.font = '700 ' + Math.round(br * 1.05) + 'px system-ui,sans-serif'; g.fillText(n > 99 ? '99+' : n, bx, by + .5); }
+    if (sc !== 1) g.restore();
     if (c.name && mpp < 14) { g.font = '600 11.5px system-ui,sans-serif'; g.fillStyle = '#fff6e0'; g.strokeStyle = 'rgba(20,14,8,.85)'; g.lineWidth = 3.5; g.lineJoin = 'round'; const t = c.name.length > 16 ? c.name.slice(0, 15) + '\u2026' : c.name; g.strokeText(t, x, y + 12); g.fillText(t, x, y + 12); }
   });
   drawMarks(sx, sy);
@@ -657,6 +892,7 @@ function draw() {
   const ring = (k, col, w) => { const c = D.cells[k]; if (!c || c.x == null) return; g.beginPath(); g.arc(sx(c.x), sy(c.y) - ps / 2, ps * .62 + 3, 0, 7); g.lineWidth = w; g.strokeStyle = col; g.stroke(); };
   if (hereK && hereK !== sel) { g.setLineDash([5, 4]); ring(hereK, '#0e0b08', 5); ring(hereK, '#ffd27a', 2.5); g.setLineDash([]); } if (sel) { ring(sel, '#2a2018', 5); ring(sel, '#e3c071', 3); }
   if (me) drawMe(sx(me.x), sy(me.y), mpp);
+  drawFX(sx, sy);
   { const real = mpp * Math.cos(toLL(V.cx, V.cy)[0] * Math.PI / 180), m = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000].filter(v => v / real <= 110).pop() || 1, el = $('#sc'); el.textContent = m >= 1000 ? m / 1000 + ' km' : m + ' m'; el.style.minWidth = Math.max(26, m / real) + 'px'; el.style.borderBottom = '3px solid #fff'; el.style.textAlign = 'center'; } if (commOn) scanSoon();
 }
 function fitData() {
@@ -720,7 +956,10 @@ $('#panel').addEventListener('change', async e => {
 });
 
 /* ===== Fiche d'une case ===== */
-function select(k) { sel = k; document.body.classList.remove('pmin'); $('#grab').textContent = '▾'; renderPanel(); draw(); }
+let pinT = 0;
+function select(k) { const neu = k !== sel || document.body.classList.contains('pmin'); sel = k; document.body.classList.remove('pmin'); $('#grab').textContent = '▾';
+  const p = $('#panel'); if (neu && !RMO.matches) { p.classList.remove('pin'); void p.offsetWidth; p.classList.add('pin'); clearTimeout(pinT); pinT = setTimeout(() => p.classList.remove('pin'), 1600); }
+  renderPanel(); if (neu) { countUp(); const c = D.cells[k]; if (c && c.x != null) { const ps = spotSz(); fxa({ k: 'ring', x: c.x, y: c.y, col: '#e3c071', r0: ps * .4, r1: ps * 1.2, dur: 650, w: 3, oy: ps / 2 }); } } draw(); }
 const collapse = () => { document.body.classList.add('pmin'); $('#grab').textContent = '▴'; };
 function pick(k) { if (rec(D.cells[k])) select(k); else { sel = k; collapse(); draw(); } }      // une case vide se sélectionne sans ouvrir le carnet
 $('#grab').onclick = () => { const m = document.body.classList.toggle('pmin'); $('#grab').textContent = m ? '▴' : '▾'; if (!m) renderPanel(); };
@@ -736,7 +975,7 @@ function renderPanel() {
   const hist = c.v.map((v, i) => [v, i]).sort((a, b) => b[0].d.localeCompare(a[0].d)).map(([v, i]) => `<li><span><i class="lg">›</i><b>${fmtD(v.d)}</b> · ${v.n ? v.n + ' cèpe' + (v.n > 1 ? 's' : '') + ' · ' + (v.e ? '≈' : '') + fmtW(v.w) : 'sans découverte'}${v.t ? '<br><small>' + esc(v.t) + '</small>' : ''}</span><span style="display:flex;flex:none"><button data-act="edit" data-i="${i}" aria-label="Modifier">✎</button><button data-act="del" data-i="${i}" aria-label="Supprimer">✕</button></span></li>`).join('');
   p.innerHTML = `<div class="eye"><span class="rar r${rk}">${RK.n}</span><span id="nvt" class="nv">${navTxt(sel)}</span></div>
     <div class="ph">${crest(rk, 32)}<input class="pname" data-f="name" placeholder="Nommer cette zone…" value="${esc(c.name)}">${rec(c) ? `<button class="ib sm" data-act="delcell" aria-label="Supprimer cette zone">${ICO.trash}</button>` : ''}</div>
-    <div class="slots"><div class="slot">${SLOT.cep}<span><b>${n}</b><small>cèpe${n > 1 ? 's' : ''}</small></span></div><div class="slot">${SLOT.sack}<span><b>${fmtW(tot)}</b><small>récolte</small></span></div><div class="slot">${SLOT.boot}<span><b>${c.v.length}</b><small>visite${c.v.length > 1 ? 's' : ''}</small></span></div></div>
+    <div class="slots"><div class="slot">${SLOT.cep}<span><b data-cu="${n}">${n}</b><small>cèpe${n > 1 ? 's' : ''}</small></span></div><div class="slot">${SLOT.sack}<span><b data-cu="${tot}" data-w="1">${fmtW(tot)}</b><small>récolte</small></span></div><div class="slot">${SLOT.boot}<span><b data-cu="${c.v.length}">${c.v.length}</b><small>visite${c.v.length > 1 ? 's' : ''}</small></span></div></div>
     ${last ? `<div class="lastf">Dernière découverte <b>${ago(last)}</b></div>` : ''}
     <div id="wxb" class="vd"><span class="vdc">…</span><span class="vdt"><span class="vdl">Potentiel de pousse</span>${gauge(0)}Lecture du ciel…</span></div>
     <div class="acts"><button class="btn gold" data-act="quick" title="≈ ${D.avg} g">+1 cèpe</button><button class="btn" data-act="addtoggle">+ Visite</button><button class="btn" data-act="go">${ICO.compass}Y aller</button></div>
@@ -912,7 +1151,7 @@ $('#panel').addEventListener('click', e => {
   const gi = e.target.closest('#gal img'); if (gi) { pvId = gi.dataset.id; $('#pvi').src = gi.src; $('#pv').classList.add('open'); return; }
   const t = e.target.closest('[data-tab]'); if (t) { ptab = t.dataset.tab; return setTab(); }
   const b = e.target.closest('[data-act]'); if (!b || !sel) return; const a = b.dataset.act, c = D.cells[sel] ||= blank();
-  if (a === 'delcell') { const snap = snapC(), k = sel; delete D.cells[k]; sel = null; save(); renderPanel(); draw(); return toast('Point supprimé', () => { restoreSnap(snap); sel = k; save(); draw(); renderPanel(); }); }
+  if (a === 'delcell') { const snap = snapC(), k = sel; if (c.x != null) fxRing(c.x, c.y, 'rgba(171,159,132,.9)', 6, 34, 550); delete D.cells[k]; sel = null; save(); renderPanel(); draw(); return toast('Point supprimé', () => { restoreSnap(snap); sel = k; save(); draw(); renderPanel(); }); }
   if (a === 'go') return goTo(sel);
   if (a === 'quick') return addFind(sel);
   if (a === 'addtoggle') { const f = $('#addv'); if (editI !== null) { renderPanel(); return $('#addv').classList.add('on'); } f.classList.toggle('on'); if (f.classList.contains('on')) $('#vn').focus(); return; }
@@ -926,15 +1165,17 @@ $('#panel').addEventListener('click', e => {
     c.v.push(nv); save(); draw(); renderPanel(); collapse(); toast('Visite ajoutée 🍄'); }
 });
 function addFind(k, pos) {
-  const snap = snapC(); if (!k) { k = newSpot(pos[0], pos[1]); sel = k; } const c = D.cells[k], t = today(), v = c.v.find(v => v.d === t && !v.t) || c.v.find(v => v.d === t);
+  const snap = snapC(), neu = !k; if (!k) { k = newSpot(pos[0], pos[1]); sel = k; } const c = D.cells[k], t = today(), v = c.v.find(v => v.d === t && !v.t) || c.v.find(v => v.d === t);
   if (v) { v.n++; v.w += D.avg; } else c.v.push({ d: t, n: 1, w: D.avg, e: true, t: '' });
+  { const ps = spotSz(); if (neu) fxa({ k: 'pop', key: k, dur: 520 }); fxGain(c.x, c.y + ps * V.mpp * .6, '+1', true); fxRing(c.x, c.y, '#ffd27a', 6, 34, 650); bump('#found'); }
   save(); collapse(); draw(); renderPanel(); try { navigator.vibrate && navigator.vibrate(40); } catch (e) {}
   toast('🍄 +1 · ' + c.v.filter(x => x.d === t).reduce((a, x) => a + x.n, 0) + ' aujourd\'hui sur ce point', () => { restoreSnap(snap); save(); draw(); renderPanel(); });
 }
 
 function addVisit(k, pos) {
-  const snap = snapC(); if (!k) { k = newSpot(pos[0], pos[1]); sel = k; } const c = D.cells[k];
+  const snap = snapC(), neu = !k; if (!k) { k = newSpot(pos[0], pos[1]); sel = k; } const c = D.cells[k];
   c.v.push({ d: today(), n: 0, w: 0, e: false, t: '' });
+  { const ps = spotSz(); if (neu) fxa({ k: 'pop', key: k, dur: 520 }); fxGain(c.x, c.y + ps * V.mpp * .6, '+1 visite', false); bump('#visit'); }
   save(); collapse(); draw(); renderPanel(); try { navigator.vibrate && navigator.vibrate(40); } catch (e) {}
   toast('👣 +1 visite · ' + c.v.length + ' au total sur ce point', () => { restoreSnap(snap); save(); draw(); renderPanel(); });
 }
@@ -1008,7 +1249,7 @@ function rtUi() {
   $('#rtn').hidden = rest.length < 2;
 }
 function startRoute(tg) {
-  RT.on = true; RT.tg = tg; RT.i = 0; RT.t = Date.now(); $('#rt').hidden = false; $('#rtb').classList.add('on'); rtCompute(); rtUi();
+  fxa({ k: 'route', key: 0, dur: 1100 }); RT.on = true; RT.tg = tg; RT.i = 0; RT.t = Date.now(); $('#rt').hidden = false; $('#rtb').classList.add('on'); rtCompute(); rtUi();
   const all = RT.polys.flat(); if (all.length) { const xs = all.map(q => q[0]), ys = all.map(q => q[1]), W = cv.clientWidth, H = cv.clientHeight;
     V.cx = (Math.min(...xs) + Math.max(...xs)) / 2; V.cy = (Math.min(...ys) + Math.max(...ys)) / 2; V.mpp = Math.max(1.5, (Math.max(...xs) - Math.min(...xs)) / (W * .8), (Math.max(...ys) - Math.min(...ys)) / (H * .7)); }
   draw();
@@ -1017,7 +1258,7 @@ function rtClose() { RT.on = false; RT.polys = []; RT.wait = null; $('#rt').hidd
 function routeTick() {
   if (RT.wait && me) { const w = RT.wait; RT.wait = null; return w === 'tour' ? startTour() : startRoute(w); }
   if (!RT.on || !me) return; const t = RT.tg[RT.i];
-  if (t && rdist([me.x, me.y], [t.x, t.y]) < 15) { toast('✅ Arrivé : ' + (t.name || 'point ' + (RT.i + 1))); try { navigator.vibrate && navigator.vibrate([60, 40, 60]); } catch (e) {} RT.i++; RT.t = 0; if (RT.i >= RT.tg.length) { toast('🏁 Tournée terminée'); return rtClose(); } }
+  if (t && rdist([me.x, me.y], [t.x, t.y]) < 15) { toast('✅ Arrivé : ' + (t.name || 'point ' + (RT.i + 1))); fxGain(t.x, t.y, '✔', true); fxRing(t.x, t.y, '#19b5ff', 8, 50, 800); try { navigator.vibrate && navigator.vibrate([60, 40, 60]); } catch (e) {} RT.i++; RT.t = 0; if (RT.i >= RT.tg.length) { toast('🏁 Tournée terminée'); return rtClose(); } }
   if (Date.now() - RT.t < 3000) return; RT.t = Date.now(); rtCompute(); rtUi(); schedule();
 }
 function startTour() {
@@ -1039,7 +1280,10 @@ function goTo(k) {
 function drawRoute(sx, sy) {
   if (!RT.on || !RT.polys.length) return; g.save(); g.lineCap = 'round'; g.lineJoin = 'round';
   const tr = (poly, w, col, dash) => { g.beginPath(); g.setLineDash(dash || []); poly.forEach((q, i) => i ? g.lineTo(sx(q[0]), sy(q[1])) : g.moveTo(sx(q[0]), sy(q[1]))); g.lineWidth = w; g.strokeStyle = col; g.stroke(); };
-  RT.polys.forEach((p, i) => { tr(p, 9, 'rgba(0,0,0,.45)'); tr(p, 5, i ? 'rgba(160,225,255,.95)' : '#19b5ff', i ? [9, 8] : null); });
+  const rv = FX.length && fxOf('route', 0), rp = rv ? Math.min(1, Math.max(0, fxP(rv))) : 1;
+  if (rp < 1) { const L = RT.polys.reduce((a, p) => a + p.reduce((s, q, i) => i ? s + Math.hypot(sx(q[0]) - sx(p[i - 1][0]), sy(q[1]) - sy(p[i - 1][1])) : 0, 0), 0); let left = L * EZ.out(rp);      // l'itinéraire se trace progressivement
+    RT.polys.forEach(p => { const l = p.reduce((s, q, i) => i ? s + Math.hypot(sx(q[0]) - sx(p[i - 1][0]), sy(q[1]) - sy(p[i - 1][1])) : 0, 0), k = Math.max(0, Math.min(l, left)); left -= l; tr(p, 9, 'rgba(0,0,0,.45)', [k, l + 9]); tr(p, 5, '#19b5ff', [k, l + 9]); }); }
+  else RT.polys.forEach((p, i) => { tr(p, 9, 'rgba(0,0,0,.45)'); tr(p, 5, i ? 'rgba(160,225,255,.95)' : '#19b5ff', i ? [9, 8] : null); });
   g.setLineDash([]); g.font = '800 12px system-ui,sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
   RT.tg.slice(RT.i).forEach((t, i) => { const x = sx(t.x), y = sy(t.y); g.beginPath(); g.arc(x, y, 11, 0, 7); g.fillStyle = '#19b5ff'; g.fill(); g.lineWidth = 2.5; g.strokeStyle = '#fff'; g.stroke(); g.fillStyle = '#fff'; g.fillText(String(RT.i + i + 1), x, y + .5); });
   g.restore();
@@ -1078,8 +1322,8 @@ function drawMe(x, y, mpp) {
   g.restore();
 }
 function onPos(p) { setTimeout(() => P.on && pmUpdate(), 0); if (samp) { const [mx, my] = toM(p.coords.latitude, p.coords.longitude); samp.push({ x: mx, y: my, a: p.coords.accuracy }); }
-  const [x, y] = toM(p.coords.latitude, p.coords.longitude); const first = !me; me = { x, y, acc: p.coords.accuracy }; trackHd(x, y, p.coords.accuracy, p.coords.heading, p.coords.speed); hereK = nearestSpot(x, y, 15); updNav();
-  if (first) { V.cx = x; V.cy = y; if (V.mpp > 4) V.mpp = 1.5; }
+  const [x, y] = toM(p.coords.latitude, p.coords.longitude); const first = !me; me = { x, y, acc: p.coords.accuracy }; trackHd(x, y, p.coords.accuracy, p.coords.heading, p.coords.speed); fogGps(x, y, p.coords.accuracy); hereK = nearestSpot(x, y, 15); updNav();
+  if (first) { flyXY(x, y, V.mpp > 4 ? 1.5 : V.mpp, 900); fxRing(x, y, '#ffd27a', 12, 60, 1100, 500, 2.5); fxRing(x, y, '#ffd27a', 12, 60, 1100, 850, 2); }
   if (pending) { const p = pending; pending = false; p === 'visit' ? addVisit(hereK, [me.x, me.y]) : addFind(hereK, [me.x, me.y]); }
   recTick(); routeTick();
   schedule();
@@ -1099,14 +1343,15 @@ $('#found').onclick = () => { const [k, pos] = target(); if (k || pos) return ad
 $('#visit').onclick = () => { const [k, pos] = target(); if (k || pos) return addVisit(k, pos); askGps('visit'); };
 
 /* ===== Menu, import / export, toast ===== */
-let tt; function toast(m, undo) { $('#tm').textContent = m; $('#tu').hidden = !undo; $('#tu').onclick = () => { undo && undo(); $('#toast').classList.remove('show'); }; $('#toast').classList.add('show'); clearTimeout(tt); tt = setTimeout(() => $('#toast').classList.remove('show'), undo ? 7000 : 3500); }
+const bump = s => { const b = $(s); if (!b || RMO.matches) return; b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump'); };
+let tt; function toast(m, undo) { $('#tm').textContent = m; $('#tu').hidden = !undo; $('#tu').onclick = () => { undo && undo(); $('#toast').classList.remove('show'); }; { const el = $('#toast'); el.classList.remove('show'); void el.offsetWidth; el.classList.add('show'); } clearTimeout(tt); tt = setTimeout(() => $('#toast').classList.remove('show'), undo ? 7000 : 3500); }
 $('#mn').onclick = () => { $('#jr').innerHTML = journal(); $('#info').textContent = Object.values(D.cells).filter(rec).length + ' zone(s) dans le carnet'; $('#menu').classList.add('open'); };
 $('#rf').onclick = async () => { toast('🔄 Actualisation…'); try { if (navigator.serviceWorker) (await navigator.serviceWorker.getRegistrations()).forEach(r => r.unregister()); } catch (e) {} try { if (window.caches) (await caches.keys()).forEach(k => caches.delete(k)); } catch (e) {}
   setTimeout(() => { try { const u = new URL(location.href); u.searchParams.set('maj', Date.now()); location.replace(u.href); } catch (e) { location.reload(); } }, 400); };
 $('#mc').onclick = () => $('#menu').classList.remove('open'); $('#menu').onclick = e => { if (e.target.id === 'menu') $('#menu').classList.remove('open'); };
 $('#imp').onclick = () => $('#fi').click();
 $('#fi').onchange = e => { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { try { importData(JSON.parse(r.result)); $('#menu').classList.remove('open'); } catch (x) { toast('Fichier illisible'); } }; r.readAsText(f); e.target.value = ''; };
-$('#exp').onclick = async () => { const photos = {}; for (const c of Object.values(D.cells)) for (const p of c.ph) { try { const u = await pGet(p.id); if (u) photos[p.id] = u; } catch (e) {} } const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify({ app: 'carnet-cepes', version: 4, grid: 50, avg: D.avg, cells: D.cells, paths: D.paths || [], marks: D.marks || [], cal: D.cal || null, photos })], { type: 'application/json' })); a.download = 'carnet-cepes-' + today() + '.json'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 10000); toast('💾 Exporté'); };
+$('#exp').onclick = async () => { const photos = {}; for (const c of Object.values(D.cells)) for (const p of c.ph) { try { const u = await pGet(p.id); if (u) photos[p.id] = u; } catch (e) {} } const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify({ app: 'carnet-cepes', version: 4, grid: 50, avg: D.avg, cells: D.cells, paths: D.paths || [], marks: D.marks || [], cal: D.cal || null, fog: FOG.pts, photos })], { type: 'application/json' })); a.download = 'carnet-cepes-' + today() + '.json'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 10000); toast('💾 Exporté'); };
 $('#cal').onclick = () => { $('#menu').classList.remove('open'); calibrate(); };
 $('#calx').onclick = () => { D.cal = null; save(); wxCache.clear(); renderPanel(); calLabel(); toast('Indice standard rétabli'); };
 calLabel();
@@ -1122,13 +1367,13 @@ function renderList() {
   const it = all.filter(x => !q || x.label.toLowerCase().includes(q) || x.c.note.toLowerCase().includes(q));
   it.sort(lsort === 'recent' ? (a, b) => b.last.localeCompare(a.last) : (a, b) => b.n - a.n || b.w - a.w);
   $('#lh').innerHTML = `Carnet de découvertes<small>${all.length} coin${all.length > 1 ? 's' : ''} à cèpes · ${all.reduce((a, x) => a + x.n, 0)} cèpes</small>`;
-  document.querySelectorAll('.seg button').forEach(b => b.classList.toggle('on', b.dataset.s === lsort));
+  document.querySelectorAll('#lst .seg button').forEach(b => b.classList.toggle('on', b.dataset.s === lsort));
   const podium = ['1er', '2e', '3e'];
   $('#ll').innerHTML = it.map((x, i) => { const k = rankK(x.c); return `<li data-k="${x.k}">${crest(k, 30)}<span class="lt"><b>${esc(x.label)}</b><br><small>${lsort === 'best' && !q && i < 3 ? `<span class="top">${podium[i]}</span> · ` : ''}<span class="r${k}">${RANKS[k].n}</span> · ${ago(x.last)}</small></span><span class="bd"><b>${x.n}</b> <small>cèpes</small><br><small>${fmtW(x.w)}</small></span></li>`; }).join('')
     || `<li class="hint" style="cursor:default">${all.length ? 'Aucun résultat.' : 'Aucune découverte consignée pour l\'instant.'}</li>`;
 }
 $('#lb').onclick = () => { $('#lq').value = ''; renderList(); $('#lst').classList.add('open'); };
-document.querySelectorAll('.seg button').forEach(b => b.onclick = () => { lsort = b.dataset.s; renderList(); });
+document.querySelectorAll('#lst .seg button').forEach(b => b.onclick = () => { lsort = b.dataset.s; renderList(); });
 $('#lq').oninput = renderList;
 $('#lc').onclick = () => $('#lst').classList.remove('open'); $('#lst').onclick = e => { if (e.target.id === 'lst') $('#lst').classList.remove('open'); };
 $('#ll').onclick = e => { const li = e.target.closest('li[data-k]'); if (!li) return; const k = li.dataset.k;
@@ -1185,6 +1430,8 @@ async function scan() {      // télécharge les communes qui couvrent l'écran 
   } finally { scanning = false; }
 }
 const cmLabel = () => { $('#cmb').innerHTML = sw('Limites des communes', commOn); };
+const fogLabel = () => $('#fogb').innerHTML = sw('Brouillard de guerre (zones non explorées voilées)', fogOn);
+$('#fogb').onclick = () => { fogOn = !fogOn; try { localStorage.setItem('cartocepe-fogon', fogOn ? '1' : '0'); } catch (e) {} fogLabel(); schedule(); toast(fogOn ? '🌫️ Brouillard activé : seules les zones parcourues sont dévoilées' : 'Brouillard masqué (vos zones explorées restent en mémoire)'); }; fogLabel();
 const foLabel = () => $('#fob').innerHTML = sw('Griser les forêts peu propices', forOn);
 $('#fob').onclick = () => { forOn = !forOn; try { localStorage.setItem('cartocepe-forest', forOn ? '1' : '0'); } catch (e) {} foLabel(); schedule(); }; foLabel();
 $('#cmb').onclick = () => { commOn = !commOn; try { localStorage.setItem('cartocepe-comm', commOn ? '1' : '0'); } catch (e) {} cmLabel(); if (commOn) scan(); schedule(); };
@@ -1290,7 +1537,7 @@ function placePt(me, quiet) {
   if (P.cur) { P.cur.pts.push(...mids, q); P.adds.push(mids.length + 1); T('📍 Point ' + P.cur.pts.length + acc + jt); }
   else if (P.start) { P.cur = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), pts: [P.start, ...mids, q] }; P.adds = [mids.length + 1]; (D.paths ||= []).push(P.cur); P.start = null; P.sel = null; T('🥾 Chemin tracé' + acc + jt); }
   else { P.start = q; P.sa = hit ? hit.p.id : null; T(hit ? '📍 Départ posé sur un trait (carrefour)' + acc + ' : marchez, puis rappuyez' : '📍 Départ posé' + acc + ' : marchez, puis rappuyez'); }
-  save(); pmUpdate(); draw();
+  fxRing(q[0], q[1], '#ffd27a', 4, 22, 550, 0, 2.5); save(); pmUpdate(); draw();
 }
 let samp = null;
 async function addPathPt() {      // mesure pendant 3 s et pose la position moyenne (pondérée par la précision)
@@ -1382,8 +1629,226 @@ $('#dlm').onclick = async e => { if (e.target.id === 'dlm' || e.target.id === 'd
   dlTiles(list, 'Zone 20 km'); };
 
 
+/* ===== Encyclopédie du cueilleur : espèces, jargon, recherche avec autocomplétion, images Wikipédia ===== */
+/* Comestibilité : ex = excellent, co = comestible, cc = comestible avec précautions, si = sans intérêt / non comestible, de = déconseillé, to = toxique, mo = mortel */
+const EDB = {
+  ex: ['Excellent comestible', '#ffd45e'], co: ['Comestible', '#9ee070'], cc: ['Comestible avec précautions', '#c9d86a'], si: ['Sans intérêt culinaire', '#b2aa98'],
+  de: ['Déconseillé', '#e8a066'], to: ['Toxique', '#ff8a5c'], mo: ['Mortel', '#ff5f5f']
+};
+/* [id, nom, latin, comestibilité, [mois début, mois fin], habitat, comment le reconnaître, [[confusion id, pourquoi], …], autres noms, précaution] */
+const SPX = [
+  ['edulis', 'Cèpe de Bordeaux', 'Boletus edulis', 'ex', [7, 11], 'Feuillus et conifères (chênes, hêtres, châtaigniers, épicéas, pins), lisières et sous-bois clairs.', 'Chapeau brun clair à brun châtain, souvent bordé d\'une fine marge blanche. Pores blancs puis jaune-vert, ne bleuissant pas. Pied ventru, clair, couvert en haut d\'un fin réseau blanc. Chair blanche, ferme, immuable, odeur agréable.', [['amer', 'pores rosés, réseau brun foncé sur le pied, chair très amère'], ['satan', 'pores rouges, chair qui bleuit']], ['cèpe', 'bolet comestible', 'gros pied']],
+  ['aereus', 'Cèpe bronzé', 'Boletus aereus', 'ex', [6, 10], 'Chênaies et châtaigneraies chaudes, sols plutôt secs ; fréquent dans le Sud-Ouest.', 'Chapeau brun très foncé presque noir, velouté, parfois taché de bronze. Pores blancs puis jaunâtres. Pied brun clair à réseau fin. Chair blanche immuable, très ferme.', [['edulis', 'chapeau plus clair, pied plus pâle'], ['amer', 'pores roses, amertume']], ['tête-de-nègre', 'cèpe noir', 'bolet bronzé']],
+  ['reticulatus', 'Cèpe d\'été', 'Boletus reticulatus', 'ex', [5, 9], 'Feuillus (chênes, hêtres, charmes), parcs et lisières, dès la fin du printemps.', 'Chapeau brun clair, mat, se craquelant par temps sec. Pied entièrement couvert d\'un réseau clair bien visible jusqu\'à la base. Chair blanche, souvent visitée par les larves.', [['amer', 'pores roses, réseau brun foncé, amertume']], ['bolet réticulé', 'cèpe réticulé']],
+  ['pinophilus', 'Cèpe des pins', 'Boletus pinophilus', 'ex', [6, 11], 'Sous les pins et parfois les épicéas, sols acides et sableux.', 'Chapeau brun rougeâtre à acajou, épais. Pores blancs puis jaune olive. Pied massif teinté de rougeâtre, à réseau clair. Chair blanche immuable.', [['amer', 'pores rosés et goût amer']], ['cèpe à tête rouge']],
+  ['badia', 'Bolet bai', 'Imleria badia', 'co', [8, 11], 'Conifères surtout (pins, épicéas), parfois feuillus, sols acides.', 'Chapeau brun bai (marron), visqueux par temps humide. Pores jaunâtres bleuissant au toucher. Pied sans réseau, strié de brun. Chair blanche à jaunâtre, bleuissant légèrement.', [['edulis', 'le cèpe a un réseau sur le pied et des pores qui ne bleuissent pas']], ['bolet bai-brun', 'cèpe des châtaigniers']],
+  ['amer', 'Bolet amer', 'Tylopilus felleus', 'si', [7, 10], 'Conifères et feuillus sur sols acides, souvent près des souches.', 'Ressemble à un cèpe, mais ses pores deviennent rose sale et son pied porte un réseau brun foncé à mailles larges. Chair d\'une amertume extrême : un seul exemplaire gâche toute une poêlée.', [['edulis', 'pores blancs à jaune-vert, réseau blanc fin, goût doux']], ['faux cèpe', 'bolet de fiel'], 'Goûter une miette crue puis la recracher suffit à le reconnaître : l\'amertume est immédiate.'],
+  ['satan', 'Bolet de Satan', 'Rubroboletus satanas', 'to', [6, 9], 'Chênaies et hêtraies claires et chaudes, sols calcaires.', 'Chapeau blanc grisâtre, massif. Pores rouges. Pied très ventru, jaune puis rouge, couvert d\'un réseau rouge. Chair bleuissant à la coupe ; odeur désagréable en vieillissant.', [['erythropus', 'chapeau brun, pied ponctué (et non réticulé) de rouge']], ['bolet satan'], 'Provoque de violents troubles digestifs.'],
+  ['erythropus', 'Bolet à pied rouge', 'Neoboletus erythropus', 'cc', [5, 10], 'Feuillus et conifères, sols acides.', 'Chapeau brun foncé velouté. Pores rouges. Pied jaune couvert de fines ponctuations rouges (pas de réseau). Chair jaune bleuissant instantanément et intensément à la coupe.', [['satan', 'chapeau blanchâtre, pied à réseau rouge, toxique']], ['bolet à pied rouge', 'pied rouge'], 'Toxique cru : seulement très bien cuit. À éviter tant qu\'on ne distingue pas sûrement les bolets à pores rouges.'],
+  ['aurantiacum', 'Bolet orangé', 'Leccinum aurantiacum', 'cc', [7, 10], 'Sous les trembles et les peupliers.', 'Chapeau orange vif à rouge brique. Pied blanc couvert de petites mèchules qui noircissent. Chair blanche devenant grisâtre à noirâtre à la coupe.', [['scabrum', 'chapeau brun, sous les bouleaux']], ['leccinum orangé'], 'Toujours bien cuit : des intoxications ont été rapportées après une cuisson insuffisante.'],
+  ['scabrum', 'Bolet rude', 'Leccinum scabrum', 'cc', [6, 10], 'Toujours sous les bouleaux.', 'Chapeau brun, chair molle. Pied blanc à grisâtre couvert de mèchules noires. Pores blanchâtres.', [['aurantiacum', 'chapeau orangé, sous les trembles']], ['bolet des bouleaux'], 'Comestible médiocre, toujours bien cuit.'],
+  ['luteus', 'Bolet jaune', 'Suillus luteus', 'co', [8, 11], 'Sous les pins, souvent en groupes.', 'Chapeau brun chocolat très visqueux. Pores jaunes. Pied portant un anneau membraneux violacé. Chair jaunâtre tendre.', [], ['nonnette voilée', 'suillus'], 'Retirer la cuticule visqueuse ; peut être laxatif chez certaines personnes.'],
+  ['girolle', 'Girolle', 'Cantharellus cibarius', 'ex', [6, 11], 'Feuillus et conifères, mousses, talus, sols acides.', 'Entièrement jaune d\'œuf. Sous le chapeau, des plis épais et fourchus qui descendent sur le pied (pas de vraies lames). Chair blanche, ferme, odeur fruitée d\'abricot.', [['faussegirolle', 'vraies lames fines et serrées, orange vif, chair molle'], ['olivier', 'vraies lames, en touffes sur souches, orange vif']], ['chanterelle', 'chanterelle commune']],
+  ['faussegirolle', 'Fausse girolle', 'Hygrophoropsis aurantiaca', 'si', [8, 11], 'Conifères, souches et débris de bois.', 'Orange vif, chapeau feutré. Vraies lames fines, serrées et fourchues, se détachant facilement. Chair molle, sans odeur fruitée.', [['girolle', 'plis épais, chair ferme, odeur d\'abricot']], ['clitocybe orangé'], 'Sans intérêt, parfois mal toléré.'],
+  ['tubaeformis', 'Chanterelle en tube', 'Craterellus tubaeformis', 'co', [9, 12], 'Conifères et feuillus, mousses humides, souvent en grandes troupes.', 'Chapeau brun en entonnoir, souvent perforé. Plis grisâtres sous le chapeau. Pied jaune, creux, lisse.', [], ['chanterelle grise', 'chanterelle d\'automne']],
+  ['trompette', 'Trompette des morts', 'Craterellus cornucopioides', 'ex', [8, 11], 'Feuillus (hêtres, chênes, charmes), sols argileux, en troupes.', 'En forme de trompette ou d\'entonnoir creux jusqu\'à la base, noir à gris. Face externe lisse, grisâtre. Chair mince et élastique.', [], ['corne d\'abondance', 'craterelle']],
+  ['hydne', 'Pied-de-mouton', 'Hydnum repandum', 'co', [8, 12], 'Feuillus et conifères, souvent en cercles.', 'Chapeau crème à orangé pâle. Sous le chapeau, des aiguillons cassants au lieu de lames. Chair blanche, ferme.', [], ['hydne sinué', 'hérisson'], 'Les vieux exemplaires deviennent amers.'],
+  ['phalloide', 'Amanite phalloïde', 'Amanita phalloides', 'mo', [7, 11], 'Feuillus surtout (chênes, châtaigniers, hêtres), parfois conifères.', 'Chapeau vert olive à jaunâtre (parfois blanc), finement vergeté. Lames blanches libres. Anneau blanc pendant. Volve blanche en sac à la base du pied, souvent enfouie : il faut déterrer le pied pour la voir.', [['rose', 'lames roses puis chocolat, pas de volve'], ['russulecharbon', 'pas d\'anneau ni de volve']], ['calice de la mort'], 'Responsable de la grande majorité des décès par champignons. Symptômes tardifs (6 à 24 h) puis atteinte du foie. Au moindre doute après un repas : appeler le 15 ou un centre antipoison.'],
+  ['verna', 'Amanite printanière', 'Amanita verna', 'mo', [4, 7], 'Feuillus, plutôt sols calcaires, dès le printemps.', 'Entièrement blanche : chapeau, lames, anneau et volve en sac. Ressemble à un rosé des prés ou à un mousseron.', [['rose', 'lames roses puis chocolat, pas de volve'], ['stgeorges', 'pas d\'anneau ni de volve, odeur de farine']], ['amanite blanche'], 'Aussi mortelle que l\'amanite phalloïde.'],
+  ['virosa', 'Amanite vireuse', 'Amanita virosa', 'mo', [7, 10], 'Conifères et feuillus sur sols acides, montagne.', 'Entièrement blanche, chapeau souvent conique et un peu asymétrique, pied pelucheux, anneau fragile, volve en sac.', [['rose', 'lames roses puis chocolat, pas de volve']], ['ange de la mort'], 'Mortelle (même toxines que la phalloïde).'],
+  ['muscaria', 'Amanite tue-mouches', 'Amanita muscaria', 'to', [8, 11], 'Bouleaux, pins, épicéas, sols acides.', 'Chapeau rouge vif parsemé de flocons blancs (que la pluie peut laver). Lames blanches. Anneau et base bulbeuse ornée de bourrelets.', [['cesar', 'lames et pied jaunes, volve en sac']], ['fausse oronge'], 'Troubles neurologiques (syndrome panthérinien).'],
+  ['pantherina', 'Amanite panthère', 'Amanita pantherina', 'to', [6, 10], 'Feuillus et conifères.', 'Chapeau brun à flocons blancs bien nets. Lames blanches. Anneau lisse. Bulbe bordé d\'un bourrelet net (« volve en chaussette »). Chair ne rougissant pas.', [['rubescens', 'chair et lésions qui rougissent, anneau strié']], ['amanite tachetée'], 'Intoxication grave (syndrome panthérinien).'],
+  ['cesar', 'Amanite des Césars', 'Amanita caesarea', 'ex', [7, 10], 'Chênaies et châtaigneraies chaudes, surtout dans le Sud.', 'Chapeau orange vif, lisse, strié au bord. Lames, anneau et pied jaunes. Grande volve blanche en sac. Sort d\'un « œuf » blanc.', [['muscaria', 'lames et pied blancs, flocons blancs']], ['oronge', 'oronge vraie'], 'Ne jamais récolter à l\'état d\'œuf fermé : on ne peut pas le distinguer d\'une amanite mortelle.'],
+  ['rubescens', 'Amanite rougissante', 'Amanita rubescens', 'cc', [6, 10], 'Feuillus et conifères, très commune.', 'Chapeau brun rosé à verrues grisâtres. Lames blanches tachées de rouge. Anneau strié. La chair et les morsures de limaces rougissent.', [['pantherina', 'chair qui ne rougit pas, bourrelet net au bulbe']], ['golmotte', 'amanite vineuse'], 'Toxique crue ; comestible seulement bien cuite. Confusion possible avec l\'amanite panthère : réservée aux connaisseurs.'],
+  ['coulemelle', 'Coulemelle', 'Macrolepiota procera', 'co', [7, 10], 'Prairies, lisières, clairières.', 'Très grande (chapeau de 15 à 30 cm), chapeau brun écailleux à mamelon central. Pied élancé, chiné de brun, avec un anneau double coulissant. Lames blanches libres.', [['lepiote', 'petite taille (moins de 10 cm)'], ['phalloide', 'volve en sac à la base, chapeau lisse']], ['lépiote élevée', 'grisette', 'parasol'], 'Ne consommer que le chapeau. Règle de prudence : jamais de lépiote de moins de 10 cm.'],
+  ['lepiote', 'Lépiote brun-incarnat', 'Lepiota brunneoincarnata', 'mo', [7, 11], 'Jardins, parcs, prairies, bords de chemins.', 'Petite (chapeau de 2 à 5 cm), écailles brun rosé sur fond clair. Pied fibreux brun rosé. Lames blanches.', [['coulemelle', 'beaucoup plus grande, anneau coulissant']], ['petite lépiote'], 'Mortelle (mêmes toxines que l\'amanite phalloïde). Toutes les petites lépiotes sont à fuir.'],
+  ['orellanus', 'Cortinaire des montagnes', 'Cortinarius orellanus', 'mo', [8, 10], 'Feuillus (chênes, châtaigniers), sols acides.', 'Chapeau et pied fauve orangé à roux, aspect fibreux. Lames rouille. Restes de cortine (voile en toile d\'araignée) sur le pied.', [['girolle', 'plis et non lames, chair ferme jaune']], ['cortinaire couleur de rocou'], 'Atteinte des reins, symptômes très tardifs (2 à 17 jours après le repas).'],
+  ['morille', 'Morille commune', 'Morchella esculenta', 'cc', [3, 5], 'Lisières, haies, vergers, bords de rivières, sous les frênes, au printemps.', 'Chapeau alvéolé comme une éponge, jaune à brun, soudé au pied. L\'ensemble est creux d\'une seule cavité de haut en bas.', [['gyromitre', 'chapeau plissé en cerveau, non alvéolé, intérieur cloisonné']], ['morille blonde'], 'Toxique crue ou peu cuite : toujours très bien cuite, et en quantité raisonnable.'],
+  ['gyromitre', 'Gyromitre', 'Gyromitra esculenta', 'mo', [3, 5], 'Conifères, sols sableux, au printemps.', 'Chapeau brun rougeâtre plissé et contourné comme un cerveau (pas d\'alvéoles). Intérieur divisé en plusieurs cavités.', [['morille', 'alvéoles régulières, une seule cavité']], ['fausse morille'], 'Mortelle ; la cuisson ne la rend pas sûre.'],
+  ['truffe', 'Truffe noire du Périgord', 'Tuber melanosporum', 'ex', [12, 3], 'Sous terre, au pied des chênes truffiers et des noisetiers, sols calcaires.', 'Tubercule noir couvert de petites verrues. Chair noire veinée de fines lignes blanches. Parfum puissant.', [], ['diamant noir', 'truffe du Périgord'], 'Récolte souvent réglementée et soumise à l\'accord du propriétaire.'],
+  ['pleurote', 'Pleurote en huître', 'Pleurotus ostreatus', 'co', [10, 3], 'Sur bois mort ou affaibli de feuillus, en grappes étagées.', 'Chapeau en forme de coquille, gris à brun bleuté. Lames blanches descendant sur un pied court et latéral. Chair tendre.', [], ['pleurote', 'oreille-de-chardon']],
+  ['rose', 'Rosé des prés', 'Agaricus campestris', 'co', [6, 10], 'Prairies et pâtures, souvent après des pluies chaudes.', 'Chapeau blanc soyeux. Lames libres roses puis brun chocolat (jamais blanches chez l\'adulte). Anneau fragile. Pas de volve. Chair légèrement rosissante.', [['verna', 'lames blanches, volve en sac à la base'], ['jaunissant', 'jaunit vivement à la base du pied, odeur d\'encre']], ['agaric champêtre'], 'Toujours vérifier les lames et la base du pied : les amanites blanches mortelles poussent aussi en bordure de prairie.'],
+  ['jaunissant', 'Agaric jaunissant', 'Agaricus xanthodermus', 'to', [7, 10], 'Parcs, jardins, bords de chemins.', 'Ressemble à un rosé, mais la base du pied jaunit vivement quand on la gratte, et il sent l\'encre ou le phénol.', [['rose', 'pas de jaunissement à la base, odeur agréable']], ['psalliote jaunissante'], 'Troubles digestifs.'],
+  ['coprin', 'Coprin chevelu', 'Coprinus comatus', 'co', [5, 11], 'Pelouses, bords de chemins, terrains remués.', 'Chapeau blanc en forme d\'obus couvert de mèches. Lames blanches devenant roses puis noires et se liquéfiant en encre.', [['coprinnoir', 'chapeau gris lisse, en touffes ; toxique avec l\'alcool']], ['coprin', 'goutte d\'encre'], 'Seulement jeune (lames encore blanches) et cuisiné aussitôt.'],
+  ['coprinnoir', 'Coprin noir d\'encre', 'Coprinopsis atramentaria', 'to', [5, 11], 'En touffes au pied des souches, sur bois enterré.', 'Chapeau gris, lisse, en cloche, se liquéfiant en encre noire.', [['coprin', 'chapeau blanc à mèches']], ['coprin à encre'], 'Toxique s\'il est consommé avec de l\'alcool, même plusieurs jours après (syndrome coprinien).'],
+  ['delicieux', 'Lactaire délicieux', 'Lactarius deliciosus', 'co', [8, 11], 'Sous les pins.', 'Chapeau orangé à zones concentriques. Laisse couler un lait orange carotte à la cassure ; les blessures verdissent.', [], ['lactaire', 'catalan', 'rouzille'], 'Colore les urines en rouge : sans danger.'],
+  ['russulecharbon', 'Russule charbonnière', 'Russula cyanoxantha', 'co', [6, 10], 'Feuillus surtout.', 'Chapeau aux teintes mêlées de violet, vert et gris. Lames blanches, souples et grasses au toucher (lardacées), qui ne cassent pas. Chair blanche, goût doux.', [['phalloide', 'anneau et volve en sac']], ['russule bleue et jaune'], 'Règle des russules : goûter une miette et la recracher ; les âcres sont à rejeter.'],
+  ['emetique', 'Russule émétique', 'Russula emetica', 'to', [7, 10], 'Conifères, tourbières, sols acides humides.', 'Chapeau rouge vif, lames blanches cassantes, pied blanc. Goût brûlant et âcre.', [], ['russule rouge'], 'Troubles digestifs.'],
+  ['nebuleux', 'Clitocybe nébuleux', 'Clitocybe nebularis', 'de', [9, 12], 'Feuillus et conifères, en cercles dans la litière.', 'Grand chapeau gris cendré. Lames crème serrées. Odeur forte, un peu farineuse.', [['entolome', 'lames roses à maturité']], ['petit gris', 'grisette'], 'Longtemps consommé, il cause des troubles chez de nombreuses personnes : déconseillé.'],
+  ['piedbleu', 'Pied bleu', 'Lepista nuda', 'cc', [10, 12], 'Litières de feuilles et d\'aiguilles, compost, jusqu\'aux premières gelées.', 'Chapeau, lames et pied violets à lilas. Odeur fruitée. Sporée rose pâle.', [['cortinaire', 'voile en toile d\'araignée et sporée rouille']], ['pied violet', 'tricholome nu'], 'Toxique cru : toujours bien cuit.'],
+  ['stgeorges', 'Tricholome de la Saint-Georges', 'Calocybe gambosa', 'ex', [4, 5], 'Prairies, haies, lisières, en ronds, vers la fin avril.', 'Blanc crème, charnu. Lames blanches très serrées. Forte odeur de farine fraîche.', [['inocybe', 'chapeau fibreux, rougissant, sans odeur de farine'], ['entolome', 'lames roses à maturité'], ['verna', 'anneau et volve en sac']], ['mousseron de printemps', 'mousseron vrai']],
+  ['oreades', 'Marasme des Oréades', 'Marasmius oreades', 'co', [5, 10], 'Pelouses, prairies, en ronds de sorcières.', 'Petit chapeau beige à mamelon. Lames espacées. Pied fin, coriace, qui se tord sans casser.', [['clitoblanc', 'blanc, lames serrées descendant sur le pied']], ['faux mousseron', 'mousseron des prés'], 'Ne consommer que les chapeaux.'],
+  ['clitoblanc', 'Clitocybe blanchi', 'Clitocybe rivulosa', 'to', [8, 11], 'Pelouses et prairies, souvent mêlé aux marasmes.', 'Petit, blanc poudré. Lames serrées descendant sur le pied.', [['oreades', 'lames espacées, pied coriace']], ['petit clitocybe blanc'], 'Toxique (syndrome muscarinien : sueurs, larmes, salivation).'],
+  ['olivier', 'Clitocybe de l\'olivier', 'Omphalotus olearius', 'to', [8, 11], 'En touffes sur souches et racines de feuillus (oliviers, chênes, châtaigniers).', 'Orange vif, en touffes. Vraies lames orange descendant sur le pied. Lames légèrement luminescentes dans le noir.', [['girolle', 'plis épais et non lames, pousse au sol']], ['faux girolle des souches'], 'Violents troubles digestifs.'],
+  ['hypholome', 'Hypholome en touffes', 'Hypholoma fasciculare', 'to', [3, 12], 'En touffes serrées sur souches de feuillus et de conifères.', 'Chapeau jaune soufre à centre orangé. Lames jaune-vert puis noirâtres. Chair très amère.', [['armillaire', 'anneau net, chapeau miel à mèches']], ['hypholome soufré'], 'Troubles digestifs.'],
+  ['armillaire', 'Armillaire couleur de miel', 'Armillaria mellea', 'cc', [9, 11], 'En touffes sur souches et racines, parasite des arbres.', 'Chapeau miel à petites mèches sombres. Lames blanchâtres. Pied avec un anneau cotonneux.', [['galere', 'petite, pied sans mèchules, toxines mortelles'], ['hypholome', 'jaune soufre, très amer']], ['armillaire', 'tête de méduse'], 'Toxique cru ou peu cuit : à blanchir puis bien cuire ; mal toléré par certains.'],
+  ['galere', 'Galère marginée', 'Galerina marginata', 'mo', [8, 12], 'Petites touffes sur bois mort, surtout de conifères.', 'Petit chapeau brun-fauve hygrophane. Lames rouille. Pied fin avec un petit anneau.', [['armillaire', 'plus grande, mèchules sur le chapeau']], ['galerina'], 'Mortelle (mêmes toxines que l\'amanite phalloïde).'],
+  ['vesse', 'Vesse-de-loup perlée', 'Lycoperdon perlatum', 'co', [7, 11], 'Bois, lisières, souvent en groupes.', 'En forme de poire, blanche, couverte de petites pointes. À maturité, l\'intérieur devient poudreux et libère les spores par un pore.', [['phalloide', 'un « œuf » d\'amanite coupé montre la silhouette d\'un champignon'], ['sclerodermes', 'chair noire marbrée']], ['vesse-de-loup'], 'Seulement jeune, chair blanche et homogène : toujours couper en deux pour vérifier.'],
+  ['sclerodermes', 'Scléroderme vulgaire', 'Scleroderma citrinum', 'to', [7, 11], 'Bois acides, bords de chemins.', 'Boule jaunâtre à écailles brunes, peau épaisse. Chair noire violacée marbrée de blanc.', [['vesse', 'chair blanche homogène']], ['scléroderme', 'fausse truffe'], 'Troubles digestifs.'],
+  ['sparassis', 'Sparassis crépu', 'Sparassis crispa', 'co', [8, 11], 'Au pied des pins.', 'Grosse masse crème en forme de chou-fleur ou d\'éponge, faite de lames ondulées.', [], ['clavaire crépue', 'morille des pins', 'chou-fleur']],
+  ['marzuolus', 'Hygrophore de mars', 'Hygrophorus marzuolus', 'co', [2, 5], 'Conifères de montagne, à la fonte des neiges.', 'Chapeau gris noir. Lames épaisses et espacées, blanches puis grises. Pied gris.', [], ['marzuolo']],
+  ['langue', 'Langue-de-bœuf', 'Fistulina hepatica', 'co', [8, 10], 'Sur le tronc des chênes et des châtaigniers.', 'Masse rouge sang charnue en forme de langue. Chair fibreuse rouge qui ressemble à de la viande et laisse couler un suc rouge.', [], ['foie de bœuf', 'fistuline']],
+  ['soufre', 'Polypore soufré', 'Laetiporus sulphureus', 'cc', [5, 9], 'Sur troncs de feuillus (chênes, saules, robiniers).', 'Grandes consoles étagées jaune soufre et orange, sans lames, à pores fins jaunes.', [], ['poulet des bois'], 'Seulement jeune et bien cuit ; éviter ceux poussant sur des arbres toxiques (if, robinier).'],
+  ['equestre', 'Tricholome équestre', 'Tricholoma equestre', 'to', [10, 12], 'Pinèdes sableuses, notamment sur la côte atlantique.', 'Chapeau jaune verdâtre, lames jaune soufre, pied jaune.', [], ['bidaou', 'canari', 'chevalier'], 'Longtemps apprécié, il peut provoquer une destruction des muscles (rhabdomyolyse). Sa vente est interdite en France.'],
+  ['paxille', 'Paxille enroulé', 'Paxillus involutus', 'mo', [7, 11], 'Feuillus et conifères, sols acides, très commun.', 'Chapeau brun à marge longtemps enroulée. Lames jaunâtres décurrentes, se tachant de brun au toucher.', [], ['paxille'], 'Longtemps consommé : il peut provoquer une réaction immunitaire grave, parfois mortelle, après des repas répétés.'],
+  ['entolome', 'Entolome livide', 'Entoloma sinuatum', 'to', [8, 10], 'Feuillus, sols argilo-calcaires.', 'Grand chapeau gris crème. Lames jaunâtres puis roses (sporée rose). Odeur de farine.', [['nebuleux', 'lames crème, jamais roses'], ['stgeorges', 'pousse au printemps, lames blanches']], ['entolome sinué'], 'Violents troubles digestifs, parfois graves.'],
+  ['inocybe', 'Inocybe de Patouillard', 'Inocybe erubescens', 'to', [5, 7], 'Feuillus, parcs, sols calcaires, en même temps que le mousseron.', 'Chapeau conique blanc crème, fibreux, fendu au bord, qui rougit en vieillissant ou au toucher.', [['stgeorges', 'charnu, lames très serrées, forte odeur de farine']], ['inocybe rougissant'], 'Intoxication grave (syndrome muscarinien), parfois mortelle.'],
+  ['cortinaire', 'Cortinaires violets', 'Cortinarius sp.', 'de', [8, 11], 'Feuillus et conifères.', 'Voile en toile d\'araignée (cortine) entre le chapeau et le pied chez le jeune. Sporée et lames rouille à maturité.', [['piedbleu', 'pas de cortine, sporée rose pâle']], ['cortinaire'], 'Genre immense comptant des espèces mortelles : à ne jamais consommer sans détermination d\'expert.']
+];
+/* Jargon du cueilleur : [terme, définition, autres formes] */
+const GLX = [
+  ['Aiguillons', 'Petites pointes sous le chapeau qui remplacent lames ou pores, comme chez le pied-de-mouton.', ['aiguillon']],
+  ['Anneau', 'Collerette sur le pied, reste du voile qui protégeait les lames du jeune champignon. Présent chez les amanites, la coulemelle, l\'armillaire.', []],
+  ['Bleuissement', 'Chair ou pores qui deviennent bleus à la coupe ou au toucher. Fréquent chez les bolets ; à lui seul, ni bon ni mauvais signe.', ['bleuit', 'bleuir']],
+  ['Bolet', 'Champignon charnu dont le dessous du chapeau porte des tubes s\'ouvrant par des pores, comme une éponge. Les cèpes sont des bolets.', ['bolets']],
+  ['Bouchon', 'Jeune cèpe trapu au chapeau encore petit et au pied ventru : le stade le plus recherché.', ['bouchons']],
+  ['Carpophore', 'La partie visible du champignon (chapeau et pied) que l\'on cueille ; le vrai organisme vit sous terre.', ['sporophore']],
+  ['Cèpe', 'Nom donné aux bolets du groupe Boletus edulis : cèpe de Bordeaux, cèpe bronzé, cèpe d\'été, cèpe des pins.', ['cèpes']],
+  ['Chair', 'L\'intérieur du champignon. On observe sa couleur, son changement à la coupe, son odeur et sa fermeté.', []],
+  ['Chapeau', 'Partie supérieure du champignon, qui porte lames, pores, plis ou aiguillons.', []],
+  ['Coin', 'Endroit secret où un cueilleur trouve régulièrement des champignons. Ne se partage pas !', ['coin à champignons', 'coin à cèpes']],
+  ['Cortine', 'Voile en fines fibres, comme une toile d\'araignée, entre la marge du chapeau et le pied ; typique des cortinaires.', []],
+  ['Cuticule', 'La « peau » du chapeau, parfois visqueuse et facile à retirer.', []],
+  ['Décurrent', 'Se dit de lames ou de plis qui descendent le long du pied.', ['décurrentes']],
+  ['Hygrophane', 'Chapeau qui change de couleur en séchant (il pâlit), en partant du centre ou du bord.', []],
+  ['Lames', 'Fines feuilles rayonnantes sous le chapeau, qui portent les spores. On observe leur couleur, leur écartement et leur attache au pied.', ['lamelles']],
+  ['Lardacé', 'Se dit de lames souples et grasses au toucher, qui plient sans casser (russule charbonnière).', []],
+  ['Lait', 'Liquide (latex) qui s\'écoule à la cassure des lactaires. Sa couleur et son goût aident à les reconnaître.', ['latex']],
+  ['Marge', 'Le bord du chapeau : enroulée, striée, lisse…', []],
+  ['Mèchules', 'Petites mèches ou écailles fibreuses à la surface du chapeau ou du pied.', ['mèches']],
+  ['Mycélium', 'Réseau de filaments souterrains qui constitue le vrai champignon. Le préserver (couper au couteau, reboucher le trou) assure les récoltes futures.', []],
+  ['Mycorhize', 'Association entre les racines d\'un arbre et un champignon, qui s\'échangent eau, sels minéraux et sucres. Les cèpes vivent ainsi avec les chênes, châtaigniers, pins…', ['mycorhizien', 'ectomycorhize']],
+  ['Œuf', 'Stade jeune des amanites, encore enfermé dans son voile. Couper un œuf en deux montre la silhouette du futur champignon : ne jamais le consommer.', []],
+  ['Parasite', 'Champignon qui vit aux dépens d\'un arbre vivant, comme l\'armillaire.', []],
+  ['Pied', 'La partie qui porte le chapeau (on dit aussi stipe). Il faut toujours le récolter entier pour voir sa base.', ['stipe']],
+  ['Plis', 'Fausses lames épaisses, basses et fourchues, comme chez la girolle.', []],
+  ['Pores', 'Ouvertures des tubes sous le chapeau des bolets et des polypores.', []],
+  ['Poussée', 'Période où les champignons sortent en nombre, en général une à deux semaines après de bonnes pluies.', ['pousse']],
+  ['Réseau', 'Fin dessin en mailles sur le pied de certains bolets (cèpes). On dit aussi réticulum.', ['réticulé', 'réticulum']],
+  ['Ronds de sorcière', 'Cercles de champignons formés par un mycélium qui s\'étend chaque année.', ['rond de sorcière']],
+  ['Saprophyte', 'Champignon qui se nourrit de matière morte : bois, feuilles, humus.', ['saprotrophe']],
+  ['Sporée', 'Dépôt de spores obtenu en posant un chapeau sur une feuille pendant quelques heures. Sa couleur (blanche, rose, rouille, brune, noire) aide à identifier.', []],
+  ['Spores', 'Les « graines » microscopiques du champignon, produites par les lames, pores, plis ou aiguillons.', ['spore']],
+  ['Tubes', 'Petits tuyaux serrés sous le chapeau des bolets, qui s\'ouvrent par les pores.', []],
+  ['Véreux', 'Champignon envahi par les larves de mouches. Couper le pied sur place permet de le laisser s\'il est trop atteint.', ['vers']],
+  ['Volve', 'Sac ou bourrelet à la base du pied, reste du voile qui enveloppait le jeune champignon. Signe des amanites, dont les mortelles : toujours déterrer la base du pied.', []],
+  ['Syndrome phalloïdien', 'Intoxication par les amatoxines (amanite phalloïde, petites lépiotes, galère) : symptômes tardifs (6 à 24 h) puis atteinte grave du foie. Urgence absolue.', ['phalloïdien', 'amatoxine']],
+  ['Syndrome orellanien', 'Atteinte des reins par certains cortinaires, avec des symptômes très tardifs (2 à 17 jours).', ['orellanien']],
+  ['Syndrome muscarinien', 'Sueurs, larmes, salivation, troubles du rythme cardiaque, causés par certains inocybes et clitocybes.', ['muscarinien', 'muscarine']],
+  ['Syndrome panthérinien', 'Troubles neurologiques (agitation, confusion) dus aux amanites tue-mouches et panthère.', ['panthérinien']],
+  ['Syndrome coprinien', 'Malaise provoqué par l\'association de certains coprins et de l\'alcool.', ['coprinien']],
+  ['Rhabdomyolyse', 'Destruction des muscles, causée notamment par le tricholome équestre.', []],
+  ['Centre antipoison', 'En cas de doute après un repas de champignons : appeler le 15 (ou le 112) ou un centre antipoison, en gardant les restes de la cueillette.', ['antipoison']],
+  ['Pharmacien', 'En France, de nombreux pharmaciens peuvent vérifier gratuitement une récolte. Les sociétés mycologiques organisent aussi des expositions et des permanences.', ['pharmacie', 'société mycologique']]
+];
+const normS = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[’']/g, ' ').replace(/\s+/g, ' ').trim();
+const ENC = [
+  ...SPX.map(([id, nom, lat, e, mo, hab, tr, conf, al, pre]) => ({ t: 'sp', id, nom, lat, e, mo, hab, tr, conf, al: al || [], pre: pre || '' })),
+  ...GLX.map(([nom, def, al]) => ({ t: 'gl', id: 'g-' + normS(nom).replace(/\W+/g, '-'), nom, def, al: al || [] }))
+];
+ENC.forEach(x => { x.keys = [x.nom, x.lat || '', ...x.al].map(normS).filter(Boolean); });
+const encById = id => ENC.find(x => x.id === id);
+const MOIS = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
+const inSeason = (mo, m) => mo[0] <= mo[1] ? m >= mo[0] && m <= mo[1] : m >= mo[0] || m <= mo[1];
+
+/* recherche : correspondance en début de mot d'abord, puis n'importe où ; insensible aux accents */
+function encSearch(q, kind) {
+  const n = normS(q), pool = ENC.filter(x => kind === 'all' || (kind === 'gl' ? x.t === 'gl' : x.t === 'sp' && (kind === 'ok' ? ['ex', 'co', 'cc'].includes(x.e) : kind === 'bad' ? ['to', 'de', 'si'].includes(x.e) : x.e === 'mo')));
+  if (!n) return pool;
+  return pool.map(x => { let s = 0; for (const k of x.keys) { if (k === n) s = Math.max(s, 100); else if (k.startsWith(n)) s = Math.max(s, 80); else if (k.split(' ').some(w => w.startsWith(n))) s = Math.max(s, 60); else if (k.includes(n)) s = Math.max(s, 30); } return [x, s]; })
+    .filter(a => a[1]).sort((a, b) => b[1] - a[1] || a[0].nom.localeCompare(b[0].nom, 'fr')).map(a => a[0]);
+}
+const hl = (txt, q) => { const n = normS(q); if (!n) return esc(txt); const t = normS(txt), i = t.indexOf(n); if (i < 0) return esc(txt); return esc(txt.slice(0, i)) + '<mark>' + esc(txt.slice(i, i + n.length)) + '</mark>' + esc(txt.slice(i + n.length)); };
+
+/* images : résumé Wikipédia (français, puis anglais), mis en cache sur l'appareil */
+const IMGK = 'cartocepe-enc-img', imgMem = (() => { try { return JSON.parse(localStorage.getItem(IMGK) || '{}') || {}; } catch (e) { return {}; } })();
+async function wikiOf(titles) {
+  const key = titles.join('|'); if (imgMem[key] && Date.now() - imgMem[key].t < 30 * 864e5) return imgMem[key];
+  for (const [lang, title] of titles.map(t => t.split('::'))) {
+    try { const r = await fetchT(`https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title.replace(/ /g, '_'))}`, 10000); if (!r.ok) continue; const j = await r.json(); if (j.type === 'disambiguation') continue;
+      const o = { src: j.thumbnail ? j.thumbnail.source : '', big: j.originalimage ? j.originalimage.source : '', ext: (j.extract || '').slice(0, 600), url: j.content_urls ? j.content_urls.mobile.page : '', lang, t: Date.now() };
+      imgMem[key] = o; try { localStorage.setItem(IMGK, JSON.stringify(imgMem)); } catch (e) {} return o; } catch (e) {}
+  }
+  return null;
+}
+const wikiTitles = x => x.t === 'wk' ? ['fr::' + x.nom] : ['fr::' + x.lat, 'fr::' + x.nom, 'en::' + x.lat];
+const encIco = x => x.t === 'gl' ? '<span class="eic gl">✦</span>' : x.t === 'wk' ? '<span class="eic wk">W</span>' : `<span class="eic" style="--ec:${EDB[x.e][1]}">${x.e === 'mo' ? '☠' : x.e === 'to' ? '!' : x.e === 'ex' ? '★' : ['co', 'cc'].includes(x.e) ? '✓' : '•'}</span>`;
+const badge = e => `<span class="ebd" style="--ec:${EDB[e][1]}">${e === 'mo' ? '☠ ' : ''}${EDB[e][0]}</span>`;
+
+/* ----- interface ----- */
+let encKind = 'all', encStack = [], wkT = 0, wkSeq = 0;
+function encOpen() { $('#encm').classList.add('open'); encList(); setTimeout(() => $('#encq').focus({ preventScroll: true }), 50); }
+function encClose() { $('#encm').classList.remove('open'); $('#encac').hidden = true; }
+function encList() {
+  encStack = []; $('#encv').hidden = true; $('#encv').dataset.cur = ''; $('#encl').hidden = false; const q = $('#encq').value, it = encSearch(q, encKind);
+  document.querySelectorAll('#encf button').forEach(b => b.classList.toggle('on', b.dataset.k === encKind));
+  $('#encl').innerHTML = it.map(x => x.t === 'gl'
+    ? `<li data-id="${x.id}" class="egl"><span class="eth gl">✦</span><span class="ett"><b>${hl(x.nom, q)}</b><small>${esc(x.def.slice(0, 80))}…</small></span></li>`
+    : `<li data-id="${x.id}"><span class="eth" data-img="${x.id}">${SLOT.cep}</span><span class="ett"><b>${hl(x.nom, q)}</b><small><i>${esc(x.lat)}</i></small>${badge(x.e)}</span></li>`).join('')
+    || `<li class="hint" style="cursor:default">Rien dans l'encyclopédie. ${navigator.onLine === false ? '' : 'Essayez les suggestions Wikipédia.'}</li>`;
+  encThumbs();
+}
+let thumbObs = null;
+function encThumbs() {      // vignettes chargées seulement quand elles apparaissent à l'écran
+  if (!('IntersectionObserver' in window)) return; thumbObs ||= new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return; thumbObs.unobserve(e.target); const x = encById(e.target.dataset.img); if (x) wikiOf(wikiTitles(x)).then(o => { if (o && o.src) e.target.innerHTML = `<img src="${o.src}" alt="" loading="lazy">`; }); }), { root: $('#encl'), rootMargin: '120px' });
+  document.querySelectorAll('#encl [data-img]').forEach(el => thumbObs.observe(el));
+}
+function encAC() {      // autocomplétion
+  const q = $('#encq').value.trim(), box = $('#encac'); encList(); if (!q) { box.hidden = true; return; }
+  const it = encSearch(q, 'all').slice(0, 7);
+  box.innerHTML = it.map(x => `<button data-id="${x.id}">${encIco(x)}<span><b>${hl(x.nom, q)}</b>${x.lat ? `<small><i>${hl(x.lat, q)}</i></small>` : '<small>Jargon</small>'}</span></button>`).join('') + '<div id="encwk"></div>';
+  box.hidden = false;
+  clearTimeout(wkT); if (q.length < 3 || navigator.onLine === false) return; const seq = ++wkSeq;
+  wkT = setTimeout(async () => { try {      // compléments : autres espèces sur Wikipédia
+    const r = await fetchT(`https://fr.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(q + ' champignon espèce')}&srlimit=6&srprop=&format=json&origin=*`, 8000), j = await r.json();
+    if (seq !== wkSeq) return; const have = new Set(ENC.flatMap(x => x.keys)), res = (j.query?.search || []).map(s => s.title).filter(t => !have.has(normS(t)) && !/^(liste|champignon|mycologie)/i.test(t)).slice(0, 4);
+    if (res.length && $('#encwk')) $('#encwk').innerHTML = '<div class="ach">Plus d\'espèces · Wikipédia</div>' + res.map(t => `<button data-wk="${esc(t)}"><span class="eic wk">W</span><span><b>${hl(t, q)}</b><small>Fiche Wikipédia</small></span></button>`).join('');
+  } catch (e) {} }, 350);
+}
+const GLR = GLX.flatMap(([nom, , al]) => [nom, ...(al || [])].map(w => [w, 'g-' + normS(nom).replace(/\W+/g, '-')])).filter(([w]) => w.length >= 4).sort((a, b) => b[0].length - a[0].length);
+function glossify(txt) {      // les termes du jargon deviennent des liens dans les fiches
+  let h = esc(txt); const used = new Set();
+  for (const [w, id] of GLR) { if (used.has(id)) continue; const re = new RegExp('(^|[^\\p{L}>\\-"=])(' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')(?=[^\\p{L}]|$)', 'iu');
+    if (re.test(h)) { h = h.replace(re, (m, a, b) => `${a}<a class="glk" data-id="${id}">${b}</a>`); used.add(id); } }
+  return h;
+}
+function encShow(x, push = true) {
+  if (push && $('#encv').dataset.cur) encStack.push($('#encv').dataset.cur);
+  $('#encac').hidden = true; $('#encl').hidden = true; const v = $('#encv'); v.hidden = false; v.dataset.cur = x.t === 'wk' ? 'wk:' + x.nom : x.id; v.scrollTop = 0;
+  const back = `<button class="eback" data-back>‹ ${encStack.length ? 'Retour' : 'Toutes les fiches'}</button>`;
+  const warn = '<div class="ewarn">⚠️ Ne consommez jamais un champignon sur la foi de cette fiche. Faites vérifier toute récolte par un pharmacien ou une société mycologique. En cas de malaise après un repas : 15 ou 112.</div>';
+  if (x.t === 'gl') {
+    const rel = SPX.filter(s => normS(s[6] + ' ' + (s[9] || '')).includes(normS(x.nom).split(' ').pop())).slice(0, 6);
+    v.innerHTML = back + `<div class="eph"><span class="eth gl big">✦</span><div><small class="ekd">Jargon du cueilleur</small><h3>${esc(x.nom)}</h3></div></div><p class="edef">${glossify(x.def)}</p>` + (rel.length ? `<div class="esec">À voir sur les fiches</div><div class="echips">${rel.map(s => `<button data-id="${s[0]}">${encIco(encById(s[0]))}${esc(s[1])}</button>`).join('')}</div>` : '');
+  } else {
+    const m = new Date().getMonth() + 1, sp = x.t === 'sp';
+    v.innerHTML = back + `<div class="eimg" id="eimg"><div class="eimg0">${SLOT.cep}<span>Image…</span></div></div>
+      <div class="eph"><div><small class="ekd">${sp ? 'Bestiaire' : 'Wikipédia'}</small><h3>${esc(x.nom)}</h3>${sp ? `<i class="elat">${esc(x.lat)}</i>` : ''}</div>${sp ? badge(x.e) : ''}</div>` +
+      (sp ? `<div class="esec">Saison${inSeason(x.mo, m) ? ' · <span class="eon">en ce moment</span>' : ''}</div><div class="emo">${MOIS.map((l, i) => `<i class="${inSeason(x.mo, i + 1) ? 'f' : ''}${i + 1 === m ? ' now' : ''}">${l}</i>`).join('')}</div>
+      <div class="esec">Habitat</div><p>${glossify(x.hab)}</p><div class="esec">Le reconnaître</div><p>${glossify(x.tr)}</p>` +
+      (x.conf.length ? `<div class="esec">Ne pas confondre avec</div><div class="econf">${x.conf.map(([id, why]) => { const c = encById(id); return c ? `<button data-id="${id}">${encIco(c)}<span><b>${esc(c.nom)}</b>${badge(c.e)}<small>${esc(why)}</small></span></button>` : ''; }).join('')}</div>` : '') +
+      (x.pre ? `<div class="epre ${['mo', 'to'].includes(x.e) ? 'danger' : ''}">${glossify(x.pre)}</div>` : '') +
+      (x.al.length ? `<p class="eal">Aussi appelé : ${x.al.map(esc).join(', ')}</p>` : '') : '') +
+      `<div id="ewk"></div>` + warn;
+    wikiOf(wikiTitles(x)).then(o => { if ($('#encv').dataset.cur !== (x.t === 'wk' ? 'wk:' + x.nom : x.id)) return; const im = $('#eimg');
+      if (o && o.src) im.innerHTML = `<img src="${o.src.replace(/\/\d+px-/, '/640px-')}" alt="${esc(x.nom)}" onerror="this.src='${o.src}'"><a class="ecr" href="${o.url}" target="_blank" rel="noopener">Image et texte : Wikipédia (licences libres)</a>`;
+      else im.innerHTML = `<div class="eimg0">${SLOT.cep}<span>${navigator.onLine === false ? 'Image indisponible hors connexion' : 'Pas d\'image trouvée'}</span></div>`;
+      if (o && o.ext && $('#ewk')) $('#ewk').innerHTML = `<div class="esec">Selon Wikipédia</div><p class="ewx">${esc(o.ext)}</p><a class="elink" href="${o.url}" target="_blank" rel="noopener">Lire l'article complet ›</a>`;
+      else if (x.t === 'wk' && $('#ewk')) $('#ewk').innerHTML = '<p class="hint">Article indisponible (connexion ?).</p>'; });
+  }
+}
+$('#encb').onclick = encOpen; $('#encx').onclick = encClose; $('#encm').onclick = e => { if (e.target.id === 'encm') encClose(); };
+$('#encq').oninput = encAC; $('#encq').onfocus = () => { if ($('#encq').value.trim()) encAC(); };
+$('#encq').onkeydown = e => { if (e.key === 'Enter') { const b = $('#encac button'); if (b) b.click(); } if (e.key === 'Escape') $('#encac').hidden = true; };
+$('#encf').onclick = e => { const b = e.target.closest('button'); if (!b) return; encKind = b.dataset.k; encList(); };
+$('#encm').addEventListener('click', e => {
+  if (e.target.closest('[data-back]')) { const prev = encStack.pop(); if (prev) { const x = prev.startsWith('wk:') ? { t: 'wk', nom: prev.slice(3) } : encById(prev); if (x) return encShow(x, false); } $('#encv').dataset.cur = ''; return encList(); }
+  const w = e.target.closest('[data-wk]'); if (w) return encShow({ t: 'wk', nom: w.dataset.wk, al: [] });
+  const b = e.target.closest('[data-id]'); if (b && b.dataset.id && !b.closest('#encf')) { const x = encById(b.dataset.id); if (x) encShow(x); }
+});
+
 /* ===== Démarrage ===== */
-load(); calLabel();
+load(); calLabel(); fogLoad(); fogSeed();
 if (!Object.keys(D.cells).length) {      // ancien carnet présent sur cet appareil (même adresse) : proposer la conversion
   try { const old = JSON.parse(localStorage.getItem('carnet-cepes-v2') || 'null'); if (old && Array.isArray(old.maps) && confirm('Un ancien carnet a été trouvé sur cet appareil. Le convertir en points précis ?')) importData(old); } catch (e) {}
 }
@@ -1391,8 +1856,8 @@ if (Object.keys(D.cells).length) fitData(); else { [V.cx, V.cy] = toM(46.6, 2.5)
 /* ===== Réactions : repères avec icône et note (icônes dessinées en SVG) ===== */
 var MKE = null, mkLast = 'pin';
 function drawMarks(sx, sy) {
-  (D.marks || []).forEach(m => { const im = MKI[m.t]; if (!im || !im.complete) return; const x = sx(m.x), y = sy(m.y), s = 34;
-    g.drawImage(im, x - s / 2, y - s, s, s);
+  (D.marks || []).forEach(m => { const im = MKI[m.t]; if (!im || !im.complete) return; const df = FX.length && fxOf('drop', m.id), dp = df ? Math.min(1, Math.max(0, fxP(df))) : 1, x = sx(m.x), y = sy(m.y) - (1 - EZ.bounce(dp)) * 70, s = 34;
+    g.globalAlpha = Math.min(1, dp * 4); g.drawImage(im, x - s / 2, y - s, s, s); g.globalAlpha = 1;      // nouveau repère : tombe et rebondit
     if (m.note) { const nx = x + 12, ny = y - s + 5; g.beginPath(); g.moveTo(nx - 4, ny - 4.5); g.lineTo(nx + 4, ny - 4.5); g.lineTo(nx + 4, ny + 4.5); g.lineTo(nx - 4, ny + 4.5); g.closePath(); g.fillStyle = '#f1e2b8'; g.fill(); g.lineWidth = 1.6; g.strokeStyle = '#0e0b08'; g.stroke();      // petit parchemin : ce repère a une note
       g.beginPath(); g.moveTo(nx - 2.2, ny - 1.6); g.lineTo(nx + 2.2, ny - 1.6); g.moveTo(nx - 2.2, ny + 1.4); g.lineTo(nx + 1.2, ny + 1.4); g.lineWidth = 1.1; g.strokeStyle = '#6b4a22'; g.stroke(); } });
 }
@@ -1421,12 +1886,13 @@ $('#mkc').onclick = closeMk; $('#mkm').onclick = e => { if (e.target.id === 'mkm
 $('#mks').onclick = () => {
   const e = MKE, note = $('#mkn').value.trim().slice(0, 500), snap = JSON.stringify(D.marks || []); D.marks ||= [];
   if (e.id) { const m = D.marks.find(x => x.id === e.id); if (m) { m.t = e.t; m.note = note; m.x = e.x; m.y = e.y; } }
-  else D.marks.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), x: e.x, y: e.y, t: e.t, note, d: today() });
+  else { const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6); D.marks.push({ id, x: e.x, y: e.y, t: e.t, note, d: today() }); if (fogReveal(e.x, e.y)) fogSave(); fxa({ k: 'drop', key: id, dur: 750 }); fxRing(e.x, e.y, 'rgba(241,230,201,.8)', 3, 20, 500, 330, 2.5); }
+  if (e.id) fxRing(e.x, e.y, MK[e.t][1], 4, 26, 600, 0, 3);
   mkLast = e.t; save(); closeMk(); draw(); toast(MK[e.t][0] + ' enregistré', () => { D.marks = JSON.parse(snap); save(); draw(); });
 };
-$('#mkd').onclick = () => { const snap = JSON.stringify(D.marks || []); D.marks = D.marks.filter(x => x.id !== MKE.id); save(); closeMk(); draw(); toast('Repère supprimé', () => { D.marks = JSON.parse(snap); save(); draw(); }); };
+$('#mkd').onclick = () => { const snap = JSON.stringify(D.marks || []); fxRing(MKE.x, MKE.y, 'rgba(171,159,132,.9)', 6, 30, 550); D.marks = D.marks.filter(x => x.id !== MKE.id); save(); closeMk(); draw(); toast('Repère supprimé', () => { D.marks = JSON.parse(snap); save(); draw(); }); };
 /* ===== Points précis : chaque trouvaille a ses coordonnées exactes (plus de cases) ===== */
-function newSpot(x, y) { const k = 's' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5); D.cells[k] = { ...blank(), x, y }; return k; }
+function newSpot(x, y) { const k = 's' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5); D.cells[k] = { ...blank(), x, y }; if (fogReveal(x, y)) fogSave(); return k; }
 function nearestSpot(x, y, m) { let best = null, bd = m; Object.entries(D.cells).forEach(([k, c]) => { if (!rec(c) || c.x == null) return; const d = rdist([x, y], [c.x, c.y]); if (d < bd) { bd = d; best = k; } }); return best; }
 function spotAt(px, py) {
   const W = cv.clientWidth, H = cv.clientHeight; const ps = spotSz(); let best = null, bd = Math.max(28, ps * .75);
@@ -1438,7 +1904,7 @@ function longSpot(px, py) {      // appui long sur la carte : pose un point exac
   const r = cv.getBoundingClientRect(), ex = spotAt(px - r.left, py - r.top), em = markAt(px - r.left, py - r.top);
   if (ex) { select(ex); return; } if (em) { openMark(em.id); return; }
   const snap = snapC(), k = newSpot(V.cx + (px - r.left - r.width / 2) * V.mpp, V.cy - (py - r.top - r.height / 2) * V.mpp);
-  save(); try { navigator.vibrate && navigator.vibrate(60); } catch (e) {} select(k); toast('\ud83d\udccd Point pos\u00e9 ici : nommez-le ou ajoutez une visite', () => { restoreSnap(snap); save(); draw(); renderPanel(); });
+  fxa({ k: 'pop', key: k, dur: 520 }); save(); try { navigator.vibrate && navigator.vibrate(60); } catch (e) {} select(k); toast('\ud83d\udccd Point pos\u00e9 ici : nommez-le ou ajoutez une visite', () => { restoreSnap(snap); save(); draw(); renderPanel(); });
 }
 function navTxt(k) {
   const [x, y] = ctr(k), [la, lo] = toLL(x, y); if (!me) return la.toFixed(5) + ', ' + lo.toFixed(5);
