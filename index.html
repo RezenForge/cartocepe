@@ -30,12 +30,15 @@ canvas{position:absolute;left:0;top:0;width:100%;height:100%;display:block;touch
 .tipb{display:flex;gap:6px;margin-top:8px}.tipb button{border:2px solid var(--dark);border-radius:8px;background:var(--forest);color:#fff;padding:10px 12px;font-size:13px;cursor:pointer}#tipn{flex:1}
 #home{flex:none;position:relative;height:30px;margin:0 4px 4px;border:3px solid var(--wood);border-radius:10px;background:linear-gradient(var(--leather),var(--wood));box-shadow:0 0 0 2px var(--dark);pointer-events:none}
 #home::after{content:'';position:absolute;left:50%;top:50%;width:90px;height:5px;margin:-2.5px 0 0 -45px;border-radius:3px;background:rgba(0,0,0,.35)}
-#pm{position:absolute;left:8px;right:8px;bottom:62px;z-index:5;background:rgba(241,226,184,.97);color:var(--ink);border:3px solid var(--wood);border-radius:10px;padding:8px;box-shadow:0 3px 0 var(--dark);font-size:13px;line-height:1.35}
+#pm,#rm{position:absolute;left:8px;right:8px;bottom:62px;z-index:5;background:rgba(241,226,184,.97);color:var(--ink);border:3px solid var(--wood);border-radius:10px;padding:8px;box-shadow:0 3px 0 var(--dark);font-size:13px;line-height:1.35}
 #pm:not([hidden])~#tip{bottom:178px}
 .pmb{display:flex;gap:6px;margin-top:6px}.pmb button{height:44px;min-width:44px;border:2px solid var(--dark);border-radius:8px;background:var(--forest);color:#fff;font-size:18px;box-shadow:0 2px 0 var(--dark);cursor:pointer}.pmb button[hidden]{display:none}#pmp{flex:1;background:var(--gold);color:var(--dark);font-size:15px}
 #dock{display:flex;gap:6px;margin:4px}
 #visit{height:48px;font-size:15px;padding:0 14px;min-width:72px;border-radius:8px;border:2px solid var(--dark);background:var(--forest);color:#fff;box-shadow:0 3px 0 var(--dark);cursor:pointer}
 #react{height:48px;min-width:52px;padding:0 10px;font-size:20px;border-radius:8px;border:2px solid var(--dark);background:var(--wood);color:#fff;box-shadow:0 3px 0 var(--dark);cursor:pointer}
+#found svg{width:28px;height:28px;vertical-align:-7px;margin-left:3px}
+#react.on{background:var(--gold);color:var(--dark)}
+#rmg{flex:1;background:var(--gold)!important;color:var(--dark)!important;font-size:15px!important}
 #react:active,.mki:active{transform:translateY(3px);box-shadow:none}
 #mkm{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:12px;z-index:40}#mkm.open{display:flex}
 #mkm .win{width:100%;max-width:420px;max-height:92dvh;overflow:auto;padding:12px;background:linear-gradient(var(--parch),#e6d29c)}
@@ -78,15 +81,70 @@ li button{border:0;background:none;cursor:pointer;min-width:40px;min-height:40px
 #toast{position:fixed;left:50%;bottom:calc(136px + env(safe-area-inset-bottom));transform:translateX(-50%);max-width:92vw;background:var(--dark);color:var(--parch);padding:8px 12px;border-radius:10px;z-index:30;display:none;gap:10px;align-items:center}
 #dlp{position:fixed;left:50%;bottom:calc(136px + env(safe-area-inset-bottom));transform:translateX(-50%);width:min(92vw,380px);background:var(--dark);color:var(--parch);padding:8px 12px;border-radius:10px;z-index:31;display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}#dlp[hidden]{display:none}#dlt{flex:1;font-size:12px}#dlb{flex-basis:100%;order:3;height:6px;background:rgba(255,255,255,.2);border-radius:3px;overflow:hidden}#dlbi{display:block;height:100%;width:0;background:var(--gold)}#dlp button{border:2px solid var(--gold);background:none;color:var(--gold);border-radius:6px;padding:8px 12px;min-height:40px}
 #toast.show{display:flex}#toast button{border:2px solid var(--gold);background:none;color:var(--gold);border-radius:6px;padding:8px 12px}
+#gr{display:none}
+#sc{padding:0 4px;line-height:1.2;background:rgba(0,0,0,.5)}
+
+/* ===== Refonte graphique : plus lisible, plus aéré, panneau compact sans défilement ===== */
+:root{--forest:#2f5233;--wood:#7a5230;--dark:#33210f;--leather:#a8783c;--parch:#fbf5e4;--ink:#2b2112;--gold:#e3b64a}
+body{font:600 14px system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#1b2e1d}
+.win{border:2px solid var(--wood);border-radius:14px;box-shadow:0 4px 14px rgba(0,0,0,.35)}
+.bar{margin:6px 6px 4px;padding:4px 10px;background:linear-gradient(var(--wood),#664425)}
+.bar h1{font-size:16px;letter-spacing:.3px;text-shadow:0 1px 0 var(--dark)}
+.ib{border-radius:12px;border:2px solid rgba(0,0,0,.55);box-shadow:0 2px 0 rgba(0,0,0,.5)}
+.ib:active{transform:translateY(2px)}
+#mapBox{margin:0 6px;border:2px solid #e2d19e;border-radius:12px}
+#zb .ib{box-shadow:0 2px 6px rgba(0,0,0,.45),0 0 0 2px rgba(255,255,255,.35)}
+#dock{margin:6px 6px 4px;gap:8px}
+#found,#visit,#react,#grab{height:50px;border-radius:14px;box-shadow:0 2px 0 rgba(0,0,0,.5);font-weight:700}
+#found{font-size:16px;min-width:84px}#visit{font-size:15px}
+#grab{background:var(--wood);font-size:16px}
+#home{display:none}
+.btn{border-radius:12px;border:2px solid rgba(0,0,0,.5);box-shadow:0 2px 0 rgba(0,0,0,.45);font-weight:700}
+.hint{font-weight:500}
+input,textarea{border-radius:10px;border:1.5px solid var(--leather);background:#fffdf5}
+#menu .win,#lst .win,#dlm .win,#mkm .win{background:var(--parch)}
+
+/* panneau : carte claire, tout tient à l'écran, seul le contenu de l'onglet défile */
+#panel{margin:0 6px 6px;padding:8px 10px 6px;max-height:none;overflow:visible;background:var(--parch);border-radius:16px;box-shadow:0 -2px 12px rgba(0,0,0,.28);border:2px solid var(--wood)}
+.ph{display:flex;gap:6px;align-items:center}
+.pname{flex:1;min-width:0;font-size:17px;font-weight:800;border:0;border-bottom:2px dashed rgba(168,120,60,.6);border-radius:0;background:transparent;min-height:36px;margin:0;padding:2px 2px}
+.ib.sm{width:36px;height:36px;font-size:15px;flex:none;background:#8b3a2e}
+.stats{display:flex;gap:12px;align-items:center;font-size:14px;margin:2px 2px 6px;color:var(--wood);white-space:nowrap;overflow:hidden}
+.stats b{color:var(--ink)}.stats .nv{margin-left:auto;font-weight:500;font-size:12px;overflow:hidden;text-overflow:ellipsis}
+.vd{display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid rgba(168,120,60,.5);border-radius:12px;padding:6px 8px;margin:0 0 6px;font-size:14px;line-height:1.25}
+.vdc{flex:none;min-width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:#1b1b1b;border:2px solid rgba(0,0,0,.35)}
+.vdt{flex:1;min-width:0}.vdt small{font-weight:500;color:var(--wood)}
+.acts{gap:8px;grid-template-columns:1.2fr 1fr 1fr}.acts .btn{margin:0 0 6px;padding:12px 4px;font-size:14px}
+.ptab{gap:6px;margin:0 0 4px}
+.ptab button{display:flex;flex-direction:column;align-items:center;gap:1px;padding:5px 2px 4px;font-size:18px;line-height:1.1;border:2px solid transparent;border-radius:12px;background:rgba(168,120,60,.14);box-shadow:none}
+.ptab button small{font-size:10px;font-weight:600;color:var(--wood)}
+.ptab button.on{background:var(--forest);border-color:rgba(0,0,0,.4)}.ptab button.on small{color:#fff}
+.tpw{max-height:19dvh;min-height:84px;overflow:auto;overscroll-behavior:contain;padding:2px}
+.tp textarea{min-height:68px}
+.wxg{gap:4px}.wxd{border:1.5px solid rgba(0,0,0,.4);border-radius:8px;padding:4px 0}.wxd b{font-size:16px}.wxd small{font-size:10px}
+.wxb{font-size:14px;margin:2px 0 6px;line-height:1.45}
+li{padding:8px 0}
+#ll li{border-radius:12px}
+#toast{bottom:calc(120px + env(safe-area-inset-bottom))}
+@media (max-height:640px){.tpw{max-height:14dvh;min-height:60px}.vdc{height:38px;min-width:40px;font-size:19px}}
+
+/* ===== Chemins : enregistrement, itinéraire ===== */
+#rt{position:absolute;left:8px;right:8px;bottom:62px;z-index:5;background:rgba(251,245,228,.97);color:var(--ink);border:2px solid var(--wood);border-radius:14px;padding:8px 10px;box-shadow:0 3px 10px rgba(0,0,0,.35);font-size:14px;line-height:1.35}
+#rts small{font-weight:500;color:var(--wood)}
+#rt .pmb button{padding:0 12px;font-size:14px}#rtn,#rtg{flex:1;min-width:0}
+#pmrec{flex:1;font-size:14px;padding:0 10px}#pmrec.rec{background:#c0392b}#pmn{padding:0 12px;font-size:14px}
+#pm:not([hidden])~#tip{bottom:236px}#rt:not([hidden])~#tip{bottom:160px}#pm:not([hidden])~#rt{bottom:236px}#pm:not([hidden])~#rt:not([hidden])~#tip{bottom:334px}
 </style></head><body>
 <header class="bar win"><h1>🍄 Cartocèpe</h1>
   <button class="ib" id="loc" aria-label="Ma position">📍</button><button class="ib" id="mn" aria-label="Options">⚙️</button></header>
 <div id="mapBox"><canvas id="cv"></canvas><div id="sc"></div><div id="hml" hidden style="position:absolute;left:8px;top:36px;z-index:5;width:200px;background:rgba(0,0,0,.6);color:#fff;border-radius:8px;padding:4px 8px 6px;font-size:11px;line-height:1.3"><div>🌦️ Indice · <b id="hmdl">…</b> <span style="opacity:.75">(plein champ)</span></div><div style="height:7px;border-radius:4px;margin:3px 0 1px;background:linear-gradient(90deg,hsl(0,75%,50%),hsl(60,75%,50%),hsl(120,75%,50%))"></div><div style="display:flex;justify-content:space-between"><span>0</span><span>50</span><span>100</span></div><input type="range" id="hmd" min="0" max="7" step="1" value="0" disabled aria-label="Jour de prévision" style="display:block;width:100%;min-height:28px;margin:4px 0 0;padding:0;border:0;background:none;accent-color:#d4a94a"></div>
   
-  <div id="pm" hidden><div id="pmt"></div><div class="pmb"><button id="pmp">📍 Point</button><button id="pmu" aria-label="Annuler le dernier point">↩️</button><button id="pme" aria-label="Terminer le chemin">✔</button><button id="pmd" hidden aria-label="Supprimer le chemin">🗑️</button><button id="pmx" aria-label="Quitter le mode chemins">✖</button></div></div>
+  <div id="pm" hidden><div id="pmt"></div><div class="pmb"><button id="pmp">📍 Point</button><button id="pmu" aria-label="Annuler le dernier point">↩️</button><button id="pme" aria-label="Terminer le chemin">✔</button><button id="pmd" hidden aria-label="Supprimer le chemin">🗑️</button><button id="pmx" aria-label="Quitter le mode chemins">✖</button></div><div class="pmb"><button id="pmrec">⏺ Enregistrer</button><button id="pmn" hidden aria-label="Nommer le chemin">✏️ Nom</button></div></div>
+  <div id="rt" hidden><div id="rtt"></div><div id="rts"></div><div class="pmb"><button id="rtn" aria-label="Point suivant">⏭ Suivant</button><button id="rtg" aria-label="Ouvrir dans Maps">🗺️ Maps</button><button id="rtx" aria-label="Fermer l'itinéraire" style="margin-left:auto">✖</button></div></div>
+  <div id="rm" hidden><div id="rmt">📌 Mode réaction : touchez la carte pour poser une réaction, ou touchez une réaction pour la modifier.</div><div class="pmb"><button id="rmg">📍 Ma position</button><button id="rmx" aria-label="Quitter le mode réaction">✖</button></div></div>
   <div id="tip" hidden><div id="tipt"></div><div class="tipb"><button id="tipg" hidden>📍 Voir</button><button id="tipn">🎲 Autre conseil</button><button id="tipx" aria-label="Fermer">✖</button></div></div>
-  <div id="zb"><button class="ib" id="tp" aria-label="Conseil aléatoire">💡</button><button class="ib" id="hmb" aria-label="Carte météo : où chercher aujourd'hui">🌡️</button><button class="ib" id="gr" aria-label="Afficher ou cacher la grille">▦</button><button class="ib" id="pt" aria-label="Cartographier les chemins">🥾</button><button class="ib" id="lb" aria-label="Liste des trouvailles">📋</button><button class="ib" id="fit" aria-label="Voir toutes mes cases">🎯</button><button class="ib" id="zo" aria-label="Dézoomer">➖</button><button class="ib" id="zi" aria-label="Zoomer">➕</button></div></div>
-<div id="dock"><button id="found" aria-label="Ajouter un cèpe">+1🍄</button><button id="visit" aria-label="Ajouter une visite">+1👣</button><button id="react" aria-label="Ajouter une réaction avec une note">📌</button><button id="grab" aria-label="Réduire ou ouvrir la fiche">▾</button></div>
+  <div id="zb"><button class="ib" id="tp" aria-label="Conseil aléatoire">💡</button><button class="ib" id="hmb" aria-label="Carte météo : où chercher aujourd'hui">🌡️</button><button class="ib" id="gr" aria-label="Afficher ou cacher la grille">▦</button><button class="ib" id="pt" aria-label="Cartographier les chemins">🥾</button><button class="ib" id="rtb" aria-label="Itinéraire vers mes points">🧭</button><button class="ib" id="lb" aria-label="Liste des trouvailles">📋</button><button class="ib" id="fit" aria-label="Voir tous mes points">🎯</button><button class="ib" id="zo" aria-label="Dézoomer">➖</button><button class="ib" id="zi" aria-label="Zoomer">➕</button></div></div>
+<div id="dock"><button id="found" aria-label="Ajouter un cèpe">+1<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" aria-hidden="true"><path d="M12.2 17.5c-1.6 4.2-2.3 8.2-.9 10.6 1 1.6 3 2.1 4.7 2.1s3.7-.5 4.7-2.1c1.4-2.4.7-6.4-.9-10.6z" fill="#f3e6c4" stroke="#3b2412" stroke-width="1.8" stroke-linejoin="round"/><path d="M2.8 17.6C2.8 9.2 8.7 3 16 3s13.2 6.2 13.2 14.6c0 1.6-5.2 2.6-13.2 2.6S2.8 19.2 2.8 17.6z" fill="#9a5522" stroke="#3b2412" stroke-width="1.8" stroke-linejoin="round"/><path d="M7 11.4c2.2-3.6 5.4-5 9-5" fill="none" stroke="#fff" stroke-opacity=".38" stroke-width="2" stroke-linecap="round"/></svg></button><button id="visit" aria-label="Ajouter une visite">+1👣</button><button id="react" aria-label="Ajouter une réaction avec une note">📌</button><button id="grab" aria-label="Réduire ou ouvrir la fiche">▾</button></div>
 <div id="panel" class="win"></div>
 <div id="mkm"><div class="win"><h2 id="mkt" style="margin:0 0 4px">📌 Nouvelle réaction</h2><div class="hint" id="mkw" style="padding:0"></div>
   <div id="mkg"></div><textarea id="mkn" placeholder="Note : ce que vous avez vu, à retenir…" maxlength="500" style="min-height:76px"></textarea>
@@ -98,9 +156,10 @@ li button{border:0;background:none;cursor:pointer;min-width:40px;min-height:40px
   <button class="btn" id="avg">⚖️ Poids moyen d'un cèpe</button>
   <button class="btn" id="cmb"></button>
   <button class="btn" id="fob"></button>
-  <button class="btn" id="rob"></button>
-  <div class="hint" style="padding:0 6px 4px;font-size:11px">Routes forestières : © contributeurs OpenStreetMap</div>
+  <button class="btn" id="cal"></button>
+  <button class="btn" id="calx" hidden>↩️ Revenir à l'indice standard</button>
   <button class="btn" id="fs"></button>
+  <button class="btn" id="wk"></button>
   <button class="btn" id="dl">📥 Enregistrer la zone affichée (hors connexion)</button>
   <button class="btn gold" id="dl20">📥 Zone de 20 km autour du centre (tous les zooms)</button>
   <div class="hint" id="info"></div>
@@ -128,22 +187,24 @@ const fmtD = d => new Date(d + 'T00:00').toLocaleDateString('fr-FR'), fmtW = g =
 const toM = (lat, lng) => [R * lng * Math.PI / 180, R * Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360))];
 const toLL = (x, y) => [(2 * Math.atan(Math.exp(y / R)) - Math.PI / 2) * 180 / Math.PI, x / R * 180 / Math.PI];
 const idAt = (x, y) => Math.floor(x / CS) + ',' + Math.floor(y / CS);
-const ctr = k => { const [i, j] = k.split(',').map(Number); return [(i + .5) * CS, (j + .5) * CS]; };
-const blank = () => ({ name: '', note: '', ph: [], v: [] }), rec = c => c && (c.v.length || c.name || c.note || (c.ph && c.ph.length));
+const legacyCtr = k => { const [i, j] = k.split(',').map(Number); return [(i + .5) * CS, (j + .5) * CS]; };
+const ctr = k => { const c = D.cells && D.cells[k]; return c && c.x != null ? [c.x, c.y] : /^-?\d+,-?\d+$/.test(k) ? legacyCtr(k) : [V.cx, V.cy]; };
+const rdist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]) * Math.cos(toLL(a[0], a[1])[0] * Math.PI / 180);
+const blank = () => ({ name: '', note: '', ph: [], v: [] }), hasData = c => c && (c.v.length || c.name || c.note || (c.ph && c.ph.length)), rec = c => c && (c.x != null || hasData(c));
 const cnt = c => c ? c.v.reduce((a, v) => a + v.n, 0) : 0;
 let D = { cells: {}, avg: 150, paths: [], marks: [] }, sel = null, hereK = null, me = null, watch = null, pending = false, V = { cx: 0, cy: 0, mpp: 1500 }, P = { on: false, cur: null, start: null, sel: null, sa: null, adds: [] };
 
 /* ===== Sauvegarde ===== */
 function save() { try { localStorage.setItem(KEY, JSON.stringify(D)); } catch (e) { toast('Stockage plein : exportez vos données'); } }
-function clean(c) { return { name: String(c?.name || ''), note: String(c?.note || ''), ph: (Array.isArray(c?.ph) ? c.ph : []).filter(p => p && /^[\w-]+$/.test(String(p.id))).map(p => ({ id: String(p.id), d: /^\d{4}-\d\d-\d\d$/.test(p.d) ? p.d : '' })), v: (Array.isArray(c?.v) ? c.v : []).filter(v => v && /^\d{4}-\d\d-\d\d$/.test(v.d)).map(v => ({ d: v.d, n: Math.max(0, Math.round(+v.n || 0)), w: Math.max(0, +v.w || 0), e: !!v.e, t: String(v.t || '') })) }; }
-function mergeCell(k, c) {      // fusionne sans doublon (importer deux fois le même fichier ne double rien)
-  c = clean(c); const a = D.cells[k] ||= blank(), sig = v => [v.d, v.n, Math.round(v.w), v.t].join('|'), have = new Set(a.v.map(sig));
+function clean(c) { const ok = c && c.x != null && c.y != null && isFinite(c.x) && isFinite(c.y); return { ...(ok ? { x: +c.x, y: +c.y } : {}), name: String(c?.name || ''), note: String(c?.note || ''), ph: (Array.isArray(c?.ph) ? c.ph : []).filter(p => p && /^[\w-]+$/.test(String(p.id))).map(p => ({ id: String(p.id), d: /^\d{4}-\d\d-\d\d$/.test(p.d) ? p.d : '' })), v: (Array.isArray(c?.v) ? c.v : []).filter(v => v && /^\d{4}-\d\d-\d\d$/.test(v.d)).map(v => ({ d: v.d, n: Math.max(0, Math.round(+v.n || 0)), w: Math.max(0, +v.w || 0), e: !!v.e, t: String(v.t || '') })) }; }
+function mergeCell(k, c, pos) {      // fusionne sans doublon (importer deux fois le même fichier ne double rien)
+  c = clean(c); const a = D.cells[k] ||= blank(); if (a.x == null) { const q = c.x != null ? [c.x, c.y] : pos || (/^-?\d+,-?\d+$/.test(k) ? legacyCtr(k) : null); if (q) { a.x = q[0]; a.y = q[1]; } } const sig = v => [v.d, v.n, Math.round(v.w), v.t].join('|'), have = new Set(a.v.map(sig));
   c.v.forEach(v => { if (!have.has(sig(v))) a.v.push(v); });
   c.ph.forEach(p => { if (!a.ph.some(x => x.id === p.id)) a.ph.push(p); });
   if (c.name && !a.name.split(' / ').includes(c.name)) a.name = a.name ? a.name + ' / ' + c.name : c.name;
   if (c.note && !a.note.includes(c.note)) a.note = a.note ? a.note + '\n' + c.note : c.note;
 }
-const cleanPaths = a => (Array.isArray(a) ? a : []).filter(p => p && /^[\w-]+$/.test(String(p.id)) && Array.isArray(p.pts)).map(p => ({ id: String(p.id), pts: p.pts.filter(q => Array.isArray(q) && isFinite(q[0]) && isFinite(q[1])).map(q => [+q[0], +q[1]]) })).filter(p => p.pts.length >= 2);
+const cleanPaths = a => (Array.isArray(a) ? a : []).filter(p => p && /^[\w-]+$/.test(String(p.id)) && Array.isArray(p.pts)).map(p => ({ id: String(p.id), name: String(p.name || '').slice(0, 60), pts: p.pts.filter(q => Array.isArray(q) && isFinite(q[0]) && isFinite(q[1])).map(q => [+q[0], +q[1]]) })).filter(p => p.pts.length >= 2);
 function mergePaths(a) { const have = new Set((D.paths ||= []).map(p => p.id)); cleanPaths(a).forEach(p => { if (!have.has(p.id)) D.paths.push(p); }); }
 var MK = { park: ['Parking', '#1e6fd9'], pin: ['Repère', '#d93a2f'], oak: ['Chêne', '#3f7d2a'], no: ['Pas intéressant', '#757575'], yes: ['Intéressant', '#e0a800'] };
 var MKG = {
@@ -154,11 +215,16 @@ var MKG = {
   yes: '<polygon fill="#fff" points="' + [...Array(10)].map((_, k) => { const a = -Math.PI / 2 + k * Math.PI / 5, r = k % 2 ? 3 : 7.2; return (16 + r * Math.cos(a)).toFixed(1) + ',' + (12.4 + r * Math.sin(a)).toFixed(1); }).join(' ') + '"/>' };
 var mkSvg = t => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M16 30.5C16 30.5 4.6 19.2 4.6 12.2a11.4 11.4 0 0 1 22.8 0C27.4 19.2 16 30.5 16 30.5z" fill="${MK[t][1]}" stroke="rgba(0,0,0,.5)" stroke-width="3.6" stroke-linejoin="round"/><path d="M16 30.5C16 30.5 4.6 19.2 4.6 12.2a11.4 11.4 0 0 1 22.8 0C27.4 19.2 16 30.5 16 30.5z" fill="${MK[t][1]}" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/>${MKG[t]}</svg>`;
 var MKI = {}; Object.keys(MK).forEach(t => { const im = new Image(); im.onload = () => schedule(); im.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(mkSvg(t)); MKI[t] = im; });
+var SPOT = { min: 24, max: 46, ref: 30 };      // taille de l'icône en px : suit le zoom de près (≈ ref mètres de large), plafonnée à max, puis ne rapetisse plus sous min
+var spotSz = () => Math.max(SPOT.min, Math.min(SPOT.max, SPOT.ref / (V.mpp * Math.cos(toLL(V.cx, V.cy)[0] * Math.PI / 180))));
+var spSvg = on => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><g${on ? '' : ' opacity=".6"'}><path d="M12.2 17.5c-1.6 4.2-2.3 8.2-.9 10.6 1 1.6 3 2.1 4.7 2.1s3.7-.5 4.7-2.1c1.4-2.4.7-6.4-.9-10.6z" fill="#f3e6c4" stroke="#3b2412" stroke-width="1.6" stroke-linejoin="round"/><path d="M2.8 17.6C2.8 9.2 8.7 3 16 3s13.2 6.2 13.2 14.6c0 1.6-5.2 2.6-13.2 2.6S2.8 19.2 2.8 17.6z" fill="${on ? '#9a5522' : '#8c8c8c'}" stroke="#3b2412" stroke-width="1.6" stroke-linejoin="round"/><path d="M7 11.4c2.2-3.6 5.4-5 9-5" fill="none" stroke="#fff" stroke-opacity=".38" stroke-width="2" stroke-linecap="round"/></g></svg>`;
+var SPI = {}; [['on', 1], ['off', 0]].forEach(([k, on]) => { const im = new Image(); im.onload = () => schedule(); im.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(spSvg(on)); SPI[k] = im; });
 const cleanMarks = a => (Array.isArray(a) ? a : []).filter(m => m && /^[\w-]+$/.test(String(m.id)) && isFinite(m.x) && isFinite(m.y) && MK[m.t]).map(m => ({ id: String(m.id), x: +m.x, y: +m.y, t: m.t, note: String(m.note || '').slice(0, 500), d: /^\d{4}-\d\d-\d\d$/.test(m.d) ? m.d : '' }));
 function mergeMarks(a) { const have = new Set((D.marks ||= []).map(m => m.id)); cleanMarks(a).forEach(m => { if (!have.has(m.id)) D.marks.push(m); }); }
-function restoreSnap(snap) { const keep = D.paths, km = D.marks; D = JSON.parse(snap); D.paths = keep; D.marks = km || []; }      // annuler une action du carnet ne touche pas aux chemins
+const cleanCal = c => c && isFinite(c.sat) && isFinite(c.dt) && c.sat >= 15 && c.sat <= 80 && Math.abs(c.dt) <= 4 ? { sat: +c.sat, dt: +c.dt, n: Math.round(+c.n || 0), auc0: +c.auc0 || 0, auc1: +c.auc1 || 0, d: String(c.d || '') } : null;
+function restoreSnap(snap) { const keep = D.paths, km = D.marks, kc = D.cal; D = JSON.parse(snap); D.paths = keep; D.marks = km || []; D.cal = kc; if (sel && !D.cells[sel]) sel = null; }      // annuler une action du carnet ne touche pas aux chemins
 function load() {
-  try { const d = JSON.parse(localStorage.getItem(KEY) || 'null'); if (d && d.cells) { D = { cells: {}, avg: d.avg || 150, paths: cleanPaths(d.paths), marks: cleanMarks(d.marks) }; Object.entries(d.cells).forEach(([k, c]) => /^-?\d+,-?\d+$/.test(k) && (D.cells[k] = clean(c))); } } catch (e) {}
+  try { const d = JSON.parse(localStorage.getItem(KEY) || 'null'); if (d && d.cells) { D = { cells: {}, avg: d.avg || 150, paths: cleanPaths(d.paths), marks: cleanMarks(d.marks), cal: cleanCal(d.cal) }; Object.entries(d.cells).forEach(([k, c]) => /^[\w,-]+$/.test(k) && (D.cells[k] = clean(c))); Object.entries(D.cells).forEach(([k, c]) => { if (c.x == null) { if (/^-?\d+,-?\d+$/.test(k) && hasData(c)) [c.x, c.y] = legacyCtr(k); else delete D.cells[k]; } }); } } catch (e) {}
 }
 
 /* ===== Conversion des anciennes cartes (grille 10×14 posée sur une image satellite) ===== */
@@ -172,8 +238,8 @@ function fromOld(maps) {
     Object.entries(m.cells).forEach(([k, c]) => {
       const mm = /^(\d+),(\d+)$/.exec(k); if (!mm || !rec(clean(c))) return;
       const wx = cx - TW / 2 + (+mm[1] + .5) * TW / 10, wy = cy - TH / 2 + (+mm[2] + .5) * TH / 14;
-      const lng = wx / N * 360 - 180, lat = Math.atan(Math.sinh(Math.PI * (1 - 2 * wy / N))) * 180 / Math.PI, [x, y] = toM(lat, lng), id = idAt(x, y);
-      if (D.cells[id]) merged++; mergeCell(id, c); n++;
+      const lng = wx / N * 360 - 180, lat = Math.atan(Math.sinh(Math.PI * (1 - 2 * wy / N))) * 180 / Math.PI, [x, y] = toM(lat, lng), id = 'q' + Math.round(x * 2) + '_' + Math.round(y * 2);
+      if (D.cells[id]) merged++; mergeCell(id, c, [x, y]); n++;
     });
   });
   return { n, merged, skipped };
@@ -239,6 +305,28 @@ async function forestFrac(k) {
     for (const p of pts) { const t = M.get(p[0] + ',' + p[1]); if (!t || !t.px) return 0; if (t.px[p[3] * 256 + p[2]] > 100) m++; }
     return m / pts.length; } catch (e) { return 0; }
 }
+/* Peuplements peu propices aux cèpes, grisés sur la carte (BD Forêt v2 IGN) : pin maritime pur, peupleraies, robiniers, eucalyptus, landes, coupes, plantations…
+   Un pin maritime mélangé à des feuillus (chênes, châtaigniers…) ou un peuplement « mixte » reste affiché. */
+const cepeBad = pr => { if (!pr) return false;      // on ne lit que les champs de type de peuplement (pas les noms de commune, de département…)
+  const low = Object.keys(pr).filter(k => /^(tfv|tfv_g11|essence|libelle\w*)$/i.test(k)).map(k => pr[k]).filter(v => typeof v === 'string').join(' ').toLowerCase();
+  if (/peuplerai|peuplier|robinier|eucalyptus/.test(low)) return true;
+  if (/feuill|chêne|chene|châtaign|chataign|hêtre|hetre|mixte|mélange|melange/.test(low)) return false;      // feuillus ou mélange : toujours conservé
+  return /sans couvert|\blandes?\b|ligneu|verger|vigne|coupe rase|plantation|pin maritime/.test(low); };
+let fx = null, fxBusy = false, fxFail = 0, fxTimer = 0;
+async function fxLoad(x0, y0, x1, y1, mpp) {
+  if (fxBusy) return; fxBusy = true;
+  try {
+    const px = (x1 - x0) * .25, py = (y1 - y0) * .25, bb = [x0 - px, y0 - py, x1 + px, y1 + py];
+    const r = await fetch(`https://data.geopf.fr/wfs/ows?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=${encodeURIComponent('LANDCOVER.FORESTINVENTORY.V2:formation_vegetale')}&OUTPUTFORMAT=${encodeURIComponent('application/json')}&SRSNAME=EPSG:3857&COUNT=4000&BBOX=${bb.map(v => v.toFixed(1)).join(',')},EPSG:3857`);
+    if (!r.ok) throw new Error('wfs'); const j = await r.json(), feats = [];
+    for (const f of j.features || []) { if (!f.geometry || !cepeBad(f.properties)) continue;
+      const polys = f.geometry.type === 'Polygon' ? [f.geometry.coordinates] : f.geometry.type === 'MultiPolygon' ? f.geometry.coordinates : [];
+      for (const poly of polys) { let a = 1e12, b = 1e12, c = -1e12, d = -1e12; for (const ring of poly) for (const p of ring) { if (p[0] < a) a = p[0]; if (p[0] > c) c = p[0]; if (p[1] < b) b = p[1]; if (p[1] > d) d = p[1]; }
+        if (Math.abs(a) < 400) throw new Error('crs'); feats.push({ b: [a, b, c, d], poly }); } }
+    fx = { bb, feats, mpp }; fxFail = 0;
+  } catch (e) { fxFail = Date.now(); }
+  fxBusy = false; schedule();
+}
 const schedule = () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; draw(); }); };
 function draw() {
   const dpr = devicePixelRatio || 1, W = cv.clientWidth, H = cv.clientHeight; if (!W) return;
@@ -251,44 +339,33 @@ function draw() {
     for (let tx = Math.max(0, Math.floor((x0 + O) / span)); tx <= Math.min(lim, Math.floor((x1 + O) / span)); tx++) {
       drawTile(Z, tx, ty, sx(tx * span - O), sy(O - ty * span), ts);
     }
-  if (forOn && Z >= 11) { const fz = Math.min(Z, 17), sh = Z - fz, n = 2 ** sh; g.globalAlpha = .3;
-    for (let ty = Math.max(0, Math.floor((O - y1) / span)); ty <= Math.min(lim, Math.floor((O - y0) / span)); ty++)
-      for (let tx = Math.max(0, Math.floor((x0 + O) / span)); tx <= Math.min(lim, Math.floor((x1 + O) / span)); tx++) {
-        const fx = tx >> sh, fy = ty >> sh, t = ftile(fz, fx, fy);
-        if (t.c) g.drawImage(t.c, (tx - (fx << sh)) * 256 / n, (ty - (fy << sh)) * 256 / n, 256 / n, 256 / n, sx(tx * span - O), sy(O - ty * span), ts + .6, ts + .6); }
-    g.globalAlpha = 1; }
-  drawRoads(sx, sy, W, H, x0, x1, y0, y1, mpp, Z, dpr);
+  if (forOn && Z >= 13) {      // forêts non propices aux cèpes (pin maritime pur, peupleraies…) grisées ; les autres restent telles quelles
+    const cov = fx && x0 >= fx.bb[0] && x1 <= fx.bb[2] && y0 >= fx.bb[1] && y1 <= fx.bb[3] && Math.abs(Math.log2(mpp / fx.mpp)) <= 1.5;
+    if (fx) { g.save(); g.fillStyle = 'rgba(105,105,105,.62)'; g.strokeStyle = 'rgba(60,60,60,.7)'; g.lineWidth = 1;
+      for (const f of fx.feats) { if (f.b[2] < x0 || f.b[0] > x1 || f.b[3] < y0 || f.b[1] > y1) continue; g.beginPath();
+        for (const ring of f.poly) { ring.forEach((p, i) => i ? g.lineTo(sx(p[0]), sy(p[1])) : g.moveTo(sx(p[0]), sy(p[1]))); g.closePath(); }
+        g.fill('evenodd'); g.stroke(); }
+      g.restore(); }
+    if (!cov && !fxBusy && Date.now() - fxFail > 30000 && !fxTimer) fxTimer = setTimeout(() => { fxTimer = 0; if (forOn) fxLoad(V.cx - cv.clientWidth / 2 * V.mpp, V.cy - cv.clientHeight / 2 * V.mpp, V.cx + cv.clientWidth / 2 * V.mpp, V.cy + cv.clientHeight / 2 * V.mpp, V.mpp); }, 500); }
   if (hmOn) { if (hm && hm.img) { g.save(); g.imageSmoothingEnabled = true; g.globalAlpha = .42; g.drawImage(hm.img, sx(hm.bb[0]), sy(hm.bb[3]), (hm.bb[2] - hm.bb[0]) / mpp, (hm.bb[3] - hm.bb[1]) / mpp); g.restore(); }
     if (!hmBusy && !hmPend && (!hm || x0 < hm.bb[0] || x1 > hm.bb[2] || y0 < hm.bb[1] || y1 > hm.bb[3] || Math.abs(Math.log2(mpp / hm.mpp)) > 1)) { hmPend = true; setTimeout(() => { hmPend = false; if (hmOn) hmLoad(); }, Math.max(500, 3000 - (Date.now() - hmT))); } }
   if (commOn) drawComm(0, sx, sy, W, x0, x1, y0, y1, mpp);
-  const px = CS / mpp, i0 =Math.floor(x0 / CS), i1 = Math.floor(x1 / CS), j0 = Math.floor(y0 / CS), j1 = Math.floor(y1 / CS);
-  if (gridOn && px >= 12 && (i1 - i0) * (j1 - j0) < 4000) {
-    g.strokeStyle = 'rgba(255,255,255,.42)'; g.lineWidth = 1; g.beginPath();
-    for (let i = i0; i <= i1 + 1; i++) { const x = Math.round(sx(i * CS)) + .5; g.moveTo(x, 0); g.lineTo(x, H); }
-    for (let j = j0; j <= j1 + 1; j++) { const y = Math.round(sy(j * CS)) + .5; g.moveTo(0, y); g.lineTo(W, y); }
-    g.stroke();
-  }
+  drawPaths(sx, sy); drawRoute(sx, sy); const ps = spotSz();
   g.textAlign = 'center'; g.textBaseline = 'middle';
-  Object.entries(D.cells).forEach(([k, c]) => {
-    if (!rec(c)) return; const [i, j] = k.split(',').map(Number); if (i < i0 || i > i1 || j < j0 || j > j1) return;
-    const x = sx(i * CS), y = sy((j + 1) * CS), n = cnt(c);
-    if (px < 10) {      // très dézoomé : pastille de taille fixe pour ne jamais perdre une case
-      const cx = x + px / 2, cy = y + px / 2; g.beginPath(); g.arc(cx, cy, n ? 9 : 5, 0, 7); g.fillStyle = n ? '#d4a94a' : 'rgba(255,255,255,.85)'; g.fill();
-      g.lineWidth = 2; g.strokeStyle = '#3b2412'; g.stroke(); if (n) { g.font = '11px serif'; g.fillStyle = '#000'; g.fillText('🍄', cx, cy + 1); } return;
-    }
-    g.fillStyle = n ? `rgba(212,169,74,${Math.min(.8, .3 + n * .08)})` : 'rgba(255,255,255,.18)'; g.fillRect(x, y, px, px);
-    if (px >= 10) { const big = n && px >= 22; g.font = `${Math.min(px * (big ? .5 : .7), 44)}px serif`; g.fillText('🍄', x + px / 2, y + px * (big ? .36 : .52)); }
-    if (px >= 22) { g.fillStyle = '#fff'; g.strokeStyle = '#000'; g.lineWidth = 3; g.font = `700 ${Math.max(11, px * .26)}px monospace`;
-      if (n) { g.strokeText(n, x + px / 2, y + px * .72); g.fillText(n, x + px / 2, y + px * .72); }
-      if (c.name && px >= 60) { g.font = '700 11px monospace'; const t = c.name.length > 14 ? c.name.slice(0, 13) + '…' : c.name; g.strokeText(t, x + px / 2, y + px - 9); g.fillText(t, x + px / 2, y + px - 9); } }
+  Object.entries(D.cells).forEach(([k, c]) => {      // un point = ses coordonnées exactes ; le centre du rond EST la position
+    if (!rec(c) || c.x == null) return; const x = sx(c.x), y = sy(c.y); if (x < -40 || x > W + 40 || y < -40 || y > H + 60) return;
+    const n = cnt(c), im = n ? SPI.on : SPI.off;
+    if (im && im.complete && im.naturalWidth) g.drawImage(im, x - ps / 2, y - ps, ps, ps);      // le pied du cèpe est posé sur la position exacte
+    if (n) { const bx = x + ps * .36, by = y - ps * .2, br = Math.max(8, ps * .24); g.beginPath(); g.arc(bx, by, br, 0, 7); g.fillStyle = '#d4a94a'; g.fill(); g.lineWidth = 2; g.strokeStyle = '#3b2412'; g.stroke(); g.fillStyle = '#3b2412'; g.font = '700 ' + Math.round(br * 1.15) + 'px monospace'; g.fillText(n > 99 ? '99+' : n, bx, by + .5); }
+    if (c.name && mpp < 14) { g.font = '700 11px monospace'; g.fillStyle = '#fff'; g.strokeStyle = '#000'; g.lineWidth = 3; const t = c.name.length > 16 ? c.name.slice(0, 15) + '\u2026' : c.name; g.strokeText(t, x, y + 12); g.fillText(t, x, y + 12); }
   });
-  drawPaths(sx, sy); drawMarks(sx, sy);
+  drawMarks(sx, sy);
   if (commOn) drawComm(1, sx, sy, W, x0, x1, y0, y1, mpp);
-  const box = (k, col, w) => { const [i, j] = k.split(',').map(Number); g.strokeStyle = col; g.lineWidth = w; g.strokeRect(sx(i * CS) + w / 2, sy((j + 1) * CS) + w / 2, px - w, px - w); };
-  if (hereK) { box(hereK, '#0b2a4a', 5); box(hereK, '#4aa3ff', 3); } if (sel) { box(sel, '#3b2412', 5); box(sel, '#d4a94a', 3); }
+  const ring = (k, col, w) => { const c = D.cells[k]; if (!c || c.x == null) return; g.beginPath(); g.arc(sx(c.x), sy(c.y) - ps / 2, ps * .62 + 3, 0, 7); g.lineWidth = w; g.strokeStyle = col; g.stroke(); };
+  if (hereK) { ring(hereK, '#0b2a4a', 5); ring(hereK, '#4aa3ff', 3); } if (sel) { ring(sel, '#3b2412', 5); ring(sel, '#d4a94a', 3); }
   if (me) { const x = sx(me.x), y = sy(me.y), r = Math.max(8, me.acc / mpp); g.fillStyle = 'rgba(74,163,255,.2)'; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill();
     g.fillStyle = '#4aa3ff'; g.strokeStyle = '#fff'; g.lineWidth = 2; g.beginPath(); g.arc(x, y, 6, 0, 7); g.fill(); g.stroke(); }
-  $('#sc').textContent = '1 case ≈ 50 m'; if (commOn) scanSoon();
+  { const real = mpp * Math.cos(toLL(V.cx, V.cy)[0] * Math.PI / 180), m = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000].filter(v => v / real <= 110).pop() || 1, el = $('#sc'); el.textContent = m >= 1000 ? m / 1000 + ' km' : m + ' m'; el.style.minWidth = Math.max(26, m / real) + 'px'; el.style.borderBottom = '3px solid #fff'; el.style.textAlign = 'center'; } if (commOn) scanSoon();
 }
 function fitData() {
   const ks = Object.keys(D.cells).filter(k => rec(D.cells[k])); if (!ks.length) return;
@@ -307,18 +384,18 @@ function zoomAt(k, px, py) { fly++;
   const r = cv.getBoundingClientRect(), dx = (px ?? r.left + r.width / 2) - r.left - r.width / 2, dy = (py ?? r.top + r.height / 2) - r.top - r.height / 2;
   const ox = V.cx + dx * V.mpp, oy = V.cy - dy * V.mpp; V.mpp = Math.min(3000, Math.max(.3, V.mpp / k)); V.cx = ox - dx * V.mpp; V.cy = oy + dy * V.mpp; schedule();
 }
-$('#fit').onclick = () => { if (!Object.values(D.cells).some(rec)) return toast('Aucune case enregistrée'); fitData(); schedule(); };
+$('#fit').onclick = () => { if (!Object.values(D.cells).some(rec)) return toast('Aucun point enregistré'); fitData(); schedule(); };
 const grLabel = () => { $('#gr').classList.toggle('on', gridOn); $('#gr').style.opacity = gridOn ? '' : '.6'; };
 $('#gr').onclick = () => { gridOn = !gridOn; try { localStorage.setItem('cartocepe-grid', gridOn ? '1' : '0'); } catch (e) {} grLabel(); schedule(); toast(gridOn ? '▦ Grille affichée' : '▢ Grille masquée'); };
 grLabel();
 $('#zi').onclick = () => zoomAt(1.6); $('#zo').onclick = () => zoomAt(1 / 1.6);
 { const ptr = new Map(); let tap = null, pinch = 0; const dist = () => { const [a, b] = [...ptr.values()]; return Math.hypot(a.x - b.x, a.y - b.y); };
-  cv.addEventListener('pointerdown', e => { fly++; ptr.set(e.pointerId, { x: e.clientX, y: e.clientY }); if (ptr.size === 1) tap = { x: e.clientX, y: e.clientY, mv: false }; else { if (tap) tap.mv = true; pinch = dist(); } });
+  cv.addEventListener('pointerdown', e => { fly++; ptr.set(e.pointerId, { x: e.clientX, y: e.clientY }); if (ptr.size === 1) { tap = { x: e.clientX, y: e.clientY, mv: false }; const t0 = tap; setTimeout(() => { if (tap === t0 && !t0.mv && ptr.size === 1 && !P.on && !RM) { t0.mv = true; longSpot(t0.x, t0.y); } }, 550); } else { if (tap) tap.mv = true; pinch = dist(); } });
   addEventListener('pointermove', e => { const p = ptr.get(e.pointerId); if (!p) return; const dx = e.clientX - p.x, dy = e.clientY - p.y; p.x = e.clientX; p.y = e.clientY;
     if (ptr.size === 1 && tap) { if (!tap.mv && Math.hypot(e.clientX - tap.x, e.clientY - tap.y) > 8) tap.mv = true; if (tap.mv) { V.cx -= dx * V.mpp; V.cy += dy * V.mpp; schedule(); } }
     else if (ptr.size === 2 && pinch) { const [a, b] = [...ptr.values()], d = dist(); zoomAt(d / pinch, (a.x + b.x) / 2, (a.y + b.y) / 2); pinch = d; } });
   const end = e => { if (!ptr.has(e.pointerId)) return; const solo = ptr.size === 1; ptr.delete(e.pointerId);
-    if (solo && e.type === 'pointerup' && tap && !tap.mv) { const r = cv.getBoundingClientRect(), k = idAt(V.cx + (e.clientX - r.left - r.width / 2) * V.mpp, V.cy - (e.clientY - r.top - r.height / 2) * V.mpp); const mk = markAt(e.clientX - r.left, e.clientY - r.top); if (mk) openMark(mk.id); else if (P.on) pathTap(e.clientX - r.left, e.clientY - r.top); else if (k === sel) { sel = null; collapse(); renderPanel(); draw(); } else { pick(k); if (rec(D.cells[k])) flyTo(k); } }
+    if (solo && e.type === 'pointerup' && tap && !tap.mv) multiTap(e);
     if (!ptr.size) tap = null; pinch = 0; };
   addEventListener('pointerup', end); addEventListener('pointercancel', end);
   cv.addEventListener('wheel', e => { e.preventDefault(); zoomAt(e.deltaY < 0 ? 1.2 : 1 / 1.2, e.clientX, e.clientY); }, { passive: false });
@@ -364,21 +441,21 @@ function renderPanel() {
   if (!sel) { p.innerHTML = ''; return; }
   const c = D.cells[sel] || blank(), [la, lo] = toLL(...ctr(sel)), tot = c.v.reduce((a, v) => a + v.w, 0);
   const hist = c.v.map((v, i) => [v, i]).sort((a, b) => b[0].d.localeCompare(a[0].d)).map(([v, i]) => `<li><span>📅 ${fmtD(v.d)} — 🍄 ${v.n} · ${v.e ? '≈' : ''}${Math.round(v.w)} g${v.t ? '<br><small>' + esc(v.t) + '</small>' : ''}</span><button data-act="edit" data-i="${i}" aria-label="Modifier">✏️</button><button data-act="del" data-i="${i}" aria-label="Supprimer">✖</button></li>`).join('');
-  p.innerHTML = `<div style="display:flex;gap:6px;align-items:center"><input class="pname" data-f="name" placeholder="✏️ Nommer ce secteur…" value="${esc(c.name)}" style="flex:1;min-width:0">${rec(c) ? '<button class="ib" data-act="delcell" aria-label="Supprimer cette case" style="width:36px;height:36px;font-size:15px;flex:none;margin-bottom:4px">🗑️</button>' : ''}</div>
-    <div class="chips"><span>🍄 ${cnt(c)}</span><span>⚖️ ${fmtW(tot)}</span><span>👣 ${c.v.length} visite${c.v.length > 1 ? 's' : ''}</span></div>
-    <div id="fty" class="wxb">🌲 Type de forêt…</div>
-    <div id="wxb" class="wxb">🌦️ Météo…</div>
-    <div class="acts"><button class="btn gold" data-act="quick" title="≈ ${D.avg} g">⚡ +1 cèpe</button><button class="btn" data-act="addtoggle">➕ Visite</button><a class="btn" target="_blank" rel="noopener" aria-label="Itinéraire à pied" href="https://www.google.com/maps/dir/?api=1&destination=${la.toFixed(6)},${lo.toFixed(6)}&travelmode=walking">🚶 À pied</a></div>
-    
+  p.innerHTML = `<div class="ph"><input class="pname" data-f="name" placeholder="✏️ Nommer ce secteur…" value="${esc(c.name)}">${rec(c) ? '<button class="ib sm" data-act="delcell" aria-label="Supprimer ce point">🗑️</button>' : ''}</div>
+    <div class="stats"><span>🍄 <b>${cnt(c)}</b></span><span>⚖️ <b>${fmtW(tot)}</b></span><span>👣 <b>${c.v.length}</b></span><span id="nvt" class="nv">${navTxt(sel)}</span></div>
+    <div id="wxb" class="vd">🌦️ Météo…</div>
+    <div class="acts"><button class="btn gold" data-act="quick" title="≈ ${D.avg} g">⚡ +1 cèpe</button><button class="btn" data-act="addtoggle">➕ Visite</button><button class="btn" data-act="go">🧭 Y aller</button></div>
     <div id="addv" class="row"><input type="date" id="vd" max="${today()}" value="${today()}"><input type="number" id="vn" min="0" placeholder="Cèpes" inputmode="numeric"><input type="number" id="vw" min="0" placeholder="Poids g" inputmode="numeric">
       <input class="full" id="vt" placeholder="Note de visite (facultatif)"><button class="btn gold full" data-act="add">✔ Enregistrer la visite</button></div>
-    <div class="ptab"><button data-tab="wx">🌦️ Météo</button><button data-tab="hs">📜 Visites</button><button data-tab="ph">📷 Photos${c.ph.length ? ' •' : ''}</button><button data-tab="nt">📝 Notes${c.note ? ' •' : ''}</button></div>
+    <div class="ptab"><button data-tab="wx">🌦️<small>Météo</small></button><button data-tab="tr">🌲<small>Terrain</small></button><button data-tab="hs">📜<small>Visites</small></button><button data-tab="ph">📷<small>Photos${c.ph.length ? ' •' : ''}</small></button><button data-tab="nt">📝<small>Notes${c.note ? ' •' : ''}</small></button></div>
+    <div class="tpw">
     <div class="tp" data-pane="wx"><div id="wx"><div class="hint">Chargement…</div></div></div>
+    <div class="tp" data-pane="tr"><div id="fty" class="wxb">🌲 Type de forêt…</div><div id="rel" class="wxb">⛰️ Relief…</div></div>
     <div class="tp" data-pane="ph"><label class="btn gold" style="text-align:center"><input type="file" accept="image/*" id="phf" multiple hidden>📷 Ajouter une photo</label><div class="gal" id="gal"></div></div>
     <div class="tp" data-pane="hs"><ul>${hist || '<li class="hint">Aucune visite.</li>'}</ul></div>
     <div class="tp" data-pane="nt"><textarea data-f="note" placeholder="Notes : pentes, essences, indices…">${esc(c.note)}</textarea>
-      <div class="hint" style="padding:2px 0">📍 ${la.toFixed(5)}, ${lo.toFixed(5)}</div></div>`;
-  setTab(); showWx(sel); showFt(sel); loadGal(sel);
+      <div class="hint" style="padding:2px 0">📍 ${la.toFixed(5)}, ${lo.toFixed(5)}</div></div></div>`;
+  setTab(); showWx(sel); showFt(sel); showRel(sel); loadGal(sel);
 }
 /* ===== Carte météo lissée : une seule requête Open-Meteo sur une grille grossière 6×6 de la zone affichée,
    indice des 8 jours de chaque point (plein champ, sans repousse), interpolé en image basse définition puis étiré ===== */
@@ -399,8 +476,7 @@ async function hmLoad() {
   hmFar = false; hmBusy = true; hmT = Date.now(); const N = 6, mx = W / 2 * mpp * 1.3, my = H / 2 * mpp * 1.3, bb = [V.cx - mx, V.cy - my, V.cx + mx, V.cy + my], la = [], lo = [];
   for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) { const [a, b] = toLL(bb[0] + (bb[2] - bb[0]) * c / (N - 1), bb[1] + (bb[3] - bb[1]) * r / (N - 1)); la.push(a.toFixed(3)); lo.push(b.toFixed(3)); }
   try {
-    const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${la.join(',')}&longitude=${lo.join(',')}&daily=precipitation_sum,temperature_2m_min,temperature_2m_max,et0_fao_evapotranspiration&past_days=24&forecast_days=8&timezone=auto`);
-    if (!res.ok) throw new Error('wx'); const j = await res.json(), arr = Array.isArray(j) ? j : [j]; if (arr.length !== N * N) throw new Error('n');
+    const j = await wxFetch(la.join(','), lo.join(',')), arr = Array.isArray(j) ? j : [j]; if (arr.length !== N * N) throw new Error('n');
     const sc = arr.map(o => { const d = o.daily; d.elev = o.elevation; return wxScores(d, '', 0).map(x => x.score); });      // sc[point][jour] : tous les jours en une seule requête
     const t0 = arr[0].daily, nd = Math.min(...sc.map(a => a.length)), dates = t0.time.slice(wxOff(t0), wxOff(t0) + nd);
     hm = { bb, img: null, mpp, sc, dates, nd }; hmDay = Math.min(hmDay, nd - 1); hmPaint();
@@ -426,55 +502,138 @@ async function showFt(k) {
     const g = n => { const key = Object.keys(pr).find(x => x.toLowerCase() === n); return key && pr[key] != null ? String(pr[key]) : ''; };
     const tfv = g('tfv') || g('tfv_g11') || g('code_tfv') || 'Forêt', ess = g('essence'), low = (tfv + ' ' + ess).toLowerCase();
     const ic = /conif|pin|épicéa|sapin|mélèze/.test(low) ? (/feuill|chêne|hêtre|châtaign/.test(low) ? '🌲🌳' : '🌲') : '🌳';
-    const bad = /peuplerai|robinier|sans couvert|lande|ligneu|verger|vigne/.test(low), good = /chêne|hêtre|châtaign|épicéa|pin|sapin|mélèze|feuillus|conifères|mixte/.test(low);
-    put(`${ic} <b>${esc(tfv)}</b>${ess && !low.startsWith(ess.toLowerCase()) && !tfv.toLowerCase().includes(ess.toLowerCase()) ? ' · ' + esc(ess) : ''}<br><small>${bad ? '⚠️ Peuplement peu propice aux cèpes' : good ? '🍄 Essence généralement associée au cèpe' : 'Essence à vérifier sur le terrain'} · source IGN, indicatif</small>`);
+    const bad = cepeBad(pr), good = /chêne|hêtre|châtaign|épicéa|pin|sapin|mélèze|feuillus|conifères|mixte/.test(low);
+    put(`${ic} <b>${esc(tfv)}</b>${ess && !low.startsWith(ess.toLowerCase()) && !tfv.toLowerCase().includes(ess.toLowerCase()) ? ' · ' + esc(ess) : ''}<br><small>${bad ? '⚠️ Peu propice aux cèpes' : good ? '🍄 Essence favorable au cèpe' : 'Essence à vérifier sur place'} · IGN</small>`);
   } catch (e) { put('🌲 Type de forêt indisponible (connexion ?)'); }
 }
-/* ===== Météo : indice « bon jour pour aller voir » (Open-Meteo, gratuit, sans clé) =====
-   Série = 24 jours passés + aujourd'hui + 7 jours de prévision (index 0..31).
-   Pour un jour D : pluie cumulée de D-12 à D-4 (déclencheur de la pousse, ~30 mm = idéal),
-   Tmin moyenne des 7 derniers jours (idéal 8-15 °C), Tmax trop chaude pénalisée, gel pénalisé, saison. */
+
+/* ===== Relief : altitude, pente, exposition (API altimétrie IGN, gratuite) : 5 points, centre + 25 m N/S/E/O ===== */
+const relCache = (() => { try { return JSON.parse(localStorage.getItem('cartocepe-relief') || '{}') || {}; } catch (e) { return {}; } })();
+async function reliefOf(k) {
+  const [x, y] = ctr(k), key = Math.round(x) + ',' + Math.round(y); if (relCache[key]) return relCache[key];
+  const dm = 25, off = dm / Math.cos(toLL(x, y)[0] * Math.PI / 180), P5 = [[x, y], [x, y + off], [x, y - off], [x + off, y], [x - off, y]].map(p => toLL(p[0], p[1]));
+  const r = await fetch(`https://data.geopf.fr/altimetrie/1.0/calcul/alti/rest/elevation.json?lon=${P5.map(p => p[1].toFixed(6)).join('|')}&lat=${P5.map(p => p[0].toFixed(6)).join('|')}&resource=ign_rge_alti_wld&delimiter=${encodeURIComponent('|')}&indent=false&measures=false&zonly=false`);
+  if (!r.ok) throw new Error('alti'); const j = await r.json(), z = (j.elevations || []).map(e => typeof e === 'number' ? e : e.z);
+  if (z.length !== 5 || z.some(v => !isFinite(v) || v < -500)) throw new Error('alti');
+  const gx = (z[3] - z[4]) / (2 * dm), gy = (z[1] - z[2]) / (2 * dm), slope = Math.atan(Math.hypot(gx, gy)) * 180 / Math.PI, az = (Math.atan2(-gx, -gy) * 180 / Math.PI + 360) % 360;      // az = direction vers laquelle descend la pente
+  const o = { z: Math.round(z[0]), slope: Math.round(slope * 10) / 10, az: Math.round(az) };
+  relCache[key] = o; if (Object.keys(relCache).length > 600) delete relCache[Object.keys(relCache)[0]]; try { localStorage.setItem('cartocepe-relief', JSON.stringify(relCache)); } catch (e) {}
+  return o;
+}
+async function showRel(k) {
+  const put = h => { if (sel === k && $('#rel')) $('#rel').innerHTML = h; };
+  try {
+    const o = await reliefOf(k), dirs = ['nord', 'nord-est', 'est', 'sud-est', 'sud', 'sud-ouest', 'ouest', 'nord-ouest'], dn = dirs[Math.round(o.az / 45) % 8], flat = o.slope < 3;
+    const hint = flat ? 'Terrain plat : le sol garde l\'eau, vérifiez qu\'il ne reste pas détrempé.' : o.az >= 292 || o.az <= 68 ? 'Versant exposé au nord : plus frais, il garde mieux l\'humidité en année sèche.' : o.az >= 112 && o.az <= 248 ? 'Versant exposé au sud : plus chaud, il se dessèche plus vite (à privilégier en saison fraîche ou humide).' : 'Versant est/ouest : conditions intermédiaires.';
+    put(`⛰️ <b>${o.z} m</b> · ${flat ? 'terrain plat' : 'pente ' + Math.round(o.slope) + '° vers le ' + dn}${o.slope >= 25 ? ' · ⚠️ pente forte' : ''}<br><small>${hint}${o.z >= 600 ? ' En altitude, la saison est plus précoce et plus courte.' : ''} · IGN</small>`);
+  } catch (e) { put('⛰️ Relief indisponible (connexion ?)'); }
+}
+/* ===== Météo : indice de pousse des cèpes de Bordeaux, 0-100 (Open-Meteo, gratuit, sans clé) =====
+   Uniquement des données météo : précipitations, ET0, températures, humidité relative, point de rosée, vent, nébulosité.
+   Série = 24 jours passés + aujourd'hui + 7 jours de prévision (index 0..31). Pour un jour D (passé, présent ou prévu) :
+   1. Humidité du sol = bilan hydrique pondéré sur les 21 jours précédents (pluie − évapotranspiration), pluies de J-7 à J-15
+      pondérées plein pot (le cèpe sort plusieurs jours après la pluie), pluies récentes (J-1 à J-6) et anciennes (J-16 à J-21) à ~40 %.
+   2. Température moyenne des 7 derniers jours : idéal 12-20 °C, pénalisée en dessous et au-dessus ; chaleur (Tmax) et gel pénalisés.
+   3. Air : humidité relative, écart température/point de rosée (air sec = pénalité), vent desséchant, ciel dégagé = évaporation.
+   Les jours futurs utilisent la pluie/ET0/températures prévues : l'indice des 7 prochains jours anticipe donc l'évolution. */
+const DAILY_BASE = 'precipitation_sum,temperature_2m_min,temperature_2m_max,et0_fao_evapotranspiration';
+const DAILY_FULL = DAILY_BASE + ',relative_humidity_2m_mean,dew_point_2m_mean,wind_speed_10m_mean,cloud_cover_mean';
+async function wxFetch(la, lo) {      // la / lo : chaînes (un point ou plusieurs séparés par des virgules) ; repli sur les variables de base si l'API refuse les autres
+  for (const v of [DAILY_FULL, DAILY_BASE]) {
+    const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${la}&longitude=${lo}&daily=${v}&past_days=24&forecast_days=8&timezone=auto`);
+    if (r.ok) return r.json();
+  }
+  throw new Error('wx');
+}
 const wxCache = new Map();
 async function wxFor(la, lo) {
   const k = la.toFixed(2) + ',' + lo.toFixed(2), c = wxCache.get(k); if (c && Date.now() - c.t < 36e5) return c.d;
-  const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${la.toFixed(3)}&longitude=${lo.toFixed(3)}&daily=precipitation_sum,temperature_2m_min,temperature_2m_max,et0_fao_evapotranspiration&past_days=24&forecast_days=8&timezone=auto`);
-  if (!r.ok) throw new Error('wx'); const j = await r.json(), d = j.daily; d.elev = j.elevation; wxCache.set(k, { t: Date.now(), d }); return d;
+  const j = await wxFetch(la.toFixed(3), lo.toFixed(3)), d = j.daily; d.elev = j.elevation; wxCache.set(k, { t: Date.now(), d }); return d;
 }
 /* Repousse : après une récolte, la case a besoin d'environ 8 jours pour se regarnir.
    Facteur 0,1 le jour même → 1 au bout de 8 jours (linéaire). `last` = date de la dernière visite avec cèpes. */
 const wxOff = d => d.precipitation_sum.length - 8;   // index d'aujourd'hui (8 jours de prévision à la fin)
 const regrow = (date, last) => { if (!last) return 1; const n = Math.round((new Date(date + 'T00:00') - new Date(last + 'T00:00')) / 864e5); return n >= 8 ? 1 : Math.max(.1, .1 + .9 * n / 8); };
-function wxScores(d, last, ff = 0) {   // ff = part de forêt de la case (0-1) : sous le couvert, moins d'évaporation, réserve d'eau plus durable, chaleur atténuée
-  const kE = .15 * (1 - .5 * ff), kO = .5 + .3 * ff;
-  const P = d.precipitation_sum.map(v => v ?? 0), Tn = d.temperature_2m_min.map(v => v ?? 8), Tx = d.temperature_2m_max.map(v => v ?? 18);
+/* Poids d'une pluie tombée n jours avant D : fort entre J-7 et J-15, faible avant et après */
+const wDay = n => n < 7 ? .3 + .2 * (n - 1) / 5 : n <= 15 ? 1 : .5 - .2 * Math.min(5, n - 16) / 5;
+function wxScores(d, last, ff = 0, par = null, from = null, to = null) {      // par = {sat, dt} (calibration) ; from/to = plage d'indices à calculer
+  const cal = par || D.cal || {}, SAT = cal.sat || 35, DT = cal.dt || 0;   // ff = part de forêt de la case (0-1) : sous le couvert, moins d'évaporation, vent atténué, chaleur atténuée
+  const kE = .5 * (1 - .4 * ff);      // part de l'ET0 réellement perdue par le sol forestier
+  const cl = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+  const num = (k, def) => d[k] ? d[k].map(v => v ?? def) : null;
+  const P = num('precipitation_sum', 0), Tn = num('temperature_2m_min', 8), Tx = num('temperature_2m_max', 18), E = num('et0_fao_evapotranspiration', 0) || P.map(() => 0);
+  const dflt = v => P.map(() => v), RH = num('relative_humidity_2m_mean', 75) || dflt(75), TD = num('dew_point_2m_mean', null), WS = num('wind_speed_10m_mean', 8) || dflt(8), CC = num('cloud_cover_mean', 50) || dflt(50);
   const sum = (a, i, j) => { let s = 0; for (let x = i; x <= j; x++) s += a[x]; return s; }, mean = (a, i, j) => sum(a, i, j) / (j - i + 1);
-  const E = d.et0_fao_evapotranspiration ? d.et0_fao_evapotranspiration.map(v => v ?? 0) : P.map(() => 0), elev = d.elev || 0;
-  const season = [.05, .05, .05, .05, .4, .7, 1, 1, 1, 1, 1, .3];
-  if (elev >= 1000) { season[4] = .1; season[9] = .5; season[10] = .1; } else if (elev >= 600) { season[9] = .8; season[10] = .3; }   // en altitude la saison s'arrête plus tôt
+  const Tm = Tn.map((v, i) => (v + Tx[i]) / 2);
   const out = [];
-  for (let i = wxOff(d); i < P.length; i++) {
-    const tn = mean(Tn, i - 6, i), lag = tn >= 12 ? 0 : tn >= 8 ? 1 : 2, a = i - 12 - lag, b = i - 4 - lag, wr = sum(P, a, b) + kO * sum(P, a - 8, a - 1);   // la pluie plus ancienne compte pour moitié (réserve d'eau du sol)
-    const rain = Math.min(1, Math.max(0, wr - kE * (sum(E, a, b) + kO * sum(E, a - 8, a - 1))) / 25) * (wr > 120 ? .85 : 1), tx = mean(Tx, i - 6, i) - 3 * ff, fr = Math.min(...Tn.slice(i - 3, i + 1));
-    const tS = tn <= 3 ? 0 : tn < 8 ? (tn - 3) / 5 : tn <= 15 ? 1 : tn < 20 ? (20 - tn) / 5 : 0;
-    const hot = tx <= 24 ? 1 : Math.max(0, 1 - (tx - 24) / 8), frost = fr < 0 ? .25 : fr < 2 ? .7 : 1;
-    const m = new Date(d.time[i] + 'T00:00').getMonth();
-    const rg = regrow(d.time[i], last), base = 100 * rain * tS * hot * frost * season[m];
-    out.push({ date: d.time[i], p: P[i], rg, base: Math.round(base), score: Math.round(base * rg), f: { ff, wr, net: Math.max(0, wr - kE * (sum(E, a, b) + kO * sum(E, a - 8, a - 1))), rain, tn, tS, hot, frost, sea: season[m] } });
+  for (let i = from ?? wxOff(d); i <= (to ?? P.length - 1); i++) {
+    let wr = 0, we = 0, r715 = 0; for (let n = 1; n <= 21; n++) { const w = wDay(n); wr += w * P[i - n]; we += w * kE * E[i - n]; if (n >= 7 && n <= 15) r715 += P[i - n]; }
+    const net = Math.max(0, wr - we), soil = cl(net / SAT) * (wr > 140 ? .9 : 1);                   // 35 mm pondérés ≈ sol bien humide
+    const tm = mean(Tm, i - 6, i) - 1.5 * ff, tx = mean(Tx, i - 6, i) - 3 * ff, fr = Math.min(...Tn.slice(i - 3, i + 1));
+    const tc = tm - DT, tS = tc <= 4 ? 0 : tc < 12 ? (tc - 4) / 8 : tc <= 20 ? 1 : tc < 28 ? (28 - tc) / 8 : 0;   // plateau 12-20 °C
+    const hot = tx <= 26 ? 1 : Math.max(0, 1 - (tx - 26) / 8), frost = fr < 0 ? .25 : fr < 2 ? .7 : 1;
+    const rh = mean(RH, i - 4, i), spread = TD ? mean(Tm, i - 4, i) - mean(TD.map(v => v ?? 0), i - 4, i) : 3;
+    const air = .6 + .4 * (.7 * cl((rh - 55) / 25) + .3 * cl(1 - (spread - 3) / 8));                  // air humide, proche de la saturation
+    const ws = mean(WS, i - 2, i) * (1 - .5 * ff), wind = 1 - .15 * cl((ws - 15) / 20);              // vent desséchant (km/h)
+    const cc = mean(CC, i - 4, i), cloud = .9 + .1 * cl(cc / 70);                                    // ciel couvert = moins d'évaporation
+    const rg = regrow(d.time[i], last), base = 100 * soil * tS * hot * frost * air * wind * cloud;
+    out.push({ date: d.time[i], p: P[i], rg, base: Math.round(base), score: Math.round(base * rg), f: { ff, wr, net, soil, r715, tm, tS, hot, frost, rh, air, ws, wind, cc, cloud } });
   }
   return out;
 }
+
+/* ===== Calibration de l'indice sur vos visites =====
+   On compare, pour chaque visite (avec ou sans cèpes), le score météo du jour (données ERA5 d'Open-Meteo) au résultat réel.
+   Deux réglages seulement sont ajustés (pluie de saturation du sol, décalage de la plage de température), jamais plus,
+   pour limiter le risque de coller au hasard. Validation croisée : on ne retient le réglage que s'il fait mieux sur des visites qu'il n'a pas vues. */
+const aucOf = (sc, y) => { let w = 0, t = 0; for (let i = 0; i < sc.length; i++) if (y[i]) for (let j = 0; j < sc.length; j++) if (!y[j]) { t++; w += sc[i] > sc[j] ? 1 : sc[i] === sc[j] ? .5 : 0; } return t ? w / t : .5; };
+async function calibrate() {
+  const today0 = today(), lim = new Date(new Date(today0 + 'T00:00').getTime() - 7 * 864e5).toISOString().slice(0, 10), items = [];
+  for (const [k, c] of Object.entries(D.cells)) for (const v of c.v) if (v.d <= lim) items.push({ k, d: v.d, y: v.n > 0 ? 1 : 0 });
+  const pos = items.filter(i => i.y).length, neg = items.length - pos;
+  if (items.length < 20 || pos < 6 || neg < 6) return alert(`Pas assez de visites pour calibrer sans se tromper.\n\nVisites exploitables (de plus de 7 jours) : ${items.length}, dont ${pos} avec cèpes et ${neg} sans cèpes.\nIl en faut au moins 20, dont 6 avec cèpes et 6 sans.\n\nAstuce : notez aussi les sorties où vous n'avez rien trouvé (visite avec 0 cèpe) : ce sont elles qui permettent d'apprendre ce qui ne marche pas.`);
+  toast('🎯 Calibration en cours…');
+  try {
+    const groups = new Map();      // une requête météo par secteur (0,1°) et par année
+    for (const it of items) { const [la, lo] = toLL(...ctr(it.k)), g = la.toFixed(1) + ',' + lo.toFixed(1) + ',' + it.d.slice(0, 4); if (!groups.has(g)) groups.set(g, { la, lo, its: [] }); groups.get(g).its.push(it); }
+    const addDays = (d, n) => new Date(new Date(d + 'T00:00').getTime() + n * 864e5).toISOString().slice(0, 10);
+    for (const g of groups.values()) {
+      const ds = g.its.map(i => i.d).sort(), a = addDays(ds[0], -25), b = ds[ds.length - 1]; let j = null;
+      for (const v of [DAILY_FULL, DAILY_BASE]) { const r = await fetch(`https://archive-api.open-meteo.com/v1/archive?latitude=${g.la.toFixed(3)}&longitude=${g.lo.toFixed(3)}&start_date=${a}&end_date=${b}&daily=${v}&timezone=auto`); if (r.ok) { j = await r.json(); break; } }
+      if (!j) throw new Error('archive'); g.d = j.daily; g.d.elev = j.elevation;
+      for (const it of g.its) { it.dd = g.d; it.i = g.d.time.indexOf(it.d); it.ff = await forestFrac(it.k); }
+    }
+    const use = items.filter(i => i.dd && i.i >= 21 && i.dd.precipitation_sum[i.i] != null); if (use.length < 20) throw new Error('data');
+    const SATS = [20, 25, 30, 35, 40, 50, 60], DTS = [-3, -2, -1, 0, 1, 2, 3], combos = []; SATS.forEach(sa => DTS.forEach(dt => combos.push({ sat: sa, dt })));
+    const S = combos.map(p => use.map(it => wxScores(it.dd, '', it.ff, p, it.i, it.i)[0].base)), Y = use.map(i => i.y), i0 = combos.findIndex(p => p.sat === 35 && p.dt === 0);
+    const aucAll = S.map(sc => aucOf(sc, Y)), ib = aucAll.indexOf(Math.max(...aucAll));
+    let gain = 0, runs = 0;      // validation croisée : réglage choisi sur une moitié, jugé sur l'autre
+    for (let r = 0; r < 40; r++) { const idx = use.map((_, i) => i).sort(() => Math.random() - .5), h = idx.length >> 1, tr = idx.slice(0, h), te = idx.slice(h), sub = (arr, ix) => ix.map(i => arr[i]);
+      const ytr = sub(Y, tr), yte = sub(Y, te); if (!ytr.some(Boolean) || ytr.every(Boolean) || !yte.some(Boolean) || yte.every(Boolean)) continue;
+      const at = S.map(sc => aucOf(sub(sc, tr), ytr)), bi = at.indexOf(Math.max(...at)); gain += aucOf(sub(S[bi], te), yte) - aucOf(sub(S[i0], te), yte); runs++; }
+    gain = runs ? gain / runs : 0;
+    const a0 = aucAll[i0], a1 = aucAll[ib], P = combos[ib], ok = a1 >= .6 && gain >= .02 && (P.sat !== 35 || P.dt !== 0);
+    const f = x => (x * 100).toFixed(0) + ' %', head = `Visites utilisées : ${use.length} (${use.filter(i => i.y).length} avec cèpes, ${use.filter(i => !i.y).length} sans).\nCapacité de l'indice à distinguer les bons jours des mauvais (50 % = hasard, 100 % = parfait) :\n• indice standard : ${f(a0)}\n• meilleur réglage : ${f(a1)} (pluie de saturation ${P.sat} mm, températures ${P.dt > 0 ? '+' : ''}${P.dt} °C)\nGain mesuré sur des visites non vues : ${gain >= 0 ? '+' : ''}${(gain * 100).toFixed(1)} points.\n\n`;
+    if (!ok) return alert(head + 'Verdict : l\'écart n\'est pas assez net ou fiable pour changer l\'indice. Il reste standard. Réessayez après davantage de visites, avec et sans cèpes.');
+    const adj = { sat: Math.round((35 + P.sat) / 2), dt: Math.round((P.dt / 2) * 2) / 2 };      // on n'applique que la moitié de l'écart : prudence
+    if (confirm(head + `Verdict : amélioration crédible. J'applique la moitié de l'écart par prudence (pluie de saturation ${adj.sat} mm, températures ${adj.dt > 0 ? '+' : ''}${adj.dt} °C).\n\nLes visites ne sont pas un échantillon neutre (vous y allez quand vous pensez que c'est bon) : l'indice calibré reste une estimation.\n\nAppliquer ?`)) {
+      D.cal = { ...adj, n: use.length, auc0: a0, auc1: a1, d: today() }; save(); wxCache.clear(); hm = null; if (hmOn) hmLoad(); renderPanel(); calLabel(); toast('🎯 Indice calibré sur ' + use.length + ' visites'); }
+  } catch (e) { toast('Calibration impossible (connexion ou données météo)'); }
+}
+const calLabel = () => { $('#cal').textContent = D.cal ? `🎯 Indice calibré (${D.cal.n} visites, ${fmtD(D.cal.d)}) : recalibrer` : '🎯 Calibrer l\'indice sur mes récoltes'; $('#calx').hidden = !D.cal; };
 async function showWx(k) {
   const put = (h, b) => { if (sel !== k) return; if ($('#wx')) $('#wx').innerHTML = h; if ($('#wxb')) $('#wxb').innerHTML = b; };
   try {
     const [la, lo] = toLL(...ctr(k)), d = await wxFor(la, lo), last = (D.cells[k]?.v || []).filter(v => v.n > 0).reduce((a, v) => v.d > a ? v.d : a, ''), ff = await forestFrac(k), s = wxScores(d, last, ff);
     const since = last ? Math.round((new Date(today() + 'T00:00') - new Date(last + 'T00:00')) / 864e5) : 99;
-    const past = d.precipitation_sum.slice(wxOff(d) - 14, wxOff(d)).reduce((a, v) => a + (v ?? 0), 0), tn7 = d.temperature_2m_min.slice(wxOff(d) - 7, wxOff(d)).reduce((a, v) => a + (v ?? 0), 0) / 7;
+    const past = d.precipitation_sum.slice(wxOff(d) - 14, wxOff(d)).reduce((a, v) => a + (v ?? 0), 0), tm7 = d.temperature_2m_min.slice(wxOff(d) - 7, wxOff(d)).reduce((a, v, j) => a + ((v ?? 0) + (d.temperature_2m_max[wxOff(d) - 7 + j] ?? 0)) / 2, 0) / 7;
     const best = s.reduce((a, b) => b.score > a.score ? b : a), day = x => new Date(x + 'T00:00').toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric' });
+    const avgS = (i, j) => s.slice(i, j).reduce((a, x) => a + x.score, 0) / Math.max(1, s.slice(i, j).length), dT = avgS(4, 8) - avgS(0, 3), trend = dT >= 8 ? '📈 en hausse' : dT <= -8 ? '📉 en baisse' : '➡️ stable';
     const lab = v => v >= 70 ? '🌟 Excellent' : v >= 50 ? '🟢 Bon' : v >= 30 ? '🟠 Moyen' : '🔴 Faible';
     const ago2 = since <= 0 ? "aujourd'hui" : since === 1 ? 'hier' : 'il y a ' + since + ' j';
     put(`<div class="wxg">${s.map((x, i) => `<div class="wxd${x === best && x.score >= 30 ? ' best' : ''}" style="background:hsl(${Math.round(x.score * 1.2)},70%,62%)"><small>${i ? new Date(x.date + 'T00:00').toLocaleDateString('fr-FR', { weekday: 'narrow' }) + ' ' + x.date.slice(8) : 'auj.'}</small><b>${x.score}</b><small>${x.p >= 1 ? '🌧' + Math.round(x.p) : '☀'}${x.rg < .8 ? '⏳' : ''}</small></div>`).join('')}</div>
-      <details class="wxi"><summary>ℹ️ Comment lire l'indice</summary><div class="wxn">Note de 0 à 100 par jour : pluie utile (pluie moins évaporation) tombée 4 à 14 jours avant (plus tôt si les nuits sont fraîches, la pousse est alors plus lente) + nuits fraîches + chaleur + gel + saison (raccourcie en altitude). ⏳ = la case est encore en repousse après une récolte (~8 j). Pluie 14 j passés : ${Math.round(past)} mm · nuits moy. 7 j : ${tn7.toFixed(1)} °C.<br><b>Détail du jour :</b> ${(f => f ? `pluie pondérée ${Math.round(f.wr)} mm, utile ${Math.round(f.net)} mm → ${Math.round(f.rain * 100)} % · nuits ${f.tn.toFixed(1)} °C → ${Math.round(f.tS * 100)} % · chaleur ${Math.round(f.hot * 100)} % · gel ${Math.round(f.frost * 100)} % · saison ${Math.round(f.sea * 100)} % · repousse ${Math.round(s[0].rg * 100)} %${f.ff > 0 ? ` · 🌲 forêt ${Math.round(f.ff * 100)} % (sol plus humide)` : ''}` : '')(s[0].f)}</div></details>`,
-      (best.score >= 30 ? `🎯 <b>${day(best.date)}</b> · ${lab(best.score)} (${best.score})` : '😴 Aucun jour favorable cette semaine') + (since <= 8 ? `<br>⏳ Dernière récolte ${ago2} : repousse en cours` : ''));
+      <details class="wxi"><summary>ℹ️ Comment lire l'indice</summary><div class="wxn">Probabilité de fructification (0 à 100) calculée chaque jour : humidité du sol (pluie − évapotranspiration sur 21 jours, pluies de J-7 à J-15 comptées en priorité) × température (idéal 12-20 °C) × chaleur × gel × air humide × vent × ciel couvert. Les 7 jours à venir utilisent les prévisions. ⏳ = la case est encore en repousse après une récolte (~8 j). Pluie 14 j passés : ${Math.round(past)} mm · températures moy. 7 j : ${tm7.toFixed(1)} °C.<br><b>Détail du jour :</b> ${(f => f ? `pluie pondérée ${Math.round(f.wr)} mm (dont ${Math.round(f.r715)} mm à J-7…J-15), utile ${Math.round(f.net)} mm → sol ${Math.round(f.soil * 100)} % · temp. ${f.tm.toFixed(1)} °C → ${Math.round(f.tS * 100)} % · chaleur ${Math.round(f.hot * 100)} % · gel ${Math.round(f.frost * 100)} % · air (HR ${Math.round(f.rh)} %) ${Math.round(f.air * 100)} % · vent ${Math.round(f.ws)} km/h → ${Math.round(f.wind * 100)} % · nuages ${Math.round(f.cc)} % → ${Math.round(f.cloud * 100)} % · repousse ${Math.round(s[0].rg * 100)} %${D.cal ? ` · 🎯 calibré (${D.cal.n} visites)` : ''}${f.ff > 0 ? ` · 🌲 forêt ${Math.round(f.ff * 100)} % (sol plus humide)` : ''}` : '')(s[0].f)}</div></details>`,
+      `<span class="vdc" style="background:hsl(${Math.round(best.score * 1.2)},70%,58%)">${best.score >= 30 ? best.score : '—'}</span><span class="vdt">` + (best.score >= 30 ? `<b>${day(best.date)}</b> · ${lab(best.score)}` : '😴 Aucun jour favorable cette semaine') + ` ${trend}` + (since <= 8 ? `<br><small>⏳ Récolte ${ago2} : repousse en cours</small>` : '') + '</span>');
   } catch (e) { put('<div class="hint">🌦️ Météo indisponible (connexion ?)</div>', '🌦️ Météo indisponible'); }
 }
 
@@ -483,7 +642,8 @@ $('#panel').addEventListener('click', e => {
   const gi = e.target.closest('#gal img'); if (gi) { pvId = gi.dataset.id; $('#pvi').src = gi.src; $('#pv').classList.add('open'); return; }
   const t = e.target.closest('[data-tab]'); if (t) { ptab = t.dataset.tab; return setTab(); }
   const b = e.target.closest('[data-act]'); if (!b || !sel) return; const a = b.dataset.act, c = D.cells[sel] ||= blank();
-  if (a === 'delcell') { const snap = JSON.stringify(D), k = sel; delete D.cells[k]; sel = null; save(); renderPanel(); draw(); return toast('Case supprimée', () => { restoreSnap(snap); sel = k; save(); draw(); renderPanel(); }); }
+  if (a === 'delcell') { const snap = JSON.stringify(D), k = sel; delete D.cells[k]; sel = null; save(); renderPanel(); draw(); return toast('Point supprimé', () => { restoreSnap(snap); sel = k; save(); draw(); renderPanel(); }); }
+  if (a === 'go') return goTo(sel);
   if (a === 'quick') return addFind(sel);
   if (a === 'addtoggle') { const f = $('#addv'); if (editI !== null) { renderPanel(); return $('#addv').classList.add('on'); } f.classList.toggle('on'); if (f.classList.contains('on')) $('#vn').focus(); return; }
   if (a === 'edit') { const v = c.v[+b.dataset.i]; if (!v) return; editI = +b.dataset.i; const f = $('#addv'); f.classList.add('on');
@@ -495,47 +655,161 @@ $('#panel').addEventListener('click', e => {
     if (editI !== null && c.v[editI]) { const snap = JSON.stringify(D); c.v[editI] = nv; save(); draw(); renderPanel(); return toast('Visite modifiée ✏️', () => { restoreSnap(snap); save(); draw(); renderPanel(); }); }
     c.v.push(nv); save(); draw(); renderPanel(); collapse(); toast('Visite ajoutée 🍄'); }
 });
-function addFind(k) {
-  const snap = JSON.stringify(D), c = D.cells[k] ||= blank(), t = today(), v = c.v.find(v => v.d === t && !v.t) || c.v.find(v => v.d === t);
+function addFind(k, pos) {
+  const snap = JSON.stringify(D); if (!k) { k = newSpot(pos[0], pos[1]); sel = k; } const c = D.cells[k], t = today(), v = c.v.find(v => v.d === t && !v.t) || c.v.find(v => v.d === t);
   if (v) { v.n++; v.w += D.avg; } else c.v.push({ d: t, n: 1, w: D.avg, e: true, t: '' });
-  save(); collapse(); draw(); try { navigator.vibrate && navigator.vibrate(40); } catch (e) {}
-  toast('🍄 +1 · ' + c.v.filter(x => x.d === t).reduce((a, x) => a + x.n, 0) + ' aujourd\'hui sur cette case', () => { restoreSnap(snap); save(); draw(); renderPanel(); });
+  save(); collapse(); draw(); renderPanel(); try { navigator.vibrate && navigator.vibrate(40); } catch (e) {}
+  toast('🍄 +1 · ' + c.v.filter(x => x.d === t).reduce((a, x) => a + x.n, 0) + ' aujourd\'hui sur ce point', () => { restoreSnap(snap); save(); draw(); renderPanel(); });
 }
 
-function addVisit(k) {
-  const snap = JSON.stringify(D), c = D.cells[k] ||= blank();
+function addVisit(k, pos) {
+  const snap = JSON.stringify(D); if (!k) { k = newSpot(pos[0], pos[1]); sel = k; } const c = D.cells[k];
   c.v.push({ d: today(), n: 0, w: 0, e: false, t: '' });
-  save(); collapse(); draw(); try { navigator.vibrate && navigator.vibrate(40); } catch (e) {}
-  toast('👣 +1 visite · ' + c.v.length + ' au total sur cette case', () => { restoreSnap(snap); save(); draw(); renderPanel(); });
+  save(); collapse(); draw(); renderPanel(); try { navigator.vibrate && navigator.vibrate(40); } catch (e) {}
+  toast('👣 +1 visite · ' + c.v.length + ' au total sur ce point', () => { restoreSnap(snap); save(); draw(); renderPanel(); });
 }
+
+/* ===== Écran allumé (Wake Lock) : la page et le GPS ne tournent que si l'écran reste actif ===== */
+var wlk = null, wakeOn = (() => { try { return localStorage.getItem('cartocepe-wake') !== '0'; } catch (e) { return true; } })();
+var RC = { on: false, hid: 0 }, RT = { on: false, tg: [], i: 0, polys: [], ld: [], dir: [], tot: 0, off: 0, wait: null, t: 0 };
+async function wakeSync() {
+  try { const need = wakeOn && (watch !== null || RC.on) && document.visibilityState === 'visible';
+    if (need && !wlk && navigator.wakeLock) { wlk = await navigator.wakeLock.request('screen'); wlk.addEventListener('release', () => { wlk = null; }); }
+    else if (!need && wlk) { await wlk.release(); wlk = null; } } catch (e) { wlk = null; }
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') { RC.hid = RC.on ? Date.now() : 0; }
+  else { if (RC.on && RC.hid && Date.now() - RC.hid > 10000) toast('⚠️ L\'écran s\'est verrouillé : des points ont pu être manqués'); RC.hid = 0; wakeSync(); }
+});
+const wkLabel = () => $('#wk').textContent = wakeOn ? '🔆 Écran allumé pendant le GPS : activé' : '🔆 Écran allumé pendant le GPS : désactivé';
+$('#wk').onclick = () => { wakeOn = !wakeOn; try { localStorage.setItem('cartocepe-wake', wakeOn ? '1' : '0'); } catch (e) {} wkLabel(); wakeSync(); toast(wakeOn ? (navigator.wakeLock ? '🔆 L\'écran restera allumé tant que le GPS est actif' : 'Non pris en charge par ce navigateur') : 'Écran libre de se verrouiller'); }; wkLabel();
+
+/* ===== Chemins : longueur, enregistrement continu ===== */
+const fmtDist = m => m >= 1000 ? (m / 1000).toFixed(1).replace('.', ',') + ' km' : Math.round(m) + ' m';
+const pathLen = p => { let t = 0; for (let i = 1; i < p.pts.length; i++) t += rdist(p.pts[i - 1], p.pts[i]); return t; };
+function recTick() {      // un point tous les ~10 m (plus si le GPS est imprécis), jamais si la précision dépasse 30 m
+  if (!RC.on || !me || me.acc > 30) return; const last = P.cur ? P.cur.pts[P.cur.pts.length - 1] : P.start, gp = { x: me.x, y: me.y, acc: me.acc };
+  if (!last) { placePt(gp, true); return pmUpdate(); }
+  if (rdist(last, [me.x, me.y]) < Math.max(10, Math.min(me.acc * .8, 25))) return;
+  placePt(gp, true); pmUpdate();
+}
+function recToggle() {
+  if (RC.on) { RC.on = false; const p = P.cur; wakeSync();
+    if (!p) { P.start = null; P.sa = null; pmUpdate(); draw(); return toast('⏹ Enregistrement arrêté : aucun déplacement'); }
+    finishPath(); const nm = prompt('Nom du chemin (facultatif)', ''); if (nm && nm.trim()) { p.name = nm.trim().slice(0, 60); save(); }
+    P.sel = p.id; pmUpdate(); draw(); return toast('⏹ ' + fmtDist(pathLen(p)) + ' enregistrés'); }
+  if (!me) { if (watch === null) startLoc(); return toast('Position en attente : réessayez dans un instant'); }
+  RC.on = true; wakeSync(); if (me.acc > 30) toast('Précision faible (±' + Math.round(me.acc) + ' m) : les points se poseront dès que le signal s\'améliore'); else toast('⏺ Enregistrement : marchez, l\'écran reste allumé');
+  recTick(); pmUpdate();
+}
+
+/* ===== Itinéraire sur vos chemins : plus court chemin (Dijkstra) depuis votre position jusqu'à vos points ===== */
+function legsFrom(from, tos) {      // pour chaque cible : { d (m), off (m hors chemin), poly, direct }
+  const ps = D.paths || [], key = q => q[0].toFixed(1) + ',' + q[1].toFixed(1), id = new Map(), pts = [], adj = [];
+  const nd = q => { const k = key(q); let i = id.get(k); if (i === undefined) { i = pts.length; id.set(k, i); pts.push([q[0], q[1]]); adj.push([]); } return i; };
+  const link = (a, b) => { const w = rdist(pts[a], pts[b]); adj[a].push([b, w]); adj[b].push([a, w]); };
+  ps.forEach(p => { for (let i = 1; i < p.pts.length; i++) { const a = nd(p.pts[i - 1]), b = nd(p.pts[i]); if (a !== b) link(a, b); } });
+  const snap = z => { let best = null; ps.forEach(p => { for (let i = 1; i < p.pts.length; i++) { const r = segProj(z, p.pts[i - 1], p.pts[i]); if (!best || r.d < best.d) best = { d: r.d, q: r.q, t: r.t, a: p.pts[i - 1], b: p.pts[i], sg: p.id + ':' + i }; } }); return best; };
+  const direct = t => { const d = rdist(from, [t.x, t.y]); return { d, off: d, poly: [from, [t.x, t.y]], direct: true }; };
+  if (!ps.length) return tos.map(direct);
+  const groups = new Map(), vs = [from, ...tos.map(t => [t.x, t.y])].map(z => { const sn = snap(z); if (!sn) return null; const v = { z, sn, n: nd(sn.q), off: rdist(z, sn.q) }; const gr = groups.get(sn.sg) || { a: nd(sn.a), b: nd(sn.b), l: [] }; gr.l.push({ n: v.n, t: sn.t }); groups.set(sn.sg, gr); return v; });
+  groups.forEach(gr => { let prev = gr.a; gr.l.sort((x, y) => x.t - y.t).forEach(e => { if (e.n !== prev && e.n !== gr.b) { link(prev, e.n); prev = e.n; } }); if (prev !== gr.b) link(prev, gr.b); });      // les points d'accroche d'un même tronçon sont chaînés
+  if (!vs[0]) return tos.map(direct);
+  const N = pts.length, dist = new Float64Array(N).fill(Infinity), prev = new Int32Array(N).fill(-1), H = [];
+  const push = (d, n) => { H.push([d, n]); let i = H.length - 1; while (i > 0) { const p = (i - 1) >> 1; if (H[p][0] <= H[i][0]) break; [H[p], H[i]] = [H[i], H[p]]; i = p; } };
+  const pop = () => { const t = H[0], l = H.pop(); if (H.length) { H[0] = l; let i = 0; for (;;) { const a = 2 * i + 1, b = a + 1; let m = i; if (a < H.length && H[a][0] < H[m][0]) m = a; if (b < H.length && H[b][0] < H[m][0]) m = b; if (m === i) break; [H[m], H[i]] = [H[i], H[m]]; i = m; } } return t; };
+  dist[vs[0].n] = 0; push(0, vs[0].n);
+  while (H.length) { const [d, u] = pop(); if (d > dist[u]) continue; for (const [v, w] of adj[u]) if (d + w < dist[v]) { dist[v] = d + w; prev[v] = u; push(d + w, v); } }
+  return tos.map((t, j) => { const v = vs[j + 1], dr = direct(t);
+    if (!v || !isFinite(dist[v.n]) || vs[0].off > 400 || v.off > 400) return dr;
+    const chain = []; for (let u = v.n; u !== -1; u = prev[u]) chain.push(pts[u]); chain.reverse();
+    const off = vs[0].off + v.off, d = dist[v.n] + off; if (dr.d < d * .5) return dr;      // si le réseau fait un énorme détour, on indique la ligne droite
+    return { d, off, poly: [from, ...chain, [t.x, t.y]], direct: false }; });
+}
+function rtCompute() {
+  if (!me || !RT.on) return; let cur = [me.x, me.y]; RT.polys = []; RT.ld = []; RT.dir = []; RT.tot = 0; RT.off = 0;
+  RT.tg.slice(RT.i).forEach(t => { const l = legsFrom(cur, [t])[0]; RT.polys.push(l.poly); RT.ld.push(l.d); RT.dir.push(l.direct); RT.tot += l.d; RT.off += l.off; cur = [t.x, t.y]; });
+}
+function rtUi() {
+  const rest = RT.tg.slice(RT.i), mins = Math.max(1, Math.round(RT.tot / 55)), nm = (t, i) => t.name || 'Point ' + (RT.i + i + 1);
+  if (!rest.length) return;
+  $('#rtt').innerHTML = rest.length === 1 ? `🧭 <b>${esc(nm(rest[0], 0))}</b> · ${fmtDist(RT.tot)} · ≈ ${mins} min` : `🧭 <b>Tournée</b> · ${rest.length} points · ${fmtDist(RT.tot)} · ≈ ${mins} min`;
+  $('#rts').innerHTML = '<small>' + (rest.length > 1 ? `Prochain : ${esc(nm(rest[0], 0))} · ${fmtDist(RT.ld[0])}${rest[1] ? ' → ' + esc(nm(rest[1], 1)) : ''}${rest.length > 2 ? ' …' : ''}<br>` : '') + (RT.dir[0] ? 'Aucun chemin proche : ligne droite.' : RT.off > 25 ? `Dont ${fmtDist(RT.off)} hors chemin (en pointillés rejoignant le réseau).` : 'Par vos chemins.') + '</small>';
+  $('#rtn').hidden = rest.length < 2;
+}
+function startRoute(tg) {
+  RT.on = true; RT.tg = tg; RT.i = 0; RT.t = Date.now(); $('#rt').hidden = false; $('#rtb').classList.add('on'); rtCompute(); rtUi();
+  const all = RT.polys.flat(); if (all.length) { const xs = all.map(q => q[0]), ys = all.map(q => q[1]), W = cv.clientWidth, H = cv.clientHeight;
+    V.cx = (Math.min(...xs) + Math.max(...xs)) / 2; V.cy = (Math.min(...ys) + Math.max(...ys)) / 2; V.mpp = Math.max(1.5, (Math.max(...xs) - Math.min(...xs)) / (W * .8), (Math.max(...ys) - Math.min(...ys)) / (H * .7)); }
+  draw();
+}
+function rtClose() { RT.on = false; RT.polys = []; RT.wait = null; $('#rt').hidden = true; $('#rtb').classList.remove('on'); draw(); }
+function routeTick() {
+  if (RT.wait && me) { const w = RT.wait; RT.wait = null; return w === 'tour' ? startTour() : startRoute(w); }
+  if (!RT.on || !me) return; const t = RT.tg[RT.i];
+  if (t && rdist([me.x, me.y], [t.x, t.y]) < 15) { toast('✅ Arrivé : ' + (t.name || 'point ' + (RT.i + 1))); try { navigator.vibrate && navigator.vibrate([60, 40, 60]); } catch (e) {} RT.i++; if (RT.i >= RT.tg.length) { toast('🏁 Tournée terminée'); return rtClose(); } }
+  if (Date.now() - RT.t < 3000) return; RT.t = Date.now(); rtCompute(); rtUi(); schedule();
+}
+function startTour() {
+  if (!me) { RT.wait = 'tour'; if (watch === null) startLoc(); return toast('Recherche de votre position… la tournée s\'affichera ensuite'); }
+  const here = [me.x, me.y], cand = Object.entries(D.cells).filter(([k, c]) => rec(c) && c.x != null).map(([k, c]) => ({ k, x: c.x, y: c.y, name: c.name || '', n: cnt(c), d: rdist(here, [c.x, c.y]) }));
+  if (!cand.length) return toast('Aucun point enregistré');
+  let pool = cand.filter(c => c.n > 0); if (!pool.length) pool = cand;      // d'abord les points où vous avez trouvé des cèpes
+  pool = pool.filter(c => c.d < 3000).sort((a, b) => a.d - b.d).slice(0, 6); if (!pool.length) return toast('Aucun point à moins de 3 km');
+  const order = []; let cur = here, left = pool.slice();      // ordre glouton : toujours le point le plus proche par les chemins
+  while (left.length) { const L = legsFrom(cur, left); let bi = 0; L.forEach((l, i) => { if (l.d < L[bi].d) bi = i; }); const t = left.splice(bi, 1)[0]; order.push(t); cur = [t.x, t.y]; }
+  startRoute(order);
+}
+function goTo(k) {
+  const c = D.cells[k], [x, y] = ctr(k), [la, lo] = toLL(x, y), t = { k, x, y, name: (c && c.name) || '' };
+  if (!(D.paths || []).length) return window.open(`https://www.google.com/maps/dir/?api=1&destination=${la.toFixed(6)},${lo.toFixed(6)}&travelmode=walking`, '_blank');      // pas encore de chemins : Maps à la place
+  if (!me) { RT.wait = [t]; if (watch === null) startLoc(); return toast('Recherche de votre position… l\'itinéraire s\'affichera ensuite'); }
+  startRoute([t]);
+}
+function drawRoute(sx, sy) {
+  if (!RT.on || !RT.polys.length) return; g.save(); g.lineCap = 'round'; g.lineJoin = 'round';
+  const tr = (poly, w, col, dash) => { g.beginPath(); g.setLineDash(dash || []); poly.forEach((q, i) => i ? g.lineTo(sx(q[0]), sy(q[1])) : g.moveTo(sx(q[0]), sy(q[1]))); g.lineWidth = w; g.strokeStyle = col; g.stroke(); };
+  RT.polys.forEach((p, i) => { tr(p, 9, 'rgba(0,0,0,.45)'); tr(p, 5, i ? 'rgba(160,225,255,.95)' : '#19b5ff', i ? [9, 8] : null); });
+  g.setLineDash([]); g.font = '800 12px system-ui,sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  RT.tg.slice(RT.i).forEach((t, i) => { const x = sx(t.x), y = sy(t.y); g.beginPath(); g.arc(x, y, 11, 0, 7); g.fillStyle = '#19b5ff'; g.fill(); g.lineWidth = 2.5; g.strokeStyle = '#fff'; g.stroke(); g.fillStyle = '#fff'; g.fillText(String(RT.i + i + 1), x, y + .5); });
+  g.restore();
+}
+$('#rtb').onclick = () => RT.on ? rtClose() : startTour();
+$('#rtx').onclick = rtClose;
+$('#rtn').onclick = () => { RT.i++; if (RT.i >= RT.tg.length) return rtClose(); RT.t = 0; rtCompute(); rtUi(); draw(); };
+$('#rtg').onclick = () => { const t = RT.tg[RT.i]; if (!t) return; const [la, lo] = toLL(t.x, t.y); window.open(`https://www.google.com/maps/dir/?api=1&destination=${la.toFixed(6)},${lo.toFixed(6)}&travelmode=walking`, '_blank'); };
 
 /* ===== Position ===== */
 function onPos(p) { setTimeout(() => P.on && pmUpdate(), 0); if (samp) { const [mx, my] = toM(p.coords.latitude, p.coords.longitude); samp.push({ x: mx, y: my, a: p.coords.accuracy }); }
-  const [x, y] = toM(p.coords.latitude, p.coords.longitude); me = { x, y, acc: p.coords.accuracy }; const first = !hereK; hereK = idAt(x, y);
+  const [x, y] = toM(p.coords.latitude, p.coords.longitude); const first = !me; me = { x, y, acc: p.coords.accuracy }; hereK = nearestSpot(x, y, 15); updNav();
   if (first) { V.cx = x; V.cy = y; if (V.mpp > 4) V.mpp = 1.5; }
-  if (pending) { const p = pending; pending = false; p === 'visit' ? addVisit(hereK) : addFind(hereK); }
+  if (pending) { const p = pending; pending = false; p === 'visit' ? addVisit(hereK, [me.x, me.y]) : addFind(hereK, [me.x, me.y]); }
+  recTick(); routeTick();
   schedule();
 }
 function startLoc() {
   if (!navigator.geolocation) return toast('Géolocalisation indisponible');
   $('#loc').classList.add('on'); toast('Recherche de votre position…');
-  watch = navigator.geolocation.watchPosition(onPos, err => { stopLoc(); toast(err.code === 1 ? 'Position refusée : ouvrez la page en https:// et autorisez-la' : 'Position indisponible'); }, { enableHighAccuracy: true, maximumAge: 5000, timeout: 20000 });
+  wakeSync(); watch = navigator.geolocation.watchPosition(onPos, err => { stopLoc(); toast(err.code === 1 ? 'Position refusée : ouvrez la page en https:// et autorisez-la' : 'Position indisponible'); }, { enableHighAccuracy: true, maximumAge: 5000, timeout: 20000 });
 }
-function stopLoc() { if (watch !== null) navigator.geolocation.clearWatch(watch); watch = null; hereK = null; me = null; pending = false; $('#loc').classList.remove('on'); schedule(); }
+function stopLoc() { if (watch !== null) navigator.geolocation.clearWatch(watch); watch = null; if (RC.on) { RC.on = false; if (P.cur) finishPath(); } wakeSync(); hereK = null; me = null; pending = false; $('#loc').classList.remove('on'); schedule(); }
 $('#loc').onclick = () => watch === null ? startLoc() : (stopLoc(), toast('Localisation arrêtée'));
 const askGps = kind => { pending = kind; if (watch === null) startLoc(); else toast('Position pas encore trouvée…'); };
-$('#found').onclick = () => { const k = sel || hereK; if (k) return addFind(k); askGps('find'); };
-$('#visit').onclick = () => { const k = sel || hereK; if (k) return addVisit(k); askGps('visit'); };
+$('#found').onclick = () => { const [k, pos] = target(); if (k || pos) return addFind(k, pos); askGps('find'); };
+$('#visit').onclick = () => { const [k, pos] = target(); if (k || pos) return addVisit(k, pos); askGps('visit'); };
 
 /* ===== Menu, import / export, toast ===== */
 let tt; function toast(m, undo) { $('#tm').textContent = m; $('#tu').hidden = !undo; $('#tu').onclick = () => { undo && undo(); $('#toast').classList.remove('show'); }; $('#toast').classList.add('show'); clearTimeout(tt); tt = setTimeout(() => $('#toast').classList.remove('show'), undo ? 7000 : 3500); }
-$('#mn').onclick = () => { $('#info').textContent = Object.values(D.cells).filter(rec).length + ' case(s) enregistrée(s) · cases de 50 m'; $('#menu').classList.add('open'); };
+$('#mn').onclick = () => { $('#info').textContent = Object.values(D.cells).filter(rec).length + ' point(s) enregistré(s)'; $('#menu').classList.add('open'); };
 $('#rf').onclick = async () => { toast('🔄 Actualisation…'); try { if (navigator.serviceWorker) (await navigator.serviceWorker.getRegistrations()).forEach(r => r.unregister()); } catch (e) {} try { if (window.caches) (await caches.keys()).forEach(k => caches.delete(k)); } catch (e) {}
   setTimeout(() => { try { const u = new URL(location.href); u.searchParams.set('maj', Date.now()); location.replace(u.href); } catch (e) { location.reload(); } }, 400); };
 $('#mc').onclick = () => $('#menu').classList.remove('open'); $('#menu').onclick = e => { if (e.target.id === 'menu') $('#menu').classList.remove('open'); };
 $('#imp').onclick = () => $('#fi').click();
 $('#fi').onchange = e => { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { try { importData(JSON.parse(r.result)); $('#menu').classList.remove('open'); } catch (x) { toast('Fichier illisible'); } }; r.readAsText(f); e.target.value = ''; };
-$('#exp').onclick = async () => { const photos = {}; for (const c of Object.values(D.cells)) for (const p of c.ph) { try { const u = await pGet(p.id); if (u) photos[p.id] = u; } catch (e) {} } const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify({ app: 'carnet-cepes', version: 4, grid: 50, avg: D.avg, cells: D.cells, paths: D.paths || [], marks: D.marks || [], photos })], { type: 'application/json' })); a.download = 'carnet-cepes-' + today() + '.json'; a.click(); toast('💾 Exporté'); };
+$('#exp').onclick = async () => { const photos = {}; for (const c of Object.values(D.cells)) for (const p of c.ph) { try { const u = await pGet(p.id); if (u) photos[p.id] = u; } catch (e) {} } const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify({ app: 'carnet-cepes', version: 4, grid: 50, avg: D.avg, cells: D.cells, paths: D.paths || [], marks: D.marks || [], cal: D.cal || null, photos })], { type: 'application/json' })); a.download = 'carnet-cepes-' + today() + '.json'; a.click(); toast('💾 Exporté'); };
+$('#cal').onclick = () => { $('#menu').classList.remove('open'); calibrate(); };
+$('#calx').onclick = () => { D.cal = null; save(); wxCache.clear(); hm = null; if (hmOn) hmLoad(); renderPanel(); calLabel(); toast('Indice standard rétabli'); };
+calLabel();
 $('#avg').onclick = () => { const v = prompt('Poids moyen estimé d\'un cèpe (g)', D.avg); if (v && +v > 9) { D.avg = Math.round(+v); save(); renderPanel(); } };
 
 /* ===== Liste des cases avec trouvailles ===== */
@@ -547,7 +821,7 @@ function renderList() {
     return { k, c, n: cnt(c), w: c.v.reduce((a, v) => a + v.w, 0), last: c.v.reduce((a, v) => v.d > a ? v.d : a, ''), label: c.name || la.toFixed(4) + ', ' + lo.toFixed(4) }; });
   const it = all.filter(x => !q || x.label.toLowerCase().includes(q) || x.c.note.toLowerCase().includes(q));
   it.sort(lsort === 'recent' ? (a, b) => b.last.localeCompare(a.last) : (a, b) => b.n - a.n || b.w - a.w);
-  $('#lh').textContent = `📋 ${all.length} case(s) · ${all.reduce((a, x) => a + x.n, 0)} cèpes`;
+  $('#lh').textContent = `📋 ${all.length} point(s) · ${all.reduce((a, x) => a + x.n, 0)} cèpes`;
   document.querySelectorAll('.seg button').forEach(b => b.classList.toggle('on', b.dataset.s === lsort));
   const medal = ['🥇', '🥈', '🥉'];
   $('#ll').innerHTML = it.map((x, i) => `<li data-k="${x.k}"><span>${lsort === 'best' && !q && i < 3 ? medal[i] : '🍄'} <b>${esc(x.label)}</b><br><small>${ago(x.last)} · ${x.c.v.length} visite(s)</small></span><span class="bd"><b>${x.n} 🍄</b><br><small>${fmtW(x.w)}</small></span></li>`).join('')
@@ -611,7 +885,7 @@ async function scan() {      // télécharge les communes qui couvrent l'écran 
   } finally { scanning = false; }
 }
 const cmLabel = () => { $('#cmb').textContent = '🏘️ Limites des communes : ' + (commOn ? 'oui' : 'non'); };
-const foLabel = () => $('#fob').textContent = forOn ? '🌲 Forêts en vert : activé' : '🌲 Forêts en vert : désactivé';
+const foLabel = () => $('#fob').textContent = forOn ? '🌲 Forêts non propices en gris : activé' : '🌲 Forêts non propices en gris : désactivé';
 $('#fob').onclick = () => { forOn = !forOn; try { localStorage.setItem('cartocepe-forest', forOn ? '1' : '0'); } catch (e) {} foLabel(); schedule(); }; foLabel();
 $('#cmb').onclick = () => { commOn = !commOn; try { localStorage.setItem('cartocepe-comm', commOn ? '1' : '0'); } catch (e) {} cmLabel(); if (commOn) scan(); schedule(); };
 $('#mn').addEventListener('click', cmLabel); cmLabel();
@@ -647,7 +921,7 @@ const KB = [
 ];
 const rnd = a => a[Math.floor(Math.random() * a.length)];
 const dsince = d => Math.round((new Date(today() + 'T00:00') - new Date(d + 'T00:00')) / 864e5);
-const cl = (k, c) => c && c.name ? `« ${c.name} »` : 'la case ' + toLL(...ctr(k)).map(x => x.toFixed(3)).join(', ');
+const cl = (k, c) => c && c.name ? `« ${c.name} »` : 'le point ' + toLL(...ctr(k)).map(x => x.toFixed(3)).join(', ');
 const infos = () => Object.entries(D.cells).filter(([k, c]) => rec(c)).map(([k, c]) => ({ k, c, n: cnt(c), last: c.v.filter(v => v.n > 0).reduce((a, v) => v.d > a ? v.d : a, '') }));
 async function tipWx() {
   const best = infos().filter(x => x.n > 0).sort((a, b) => b.n - a.n)[0], k = sel || hereK || best?.k || idAt(V.cx, V.cy), c = D.cells[k], [la, lo] = toLL(...ctr(k));
@@ -667,12 +941,12 @@ async function tipWx() {
 const tipGens = [
   () => ({ t: rnd(KB) }), () => ({ t: rnd(KB) }), () => ({ t: rnd(KB) }),
   () => infos().length ? null : { t: `🍄 Enregistrez votre première trouvaille avec +1🍄 : l'appli pourra ensuite vous conseiller selon vos zones.` },
-  () => { const a = infos().filter(x => x.n > 0).sort((x, y) => y.n - x.n)[0]; return a && { t: `🏆 ${cl(a.k, a.c)} est votre case la plus fructueuse : ${a.n} cèpe(s) en ${a.c.v.length} visite(s). Repassez-y après les prochaines pluies.`, k: a.k }; },
+  () => { const a = infos().filter(x => x.n > 0).sort((x, y) => y.n - x.n)[0]; return a && { t: `🏆 ${cl(a.k, a.c)} est votre point le plus fructueux : ${a.n} cèpe(s) en ${a.c.v.length} visite(s). Repassez-y après les prochaines pluies.`, k: a.k }; },
   () => { const a = infos().filter(x => x.last && dsince(x.last) < 8); if (!a.length) return null; const x = rnd(a), s = dsince(x.last); return { t: `⏳ ${cl(x.k, x.c)} a été récoltée ${s <= 0 ? `aujourd'hui` : 'il y a ' + s + ' j'} : laissez-lui encore ~${Math.max(1, 8 - s)} jour(s) pour se regarnir.`, k: x.k }; },
   () => { const a = infos().filter(x => x.n > 0 && x.last && dsince(x.last) >= 21); if (!a.length) return null; const x = rnd(a); return { t: `🔁 ${cl(x.k, x.c)} n'a plus été récoltée depuis ${dsince(x.last)} jours : un passage de contrôle pourrait payer.`, k: x.k }; },
   () => { const m = {}, vs = infos().flatMap(x => x.c.v).filter(v => v.n > 0); if (vs.length < 2) return null; vs.forEach(v => { const k = +v.d.slice(5, 7) - 1; m[k] = (m[k] || 0) + v.n; }); const b = Object.entries(m).sort((x, y) => y[1] - x[1])[0]; return { t: `📅 Vos plus belles récoltes tombent en ${new Date(2000, +b[0], 1).toLocaleDateString('fr-FR', { month: 'long' })} (${b[1]} cèpes) : c'est votre période à surveiller.` }; },
   () => { const vs = infos().flatMap(x => x.c.v).filter(v => v.n > 0 && !v.e), n = vs.reduce((a, v) => a + v.n, 0); if (n < 3) return null; const avg = vs.reduce((a, v) => a + v.w, 0) / n; return Math.abs(avg - D.avg) / D.avg > .25 ? { t: `⚖️ Vos cèpes pesés font ${Math.round(avg)} g en moyenne, contre ${D.avg} g réglés dans les options : ajustez « Poids moyen » pour des estimations plus justes.` } : null; },
-  () => { const a = infos().filter(x => x.n >= 2); if (!a.length) return null; const x = rnd(a), [i, j] = x.k.split(',').map(Number), e = []; for (let di = -1; di <= 1; di++) for (let dj = -1; dj <= 1; dj++) { const k = (i + di) + ',' + (j + dj); if ((di || dj) && !rec(D.cells[k])) e.push(k); } return e.length ? { t: `🧭 Autour de ${cl(x.k, x.c)}, ${e.length} case(s) voisine(s) sont encore vierges : les cèpes poussent souvent en groupe, explorez-les.`, k: rnd(e) } : null; },
+  () => { return null; const a = infos().filter(x => x.n >= 2); if (!a.length) return null; const x = rnd(a), [i, j] = x.k.split(',').map(Number), e = []; for (let di = -1; di <= 1; di++) for (let dj = -1; dj <= 1; dj++) { const k = (i + di) + ',' + (j + dj); if ((di || dj) && !rec(D.cells[k])) e.push(k); } return e.length ? { t: `🧭 Autour de ${cl(x.k, x.c)}, ${e.length} case(s) voisine(s) sont encore vierges : les cèpes poussent souvent en groupe, explorez-les.`, k: rnd(e) } : null; },
   tipWx, tipWx
 ];
 let lastTip = '', tipBusy = false, tipK = null;
@@ -690,18 +964,22 @@ $('#tipg').onclick = () => { if (!tipK) return; const k = tipK; closeTip(); flyT
 /* ===== Chemins : lignes posées point par point avec le GPS (coordonnées en mètres Mercator) ===== */
 function drawPaths(sx, sy) {
   const ps = D.paths || []; if (!ps.length && !P.start) return;
-  g.save(); g.lineCap = 'round'; g.lineJoin = 'round';
+  const fa = P.on ? 1 : Math.max(0, Math.min(1, Math.log2(80 / V.mpp) / Math.log2(80 / 6)));      // plein à fort zoom (≤ 6 m/px), invisible vers 80 m/px ; toujours plein en mode chemins
+  g.save(); g.lineCap = 'round'; g.lineJoin = 'round'; g.globalAlpha = fa;
   const trace = p => { g.beginPath(); p.pts.forEach(([x, y], i) => i ? g.lineTo(sx(x), sy(y)) : g.moveTo(sx(x), sy(y))); g.stroke(); };
   ps.forEach(p => { g.lineWidth = 7; g.strokeStyle = 'rgba(0,0,0,.25)'; trace(p); g.lineWidth = 4; g.strokeStyle = p.id === P.sel ? 'rgba(255,255,255,.8)' : 'rgba(255,190,60,.7)'; trace(p); });
   const cnt = new Map(); ps.forEach(p => p.pts.forEach(([x, y]) => { const k = x + ',' + y; cnt.set(k, (cnt.get(k) || 0) + 1); }));      // sommet partagé = carrefour
   if (P.on) ps.forEach(p => p.pts.forEach(([x, y], i) => { const e = i === 0 || i === p.pts.length - 1, j = cnt.get(x + ',' + y) > 1; g.beginPath(); g.arc(sx(x), sy(y), j ? 6 : e ? 4.5 : 3, 0, 7); g.fillStyle = j ? 'rgba(255,255,255,.95)' : p.id === P.sel ? 'rgba(255,255,255,.85)' : 'rgba(255,190,60,.8)'; g.fill(); g.lineWidth = j ? 2.5 : 1.5; g.strokeStyle = j ? 'rgb(212,169,74)' : 'rgba(59,36,18,.7)'; g.stroke(); }));
+  if (fa > .6 && V.mpp < 12) { g.font = '700 12px system-ui,sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineWidth = 4; g.lineJoin = 'round';
+    ps.forEach(p => { if (!p.name) return; const m = p.pts[p.pts.length >> 1], x = sx(m[0]), y = sy(m[1]) - 10; g.strokeStyle = 'rgba(0,0,0,.7)'; g.strokeText(p.name, x, y); g.fillStyle = '#fff'; g.fillText(p.name, x, y); }); }
+  g.globalAlpha = 1;
   if (P.start) { const x = sx(P.start[0]), y = sy(P.start[1]); g.beginPath(); g.arc(x, y, 10, 0, 7); g.lineWidth = 3; g.strokeStyle = 'rgba(255,255,255,.9)'; g.stroke(); g.beginPath(); g.arc(x, y, 5, 0, 7); g.fillStyle = 'rgba(255,120,40,.9)'; g.fill(); }
   g.restore();
 }
 function pmUpdate() {
-  const n = (D.paths || []).length, gps = me ? ' · GPS ±' + Math.round(me.acc) + ' m' : ' · GPS en attente';
-  $('#pmt').textContent = (P.cur ? `🥾 Chemin en cours : ${P.cur.pts.length} points. Marchez, puis 📍 Point (virage ou fin), ✔ pour finir.` : P.start ? `📍 Départ posé. Marchez en ligne droite, puis 📍 Point.` : `🥾 ${n} chemin(s). 📍 Point pose un départ ; touchez une ligne pour repartir de n'importe quel endroit (début, milieu ou bout). Les croisements deviennent des carrefours 🔀.`) + gps;
-  $('#pmd').hidden = !P.sel; $('#pt').classList.toggle('on', P.on); $('#pm').hidden = !P.on;
+  const n = (D.paths || []).length, sp = (D.paths || []).find(p => p.id === P.sel), totLen = (D.paths || []).reduce((a, p) => a + pathLen(p), 0), gps = me ? ' · GPS ±' + Math.round(me.acc) + ' m' : ' · GPS en attente';
+  $('#pmt').textContent = (P.cur ? `${RC.on ? '⏺ Enregistrement' : '🥾 Chemin en cours'} : ${P.cur.pts.length} points · ${fmtDist(pathLen(P.cur))}. ${RC.on ? 'Marchez, les points se posent tout seuls.' : 'Marchez, puis 📍 Point (virage ou fin), ✔ pour finir.'}` : P.start ? `📍 Départ posé. Marchez en ligne droite, puis 📍 Point.` : (sp ? `🥾 « ${sp.name || 'Sans nom'} » · ${fmtDist(pathLen(sp))}. ` : `🥾 ${n} chemin(s) · ${fmtDist(totLen)}. `) + `📍 Point pose un départ ; ⏺ enregistre en marchant ; touchez une ligne pour repartir de là.`) + gps;
+  $('#pmd').hidden = !P.sel; $('#pmn').hidden = !(P.sel || P.cur); $('#pmrec').textContent = RC.on ? '⏹ Arrêter' + (P.cur ? ' · ' + P.cur.pts.length + ' pts' : '') : '⏺ Enregistrer'; $('#pmrec').classList.toggle('rec', RC.on); $('#pt').classList.toggle('on', P.on); $('#pm').hidden = !P.on;
 }
 const segProj = (p, a, b) => { const dx = b[0] - a[0], dy = b[1] - a[1], l2 = dx * dx + dy * dy, t = l2 ? Math.max(0, Math.min(1, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / l2)) : 0, q = [a[0] + t * dx, a[1] + t * dy]; return { q, t, d: Math.hypot(p[0] - q[0], p[1] - q[1]) }; };
 const segInter = (a, b, c, d) => {      // croisement strict de [a,b] et [c,d] (hors extrémités)
@@ -721,17 +999,18 @@ function commitStart() {      // un départ posé au milieu d'un trait devient u
   const b = nearSeg(p, P.start); if (!b || b.d > 3) return 0;
   const v = junction(p, b.i, P.start); P.start = [v[0], v[1]]; return 1;
 }
-function placePt(me) {
-  if (!me) { toast('Position GPS introuvable : patientez un instant'); if (watch === null) startLoc(); return; }
+function placePt(me, quiet) {
+  const T = m => { if (!quiet) T(m); };
+  if (!me) { T('Position GPS introuvable : patientez un instant'); if (watch === null) startLoc(); return; }
   const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]), last = P.cur ? P.cur.pts[P.cur.pts.length - 1] : P.start, gp = [me.x, me.y];
   const others = (D.paths || []).filter(p => p !== P.cur), away = (p, i, a) => !a || segProj(a, p.pts[i], p.pts[i + 1]).d > 2;      // ignore le tronçon qu'on quitte
   let pt = gp, bd = 10, vtx = false, hit = null;      // s'aimante sur un point existant à moins de 10 m (carrefours)
-  (D.paths || []).forEach(p => p.pts.forEach(q => { if (last && q[0] === last[0] && q[1] === last[1]) return; const d = dist(q, gp); if (d < bd) { bd = d; pt = q; vtx = true; } }));
+  (D.paths || []).forEach(p => p.pts.forEach((q, qi) => { if (quiet && p === P.cur && qi >= p.pts.length - 4) return; if (last && q[0] === last[0] && q[1] === last[1]) return; const d = dist(q, gp); if (d < bd) { bd = d; pt = q; vtx = true; } }));
   if (!vtx) {      // arrivée au milieu d'un trait : on s'y accroche, et le point devient un carrefour
     let sd = Math.min(12, Math.max(6, me.acc));
     others.forEach(p => { for (let i = 0; i + 1 < p.pts.length; i++) { if (!away(p, i, last)) continue; const r = segProj(gp, p.pts[i], p.pts[i + 1]); if (r.d < sd) { sd = r.d; hit = { p, i }; pt = r.q; } } });
   }
-  if (last && dist(last, pt) < 2.5) return toast(`Déplacez-vous avant d'ajouter un point`);
+  if (last && dist(last, pt) < 2.5) return T(`Déplacez-vous avant d'ajouter un point`);
   let nj = commitStart(), q = rp1(pt);
   const from = P.cur ? P.cur.pts[P.cur.pts.length - 1] : P.start, X = [];
   if (hit && from) { const v = junction(hit.p, hit.i, q); q = [v[0], v[1]]; nj++; }
@@ -743,9 +1022,9 @@ function placePt(me) {
   X.forEach(x => { x.v = junction(x.p, x.i, x.q); });
   X.sort((a, b) => a.t - b.t); nj += X.length;
   const mids = X.map(x => [x.v[0], x.v[1]]), acc = ' (±' + Math.round(me.acc) + ' m)', jt = nj ? ' · 🔀 ' + nj + ' carrefour' + (nj > 1 ? 's' : '') : '';
-  if (P.cur) { P.cur.pts.push(...mids, q); P.adds.push(mids.length + 1); toast('📍 Point ' + P.cur.pts.length + acc + jt); }
-  else if (P.start) { P.cur = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), pts: [P.start, ...mids, q] }; P.adds = [mids.length + 1]; (D.paths ||= []).push(P.cur); P.start = null; P.sel = null; toast('🥾 Chemin tracé' + acc + jt); }
-  else { P.start = q; P.sa = hit ? hit.p.id : null; toast(hit ? '📍 Départ posé sur un trait (carrefour)' + acc + ' : marchez, puis rappuyez' : '📍 Départ posé' + acc + ' : marchez, puis rappuyez'); }
+  if (P.cur) { P.cur.pts.push(...mids, q); P.adds.push(mids.length + 1); T('📍 Point ' + P.cur.pts.length + acc + jt); }
+  else if (P.start) { P.cur = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), pts: [P.start, ...mids, q] }; P.adds = [mids.length + 1]; (D.paths ||= []).push(P.cur); P.start = null; P.sel = null; T('🥾 Chemin tracé' + acc + jt); }
+  else { P.start = q; P.sa = hit ? hit.p.id : null; T(hit ? '📍 Départ posé sur un trait (carrefour)' + acc + ' : marchez, puis rappuyez' : '📍 Départ posé' + acc + ' : marchez, puis rappuyez'); }
   save(); pmUpdate(); draw();
 }
 let samp = null;
@@ -781,7 +1060,9 @@ function pathTap(px, py) {      // toucher une ligne : la sélectionne et pose l
   pmUpdate(); draw(); toast(mid ? '📍 Départ posé au milieu du chemin (carrefour) : marchez, puis 📍 Point' : '📍 Départ posé sur ce point du chemin : marchez, puis 📍 Point');
 }
 $('#pt').onclick = () => { P.on = !P.on; if (P.on) { if (watch === null) startLoc(); } else { P.cur = null; P.start = null; P.sel = null; P.sa = null; P.adds = []; } pmUpdate(); draw(); };
-$('#pmp').onclick = addPathPt; $('#pmu').onclick = undoPathPt; $('#pme').onclick = finishPath; $('#pmd').onclick = delPath; $('#pmx').onclick = () => $('#pt').click();
+$('#pmp').onclick = addPathPt; $('#pmu').onclick = undoPathPt; $('#pme').onclick = finishPath; $('#pmd').onclick = delPath; $('#pmx').onclick = () => { if (RC.on) recToggle(); $('#pt').click(); };
+$('#pmrec').onclick = recToggle;
+$('#pmn').onclick = () => { const id = P.sel || (P.cur && P.cur.id), p = (D.paths || []).find(x => x.id === id); if (!p) return; const nm = prompt('Nom du chemin', p.name || ''); if (nm === null) return; p.name = nm.trim().slice(0, 60); save(); pmUpdate(); draw(); };
 pmUpdate();
 
 /* ===== Carte hors connexion : tuiles « épinglées » (jamais purgées), téléchargement reprenable, 6 requêtes en parallèle ===== */
@@ -835,61 +1116,11 @@ $('#dlm').onclick = async e => { if (e.target.id === 'dlm' || e.target.id === 'd
     if (free < need * 1.3 && !confirm(`Espace libre estimé : ${Math.round(free / 1048576)} Mo, besoin ≈ ${fmtMo(list.length)}. Continuer quand même ?`)) return; } catch (e) {}
   dlTiles(list, 'Zone 20 km'); };
 
-/* ===== Routes forestières : pistes OpenStreetMap (highway=track), en transparence, uniquement dans les forêts (masque IGN) ===== */
-let roOn = (() => { try { return localStorage.getItem('cartocepe-roads') !== '0'; } catch (e) { return true; } })();
-const rdbP = new Promise(res => { try { const r = indexedDB.open('cartocepe-roads', 1); r.onupgradeneeded = () => r.result.createObjectStore('r'); r.onsuccess = () => res(r.result); r.onerror = () => res(null); } catch (e) { res(null); } });
-const rget = async k => { const db = await rdbP; if (!db) return null; return new Promise(res => { try { const q = db.transaction('r').objectStore('r').get(k); q.onsuccess = () => res(q.result || null); q.onerror = () => res(null); } catch (e) { res(null); } }); };
-const rput = async (k, v) => { const db = await rdbP; if (!db) return; try { db.transaction('r', 'readwrite').objectStore('r').put(v, k); } catch (e) {} };
-const RSPAN = 256 * 156543.03392 / 2 ** 14, rtiles = new Map(), ROV = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter'];
-let rQ = [], rBusy = 0, rErrT = 0, rcv = null, mcv = null;
-async function rFetch(tx, ty) {      // pistes d'une tuile zoom 14 → lignes aplaties [x, y, x, y…] en mètres Mercator
-  const [s, w] = toLL(tx * RSPAN - O, O - (ty + 1) * RSPAN), [n, e] = toLL((tx + 1) * RSPAN - O, O - ty * RSPAN);
-  const q = `[out:json][timeout:25];way["highway"="track"](${s.toFixed(5)},${w.toFixed(5)},${n.toFixed(5)},${e.toFixed(5)});out geom;`; let err;
-  for (const u of ROV) { try { const r = await fetch(u, { method: 'POST', body: 'data=' + encodeURIComponent(q), headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }); if (!r.ok) throw new Error(r.status);
-      return ((await r.json()).elements || []).filter(el => el.geometry && el.geometry.length > 1).map(el => el.geometry.flatMap(p => { const [x, y] = toM(p.lat, p.lon); return [+x.toFixed(1), +y.toFixed(1)]; })); } catch (e2) { err = e2; } }
-  throw err;
-}
-function rTile(tx, ty) {
-  const k = tx + '/' + ty; let t = rtiles.get(k);
-  if (!t) { t = { w: null }; rtiles.set(k, t);
-    rget(k).then(c => { if (c && c.w) { t.w = c.w; schedule(); if (Date.now() - c.t < 7.8e9) return; }      // en cache : on le garde 90 jours
-      rQ.push([k, tx, ty, t]); while (rQ.length > 12) rtiles.delete(rQ.shift()[0]); rPump(); }); }
-  return t;
-}
-async function rPump() {
-  if (rBusy >= 2 || !rQ.length) return; rBusy++; const [k, tx, ty, t] = rQ.shift();
-  try { const w = await rFetch(tx, ty); t.w = w; rput(k, { w, t: Date.now() }); schedule(); }
-  catch (e) { if (!t.w) { if (Date.now() - rErrT > 20000) { rErrT = Date.now(); toast('Routes forestières indisponibles (connexion ?)'); } setTimeout(() => { if (rtiles.get(k) === t) rtiles.delete(k); }, 30000); } }
-  rBusy--; setTimeout(rPump, 600);
-}
-function drawRoads(sx, sy, W, H, x0, x1, y0, y1, mpp, Z, dpr) {
-  if (!roOn || mpp > 8) return;
-  const tl = [];
-  for (let ty = Math.max(0, Math.floor((O - y1) / RSPAN)); ty <= Math.floor((O - y0) / RSPAN); ty++) for (let tx = Math.max(0, Math.floor((x0 + O) / RSPAN)); tx <= Math.floor((x1 + O) / RSPAN); tx++) tl.push(rTile(tx, ty));
-  if (!tl.some(t => t.w)) return;
-  rcv ||= document.createElement('canvas'); mcv ||= document.createElement('canvas');
-  for (const c of [rcv, mcv]) if (c.width !== cv.width || c.height !== cv.height) { c.width = cv.width; c.height = cv.height; }
-  const r = rcv.getContext('2d'), m = mcv.getContext('2d'), path = new Path2D();
-  tl.forEach(t => t.w && t.w.forEach(a => { for (let i = 0; i < a.length; i += 2) i ? path.lineTo(sx(a[i]), sy(a[i + 1])) : path.moveTo(sx(a[0]), sy(a[1])); }));
-  r.setTransform(dpr, 0, 0, dpr, 0, 0); r.clearRect(0, 0, W, H); r.lineCap = r.lineJoin = 'round';
-  r.lineWidth = 4.4; r.strokeStyle = 'rgba(0,0,0,.4)'; r.stroke(path); r.lineWidth = 2.2; r.strokeStyle = '#f4f1e8'; r.stroke(path);
-  /* masque : on ne garde les routes que là où le masque forêt IGN est présent (tuile non disponible = pas de découpe) */
-  m.setTransform(dpr, 0, 0, dpr, 0, 0); m.clearRect(0, 0, W, H); m.fillStyle = '#000';
-  const fz = Math.min(Z, 17), ms = 256 * 156543.03392 / 2 ** fz, mz = ms / mpp + .6;
-  for (let fy = Math.max(0, Math.floor((O - y1) / ms)); fy <= Math.floor((O - y0) / ms); fy++) for (let fx = Math.max(0, Math.floor((x0 + O) / ms)); fx <= Math.floor((x1 + O) / ms); fx++) {
-    const t = ftile(fz, fx, fy); if (!t.hk) { t.hk = 1; t.p.then(() => { t.settled = true; schedule(); }); }
-    const dx = sx(fx * ms - O), dy = sy(O - fy * ms);
-    if (t.c) m.drawImage(t.c, dx, dy, mz, mz); else if (t.settled) m.fillRect(dx, dy, mz, mz); }
-  r.setTransform(1, 0, 0, 1, 0, 0); r.globalCompositeOperation = 'destination-in'; r.drawImage(mcv, 0, 0); r.globalCompositeOperation = 'source-over';
-  g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = .6; g.drawImage(rcv, 0, 0); g.restore();
-}
-const roLabel = () => { $('#rob').textContent = roOn ? '🛤️ Routes forestières : affichées' : '🛤️ Routes forestières : masquées'; };
-$('#rob').onclick = () => { roOn = !roOn; try { localStorage.setItem('cartocepe-roads', roOn ? '1' : '0'); } catch (e) {} roLabel(); schedule(); if (roOn && V.mpp > 8) toast('🛤️ Zoomez pour voir les routes forestières'); }; roLabel();
 
 /* ===== Démarrage ===== */
-load();
+load(); calLabel();
 if (!Object.keys(D.cells).length) {      // ancien carnet présent sur cet appareil (même adresse) : proposer la conversion
-  try { const old = JSON.parse(localStorage.getItem('carnet-cepes-v2') || 'null'); if (old && Array.isArray(old.maps) && confirm('Un ancien carnet a été trouvé sur cet appareil. Le convertir en cases de 50 m ?')) importData(old); } catch (e) {}
+  try { const old = JSON.parse(localStorage.getItem('carnet-cepes-v2') || 'null'); if (old && Array.isArray(old.maps) && confirm('Un ancien carnet a été trouvé sur cet appareil. Le convertir en points précis ?')) importData(old); } catch (e) {}
 }
 if (Object.keys(D.cells).length) fitData(); else { [V.cx, V.cy] = toM(46.6, 2.5); V.mpp = 1500; }
 /* ===== Réactions : repères avec icône et note (icônes dessinées en SVG) ===== */
@@ -905,7 +1136,7 @@ function markAt(px, py) {
   return best;
 }
 function here() { return me ? { x: me.x, y: me.y, where: 'gps' } : { x: V.cx, y: V.cy, where: 'center' }; }
-function mkWhere() { const e = MKE; $('#mkw').textContent = (e.id ? 'Placée le ' + fmtD(e.d) + ' · ' : '') + (e.moved ? (me ? '📍 déplacée à votre position (±' + Math.round(me.acc) + ' m)' : '🎯 déplacée au centre de la carte') : e.id ? 'position inchangée' : e.where === 'gps' ? '📍 À votre position (±' + Math.round(me.acc) + ' m)' : '🎯 Au centre de la carte (activez 📍 pour utiliser votre position)'); }
+function mkWhere() { const e = MKE; $('#mkw').textContent = (e.id ? 'Placée le ' + fmtD(e.d) + ' · ' : '') + (e.moved ? (me ? '📍 déplacée à votre position (±' + Math.round(me.acc) + ' m)' : '🎯 déplacée au centre de la carte') : e.id ? 'position inchangée' : e.where === 'tap' ? '\ud83d\udccd Pos\u00e9e l\u00e0 o\u00f9 vous avez touch\u00e9' : e.where === 'gps' ? '📍 À votre position (±' + Math.round(me.acc) + ' m)' : '🎯 Au centre de la carte (activez 📍 pour utiliser votre position)'); }
 function openMk(e) {
   MKE = e; $('#mkt').textContent = e.id ? '📌 Modifier la réaction' : '📌 Nouvelle réaction'; $('#mkn').value = e.note || '';
   $('#mkg').innerHTML = Object.keys(MK).map(t => `<button class="mki${t === e.t ? ' on' : ''}" data-t="${t}" aria-label="${MK[t][0]}">${mkSvg(t)}<span>${MK[t][0]}</span></button>`).join('');
@@ -913,7 +1144,11 @@ function openMk(e) {
 }
 const closeMk = () => $('#mkm').classList.remove('open');
 function openMark(id) { const m = (D.marks || []).find(x => x.id === id); if (m) openMk({ ...m }); }
-$('#react').onclick = () => openMk({ id: null, t: mkLast, note: '', ...here() });
+var RM = false;
+function setRM(on) { RM = on; $('#rm').hidden = !on; $('#react').classList.toggle('on', on); if (on && P.on) $('#pt').click(); if (!on) closeMk(); draw(); }
+$('#react').onclick = () => setRM(!RM); $('#rmx').onclick = () => setRM(false);
+$('#rmg').onclick = () => { if (!me) { if (watch === null) startLoc(); return toast('Position en attente : réessayez dans un instant, ou touchez la carte'); } openMk({ id: null, t: mkLast, note: '', x: me.x, y: me.y, where: 'gps' }); };
+{ const pt0 = $('#pt').onclick; $('#pt').onclick = e => { if (!P.on) setRM(false); pt0(e); }; }
 $('#mkg').onclick = e => { const b = e.target.closest('.mki'); if (!b) return; MKE.t = b.dataset.t; document.querySelectorAll('.mki').forEach(x => x.classList.toggle('on', x === b)); };
 $('#mkv').onclick = () => { Object.assign(MKE, here(), { moved: true }); mkWhere(); };
 $('#mkc').onclick = closeMk; $('#mkm').onclick = e => { if (e.target.id === 'mkm') closeMk(); };
@@ -924,5 +1159,43 @@ $('#mks').onclick = () => {
   mkLast = e.t; save(); closeMk(); draw(); toast(MK[e.t][0] + ' enregistré', () => { D.marks = JSON.parse(snap); save(); draw(); });
 };
 $('#mkd').onclick = () => { const snap = JSON.stringify(D.marks || []); D.marks = D.marks.filter(x => x.id !== MKE.id); save(); closeMk(); draw(); toast('Réaction supprimée', () => { D.marks = JSON.parse(snap); save(); draw(); }); };
+/* ===== Points précis : chaque trouvaille a ses coordonnées exactes (plus de cases) ===== */
+function newSpot(x, y) { const k = 's' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5); D.cells[k] = { ...blank(), x, y }; return k; }
+function nearestSpot(x, y, m) { let best = null, bd = m; Object.entries(D.cells).forEach(([k, c]) => { if (!rec(c) || c.x == null) return; const d = rdist([x, y], [c.x, c.y]); if (d < bd) { bd = d; best = k; } }); return best; }
+function spotAt(px, py) {
+  const W = cv.clientWidth, H = cv.clientHeight; const ps = spotSz(); let best = null, bd = Math.max(28, ps * .75);
+  Object.entries(D.cells).forEach(([k, c]) => { if (!rec(c) || c.x == null) return; const d = Math.hypot(px - ((c.x - V.cx) / V.mpp + W / 2), py - (H / 2 - (c.y - V.cy) / V.mpp - ps / 2)); if (d < bd) { bd = d; best = k; } });
+  return best;
+}
+function target() { if (me) { const near = sel && D.cells[sel] && rdist(ctr(sel), [me.x, me.y]) < 40; return near ? [sel, null] : [hereK, [me.x, me.y]]; } return [sel, null]; }
+function longSpot(px, py) {      // appui long sur la carte : pose un point exactement là
+  const r = cv.getBoundingClientRect(), snap = JSON.stringify(D), k = newSpot(V.cx + (px - r.left - r.width / 2) * V.mpp, V.cy - (py - r.top - r.height / 2) * V.mpp);
+  save(); try { navigator.vibrate && navigator.vibrate(60); } catch (e) {} select(k); toast('\ud83d\udccd Point pos\u00e9 ici : nommez-le ou ajoutez une visite', () => { restoreSnap(snap); save(); draw(); renderPanel(); });
+}
+function navTxt(k) {
+  const [x, y] = ctr(k), [la, lo] = toLL(x, y); if (!me) return '\ud83d\udccd ' + la.toFixed(5) + ', ' + lo.toFixed(5) + ' \u00b7 activez \ud83d\udccd pour \u00eatre guid\u00e9';
+  const d = rdist([x, y], [me.x, me.y]); if (d < 4) return '\ud83c\udfaf Vous y \u00eates (\u00b1' + Math.round(me.acc) + ' m)';
+  const i = Math.round(((Math.atan2(x - me.x, y - me.y) * 180 / Math.PI + 360) % 360) / 45) % 8;
+  return '\ud83e\udded <b>' + (d < 1000 ? Math.round(d) + ' m' : (d / 1000).toFixed(1) + ' km') + '</b> ' + ['\u2191', '\u2197', '\u2192', '\u2198', '\u2193', '\u2199', '\u2190', '\u2196'][i] + ' ' + ['nord', 'nord-est', 'est', 'sud-est', 'sud', 'sud-ouest', 'ouest', 'nord-ouest'][i] + ' (\u00b1' + Math.round(me.acc) + ' m)';
+}
+function navLine(k) { return ''; }
+function updNav() { const e = $('#nvt'); if (e && sel && D.cells[sel]) e.innerHTML = navTxt(sel); }
+/* ===== Tap : 1 = action, 2 = zoom doux à l'endroit touché, 3 = dézoom doux ===== */
+function onTap(e) { const r = cv.getBoundingClientRect(); const pt = spotAt(e.clientX - r.left, e.clientY - r.top), mk = markAt(e.clientX - r.left, e.clientY - r.top); if (RM) { if (mk) openMark(mk.id); else openMk({ id: null, t: mkLast, note: '', x: V.cx + (e.clientX - r.left - r.width / 2) * V.mpp, y: V.cy - (e.clientY - r.top - r.height / 2) * V.mpp, where: 'tap' }); } else if (P.on) pathTap(e.clientX - r.left, e.clientY - r.top); else if (pt && pt !== sel) { select(pt); flyTo(pt); } else if (sel) { sel = null; collapse(); renderPanel(); draw(); } }
+var TT = { t: 0, n: 0, x: 0, y: 0, timer: 0 };
+function multiTap(e) {
+  const now = performance.now(), same = now - TT.t < 330 && Math.hypot(e.clientX - TT.x, e.clientY - TT.y) < 36;
+  TT.n = same ? TT.n + 1 : 1; TT.t = now; TT.x = e.clientX; TT.y = e.clientY; clearTimeout(TT.timer);
+  if (TT.n === 1) { const ev = { clientX: e.clientX, clientY: e.clientY }; TT.timer = setTimeout(() => onTap(ev), 300); }      // l'action d'un tap simple attend de savoir s'il y en a d'autres
+  else if (TT.n === 2) zoomSmooth(2.6, e.clientX, e.clientY);
+  else { zoomSmooth(1 / 3.2, e.clientX, e.clientY); TT.n = 0; }
+}
+function zoomSmooth(f, px, py) {      // zoom animé qui garde le point touché sous le doigt
+  const r = cv.getBoundingClientRect(), dx = px - r.left - r.width / 2, dy = py - r.top - r.height / 2, ox = V.cx + dx * V.mpp, oy = V.cy - dy * V.mpp;
+  const m0 = V.mpp, m1 = Math.min(3000, Math.max(.3, m0 / f)), t0 = performance.now(), id = ++fly;
+  const step = now => { if (id !== fly) return; const p = Math.min(1, (now - t0) / 320), e = 1 - (1 - p) ** 3, m = Math.exp(Math.log(m0) + (Math.log(m1) - Math.log(m0)) * e);
+    V.mpp = m; V.cx = ox - dx * m; V.cy = oy + dy * m; draw(); if (p < 1) requestAnimationFrame(step); };
+  requestAnimationFrame(step);
+}
 renderPanel(); draw();
 </script></body></html>
