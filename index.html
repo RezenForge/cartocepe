@@ -405,7 +405,6 @@ const SV = p => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${p}</svg
 const ICO = {
   loc: SV('<circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.2" fill="currentColor"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>'),
   set: SV('<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>'),
-  tip: SV('<path d="M10 3.6a2 2 0 0 1 4 0"/><path d="M8.5 6h7l1 3h-9zM8.5 9v8.5M15.5 9v8.5M7 19.5h10M8.5 17.5h7"/><path d="M12 11.3c1.1 1.3 1.1 2.5 0 3.5-1.1-1-1.1-2.2 0-3.5z" fill="currentColor"/>'),
   wx: SV('<path d="M7 15a4 4 0 1 1 .9-7.9A5 5 0 0 1 17.5 9 3 3 0 0 1 17 15z"/><path d="M9 18l-1 2.2M13 18l-1 2.2M17 18l-1 2.2"/>'),
   trail: SV('<circle cx="5" cy="18.5" r="2"/><circle cx="19" cy="5.5" r="2"/><path d="M7.2 18.5H13a3.2 3.2 0 0 0 0-6.4h-2a3.2 3.2 0 0 1 0-6.4h5.8" stroke-dasharray="2.4 2.6"/>'),
   compass: SV('<circle cx="12" cy="12" r="9"/><path d="M15.6 8.4l-2.1 5.1-5.1 2.1 2.1-5.1z" fill="currentColor" fill-opacity=".22"/><circle cx="12" cy="12" r=".9" fill="currentColor"/>'),
@@ -434,7 +433,6 @@ const crest = (k, s = 30) => `<svg class="crest" width="${s}" height="${s}" view
 /* Potentiel de pousse : 4 niveaux, comme une rareté */
 const TIERS = [{ n: 'Dormant', c: '#7a7468', b: '#bdb5a2' }, { n: 'Prometteur', c: '#8d5c17', b: '#cf9a45' }, { n: 'Favorable', c: '#43701f', b: '#86ad4f' }, { n: 'Exceptionnel', c: '#8a5a00', b: '#e7b440' }];
 const tierOf = s => TIERS[s >= 70 ? 3 : s >= 50 ? 2 : s >= 30 ? 1 : 0];
-const pips = s => { const k = s >= 70 ? 4 : s >= 50 ? 3 : s >= 30 ? 2 : s >= 10 ? 1 : 0; return `<span class="pips" style="--pc:${tierOf(s).b}" aria-hidden="true">${[0, 1, 2, 3].map(i => `<i${i < k ? ' class="f"' : ''}></i>`).join('')}</span>`; };
 const sw = (label, on) => `<span>${label}</span><em class="sw${on ? ' on' : ''}" aria-hidden="true"></em>`;
 { const d = new Date(), m = d.getMonth(), s = m >= 2 && m <= 4 ? 'Printemps' : m >= 5 && m <= 7 ? 'Été' : m >= 8 && m <= 10 ? 'Automne' : 'Hiver'; document.getElementById('ssn').textContent = 'Carnet · ' + s + ' ' + d.getFullYear(); }
 function journal() {      // journal d'exploration : bilan de toutes les sorties
@@ -462,7 +460,9 @@ const cnt = c => c ? c.v.reduce((a, v) => a + v.n, 0) : 0;
 let D = { cells: {}, avg: 150, paths: [], marks: [] }, sel = null, hereK = null, me = null, watch = null, pending = false, V = { cx: 0, cy: 0, mpp: 1500 }, P = { on: false, cur: null, start: null, sel: null, sa: null, adds: [] };
 
 /* ===== Sauvegarde ===== */
-function save() { try { localStorage.setItem(KEY, JSON.stringify(D)); } catch (e) { toast('Stockage plein : exportez vos données'); } }
+let saveT = 0; const saveSoon = () => { clearTimeout(saveT); saveT = setTimeout(save, 400); };
+addEventListener('pagehide', () => { if (saveT) { clearTimeout(saveT); save(); } });
+function save() { clearTimeout(saveT); saveT = 0; try { localStorage.setItem(KEY, JSON.stringify(D)); } catch (e) { toast('Stockage plein : exportez vos données'); } }
 function clean(c) { const ok = c && c.x != null && c.y != null && isFinite(c.x) && isFinite(c.y); return { ...(ok ? { x: +c.x, y: +c.y } : {}), name: String(c?.name || ''), note: String(c?.note || ''), ph: (Array.isArray(c?.ph) ? c.ph : []).filter(p => p && /^[\w-]+$/.test(String(p.id))).map(p => ({ id: String(p.id), d: /^\d{4}-\d\d-\d\d$/.test(p.d) ? p.d : '' })), v: (Array.isArray(c?.v) ? c.v : []).filter(v => v && /^\d{4}-\d\d-\d\d$/.test(v.d)).map(v => ({ d: v.d, n: Math.max(0, Math.round(+v.n || 0)), w: Math.max(0, +v.w || 0), e: !!v.e, t: String(v.t || '') })) }; }
 function mergeCell(k, c, pos) {      // fusionne sans doublon (importer deux fois le même fichier ne double rien)
   c = clean(c); const a = D.cells[k] ||= blank(); if (a.x == null) { const q = c.x != null ? [c.x, c.y] : pos || (/^-?\d+,-?\d+$/.test(k) ? legacyCtr(k) : null); if (q) { a.x = q[0]; a.y = q[1]; } } const sig = v => [v.d, v.n, Math.round(v.w), v.t].join('|'), have = new Set(a.v.map(sig));
@@ -511,7 +511,8 @@ var SPI = {}; [['on', 1], ['off', 0]].forEach(([k, on]) => { const im = new Imag
 const cleanMarks = a => (Array.isArray(a) ? a : []).filter(m => m && /^[\w-]+$/.test(String(m.id)) && isFinite(m.x) && isFinite(m.y) && MK[m.t]).map(m => ({ id: String(m.id), x: +m.x, y: +m.y, t: m.t, note: String(m.note || '').slice(0, 500), d: /^\d{4}-\d\d-\d\d$/.test(m.d) ? m.d : '' }));
 function mergeMarks(a) { const have = new Set((D.marks ||= []).map(m => m.id)); cleanMarks(a).forEach(m => { if (!have.has(m.id)) D.marks.push(m); }); }
 const cleanCal = c => c && isFinite(c.sat) && isFinite(c.dt) && c.sat >= 15 && c.sat <= 80 && Math.abs(c.dt) <= 4 ? { sat: +c.sat, dt: +c.dt, n: Math.round(+c.n || 0), auc0: +c.auc0 || 0, auc1: +c.auc1 || 0, d: String(c.d || '') } : null;
-function restoreSnap(snap) { const keep = D.paths, km = D.marks, kc = D.cal; D = JSON.parse(snap); D.paths = keep; D.marks = km || []; D.cal = kc; if (sel && !D.cells[sel]) sel = null; }      // annuler une action du carnet ne touche pas aux chemins
+const snapC = () => JSON.stringify({ cells: D.cells, avg: D.avg });
+function restoreSnap(snap) { const o = JSON.parse(snap); D.cells = o.cells; D.avg = o.avg; if (sel && !D.cells[sel]) sel = null; }      // annuler une action du carnet ne touche ni aux chemins ni aux repères      // annuler une action du carnet ne touche pas aux chemins
 function load() {
   try { const d = JSON.parse(localStorage.getItem(KEY) || 'null'); if (d && d.cells) { D = { cells: {}, avg: d.avg || 150, paths: cleanPaths(d.paths), marks: cleanMarks(d.marks), cal: cleanCal(d.cal) }; Object.entries(d.cells).forEach(([k, c]) => /^[\w,-]+$/.test(k) && (D.cells[k] = clean(c))); Object.entries(D.cells).forEach(([k, c]) => { if (c.x == null) { if (/^-?\d+,-?\d+$/.test(k) && hasData(c)) [c.x, c.y] = legacyCtr(k); else delete D.cells[k]; } }); } } catch (e) {}
 }
@@ -562,7 +563,7 @@ const tileImg = (z, x, y) => {      // cache d'abord ; sinon UNE seule requête 
   if (!t) { t = new Image(); tiles.set(k, t); if (tiles.size > 400) tiles.delete(tiles.keys().next().value);
     const direct = () => { t.onload = () => schedule(); t.onerror = () => { t.bad = true; schedule(); setTimeout(() => { if (tiles.get(k) === t) tiles.delete(k); }, 15000); }; t.src = TURL(z, x, y); };
     const show = b => { const u = URL.createObjectURL(b); t.onload = () => { URL.revokeObjectURL(u); schedule(); }; t.onerror = () => { URL.revokeObjectURL(u); direct(); }; t.src = u; };
-    tget(k).then(c => c && c.b ? show(c.b) : fetch(TURL(z, x, y), { mode: 'cors' }).then(r => r.ok ? r.blob() : Promise.reject(r.status)).then(b => { tput(k, b); show(b); })).catch(direct); }
+    tget(k).then(c => c && c.b ? show(c.b) : fetchT(TURL(z, x, y), 12000, { mode: 'cors' }).then(r => r.ok ? r.blob() : Promise.reject(r.status)).then(b => { tput(k, b); show(b); })).catch(direct); }
   return t;
 };
 function drawTile(Z, tx, ty, dx, dy, ds) {
@@ -585,11 +586,13 @@ const ftile = (z, x, y) => { const k = z + '/' + x + '/' + y; let t = ftiles.get
       a.src = FURL(z, x, y); }); }
   return t; };
 /* Part de forêt d'une case (0 à 1) : 9 points échantillonnés dans le masque forêt (tuile zoom 17). 0 si indisponible. */
-async function forestFrac(k) {
+const ffCache = new Map();
+async function forestFrac(k) { const [cx0, cy0] = ctr(k), ck = Math.round(cx0) + ',' + Math.round(cy0); if (ffCache.has(ck)) return ffCache.get(ck); const v = await forestFrac0(k); if (v > 0 || navigator.onLine !== false) ffCache.set(ck, v); return v; }
+async function forestFrac0(k) {
   try { const [x, y] = ctr(k), z = 17, span = 256 * 156543.03392 / 2 ** z, h = CS / 3, pts = [];
     for (const dx of [-h, 0, h]) for (const dy of [-h, 0, h]) { const u = (x + dx + O) / span, v = (O - (y + dy)) / span, tx = Math.floor(u), ty = Math.floor(v); pts.push([tx, ty, Math.min(255, Math.floor((u - tx) * 256)), Math.min(255, Math.floor((v - ty) * 256))]); }
     const keys = [...new Set(pts.map(p => p[0] + ',' + p[1]))];
-    const ts = await Promise.race([Promise.all(keys.map(q => { const [a, b] = q.split(',').map(Number); return ftile(z, a, b).p.then(t => [q, t]); })), new Promise(r => setTimeout(() => r(null), 4000))]);
+    const ts = await Promise.race([Promise.all(keys.map(q => { const [a, b] = q.split(',').map(Number); return ftile(z, a, b).p.then(t => [q, t]); })), new Promise(r => setTimeout(() => r(null), 3000))]);
     if (!ts) return 0; const M = new Map(ts); let m = 0;
     for (const p of pts) { const t = M.get(p[0] + ',' + p[1]); if (!t || !t.px) return 0; if (t.px[p[3] * 256 + p[2]] > 100) m++; }
     return m / pts.length; } catch (e) { return 0; }
@@ -606,7 +609,7 @@ async function fxLoad(x0, y0, x1, y1, mpp) {
   if (fxBusy) return; fxBusy = true;
   try {
     const px = (x1 - x0) * .25, py = (y1 - y0) * .25, bb = [x0 - px, y0 - py, x1 + px, y1 + py];
-    const r = await fetch(`https://data.geopf.fr/wfs/ows?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=${encodeURIComponent('LANDCOVER.FORESTINVENTORY.V2:formation_vegetale')}&OUTPUTFORMAT=${encodeURIComponent('application/json')}&SRSNAME=EPSG:3857&COUNT=4000&BBOX=${bb.map(v => v.toFixed(1)).join(',')},EPSG:3857`);
+    const r = await fetchT(`https://data.geopf.fr/wfs/ows?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=${encodeURIComponent('LANDCOVER.FORESTINVENTORY.V2:formation_vegetale')}&OUTPUTFORMAT=${encodeURIComponent('application/json')}&SRSNAME=EPSG:3857&COUNT=4000&BBOX=${bb.map(v => v.toFixed(1)).join(',')},EPSG:3857`);
     if (!r.ok) throw new Error('wfs'); const j = await r.json(), feats = [];
     for (const f of j.features || []) { if (!f.geometry || !cepeBad(f.properties)) continue;
       const polys = f.geometry.type === 'Polygon' ? [f.geometry.coordinates] : f.geometry.type === 'MultiPolygon' ? f.geometry.coordinates : [];
@@ -616,6 +619,7 @@ async function fxLoad(x0, y0, x1, y1, mpp) {
   } catch (e) { fxFail = Date.now(); }
   fxBusy = false; schedule();
 }
+const fetchT = (u, ms = 15000, o = {}) => { const ac = new AbortController(), t = setTimeout(() => ac.abort(), ms); return fetch(u, { ...o, signal: ac.signal }).finally(() => clearTimeout(t)); };
 const schedule = () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; draw(); }); };
 function draw() {
   const dpr = devicePixelRatio || 1, W = cv.clientWidth, H = cv.clientHeight; if (!W) return;
@@ -651,7 +655,7 @@ function draw() {
   drawMarks(sx, sy);
   if (commOn) drawComm(1, sx, sy, W, x0, x1, y0, y1, mpp);
   const ring = (k, col, w) => { const c = D.cells[k]; if (!c || c.x == null) return; g.beginPath(); g.arc(sx(c.x), sy(c.y) - ps / 2, ps * .62 + 3, 0, 7); g.lineWidth = w; g.strokeStyle = col; g.stroke(); };
-  if (hereK) { ring(hereK, '#0b2a4a', 5); ring(hereK, '#4aa3ff', 3); } if (sel) { ring(sel, '#2a2018', 5); ring(sel, '#e3c071', 3); }
+  if (hereK && hereK !== sel) { g.setLineDash([5, 4]); ring(hereK, '#0e0b08', 5); ring(hereK, '#ffd27a', 2.5); g.setLineDash([]); } if (sel) { ring(sel, '#2a2018', 5); ring(sel, '#e3c071', 3); }
   if (me) drawMe(sx(me.x), sy(me.y), mpp);
   { const real = mpp * Math.cos(toLL(V.cx, V.cy)[0] * Math.PI / 180), m = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000].filter(v => v / real <= 110).pop() || 1, el = $('#sc'); el.textContent = m >= 1000 ? m / 1000 + ' km' : m + ' m'; el.style.minWidth = Math.max(26, m / real) + 'px'; el.style.borderBottom = '3px solid #fff'; el.style.textAlign = 'center'; } if (commOn) scanSoon();
 }
@@ -706,7 +710,7 @@ let pvId = null;
 const closePh = () => { $('#pv').classList.remove('open'); $('#pvi').removeAttribute('src'); pvId = null; };
 $('#pvx').onclick = closePh;
 $('#pvd').onclick = () => { const k = sel, id = pvId, c = k && D.cells[k], i = c ? c.ph.findIndex(p => p.id === id) : -1; if (i < 0) return closePh();
-  const snap = JSON.stringify(D); c.ph.splice(i, 1); save(); closePh(); draw(); renderPanel();
+  const snap = snapC(); c.ph.splice(i, 1); save(); closePh(); draw(); renderPanel();
   setTimeout(() => { if (!D.cells[k]?.ph.some(p => p.id === id)) pDel(id).catch(() => {}); }, 8000);
   toast('Photo supprimée', () => { restoreSnap(snap); save(); draw(); renderPanel(); }); };
 $('#panel').addEventListener('change', async e => {
@@ -753,7 +757,7 @@ const ftCache = new Map();
 async function forestType(k) {
   if (ftCache.has(k)) return ftCache.get(k);
   const [x, y] = ctr(k), r = 4, bb = [x - r, y - r, x + r, y + r].map(v => v.toFixed(1)).join(',');
-  const res = await fetch(`https://data.geopf.fr/wfs/ows?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=${encodeURIComponent('LANDCOVER.FORESTINVENTORY.V2:formation_vegetale')}&OUTPUTFORMAT=${encodeURIComponent('application/json')}&SRSNAME=EPSG:3857&COUNT=30&BBOX=${bb},EPSG:3857`);
+  const res = await fetchT(`https://data.geopf.fr/wfs/ows?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=${encodeURIComponent('LANDCOVER.FORESTINVENTORY.V2:formation_vegetale')}&OUTPUTFORMAT=${encodeURIComponent('application/json')}&SRSNAME=EPSG:3857&COUNT=30&BBOX=${bb},EPSG:3857`);
   if (!res.ok) throw new Error('wfs'); const j = await res.json(), fs = (j.features || []).filter(f => f.geometry);
   /* le filtre BBOX du service renvoie aussi les peuplements voisins : on garde celui qui contient vraiment le point (comme pour le grisage de la carte) */
   const parts = f => f.geometry.type === 'Polygon' ? [f.geometry.coordinates] : f.geometry.type === 'MultiPolygon' ? f.geometry.coordinates : [];
@@ -777,7 +781,7 @@ const relCache = (() => { try { return JSON.parse(localStorage.getItem('cartocep
 async function reliefOf(k) {
   const [x, y] = ctr(k), key = Math.round(x) + ',' + Math.round(y); if (relCache[key]) return relCache[key];
   const dm = 25, off = dm / Math.cos(toLL(x, y)[0] * Math.PI / 180), P5 = [[x, y], [x, y + off], [x, y - off], [x + off, y], [x - off, y]].map(p => toLL(p[0], p[1]));
-  const r = await fetch(`https://data.geopf.fr/altimetrie/1.0/calcul/alti/rest/elevation.json?lon=${P5.map(p => p[1].toFixed(6)).join('|')}&lat=${P5.map(p => p[0].toFixed(6)).join('|')}&resource=ign_rge_alti_wld&delimiter=${encodeURIComponent('|')}&indent=false&measures=false&zonly=false`);
+  const r = await fetchT(`https://data.geopf.fr/altimetrie/1.0/calcul/alti/rest/elevation.json?lon=${P5.map(p => p[1].toFixed(6)).join('|')}&lat=${P5.map(p => p[0].toFixed(6)).join('|')}&resource=ign_rge_alti_wld&delimiter=${encodeURIComponent('|')}&indent=false&measures=false&zonly=false`);
   if (!r.ok) throw new Error('alti'); const j = await r.json(), z = (j.elevations || []).map(e => typeof e === 'number' ? e : e.z);
   if (z.length !== 5 || z.some(v => !isFinite(v) || v < -500)) throw new Error('alti');
   const gx = (z[3] - z[4]) / (2 * dm), gy = (z[1] - z[2]) / (2 * dm), slope = Math.atan(Math.hypot(gx, gy)) * 180 / Math.PI, az = (Math.atan2(-gx, -gy) * 180 / Math.PI + 360) % 360;      // az = direction vers laquelle descend la pente
@@ -805,7 +809,7 @@ const DAILY_BASE = 'precipitation_sum,temperature_2m_min,temperature_2m_max,et0_
 const DAILY_FULL = DAILY_BASE + ',relative_humidity_2m_mean,dew_point_2m_mean,wind_speed_10m_mean,cloud_cover_mean';
 async function wxFetch(la, lo) {      // la / lo : chaînes (un point ou plusieurs séparés par des virgules) ; repli sur les variables de base si l'API refuse les autres
   for (const v of [DAILY_FULL, DAILY_BASE]) {
-    const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${la}&longitude=${lo}&daily=${v}&past_days=24&forecast_days=8&timezone=auto`);
+    const r = await fetchT(`https://api.open-meteo.com/v1/forecast?latitude=${la}&longitude=${lo}&daily=${v}&past_days=24&forecast_days=8&timezone=auto`);
     if (r.ok) return r.json();
   }
   throw new Error('wx');
@@ -864,7 +868,7 @@ async function calibrate() {
     const addDays = (d, n) => new Date(new Date(d + 'T00:00').getTime() + n * 864e5).toISOString().slice(0, 10);
     for (const g of groups.values()) {
       const ds = g.its.map(i => i.d).sort(), a = addDays(ds[0], -25), b = ds[ds.length - 1]; let j = null;
-      for (const v of [DAILY_FULL, DAILY_BASE]) { const r = await fetch(`https://archive-api.open-meteo.com/v1/archive?latitude=${g.la.toFixed(3)}&longitude=${g.lo.toFixed(3)}&start_date=${a}&end_date=${b}&daily=${v}&timezone=auto`); if (r.ok) { j = await r.json(); break; } }
+      for (const v of [DAILY_FULL, DAILY_BASE]) { const r = await fetchT(`https://archive-api.open-meteo.com/v1/archive?latitude=${g.la.toFixed(3)}&longitude=${g.lo.toFixed(3)}&start_date=${a}&end_date=${b}&daily=${v}&timezone=auto`); if (r.ok) { j = await r.json(); break; } }
       if (!j) throw new Error('archive'); g.d = j.daily; g.d.elev = j.elevation;
       for (const it of g.its) { it.dd = g.d; it.i = g.d.time.indexOf(it.d); it.ff = await forestFrac(it.k); }
     }
@@ -889,7 +893,7 @@ const calLabel = () => { $('#cal').textContent = D.cal ? `Indice calibré (${D.c
 async function showWx(k) {
   const put = (h, b) => { if (sel !== k) return; if ($('#wx')) $('#wx').innerHTML = h; if ($('#wxb')) $('#wxb').innerHTML = b; };
   try {
-    const [la, lo] = toLL(...ctr(k)), d = await wxFor(la, lo), last = (D.cells[k]?.v || []).filter(v => v.n > 0).reduce((a, v) => v.d > a ? v.d : a, ''), ff = await forestFrac(k), s = wxScores(d, last, ff);
+    const [la, lo] = toLL(...ctr(k)), [d, ff] = await Promise.all([wxFor(la, lo), forestFrac(k)]), last = (D.cells[k]?.v || []).filter(v => v.n > 0).reduce((a, v) => v.d > a ? v.d : a, ''), s = wxScores(d, last, ff);
     const since = last ? Math.round((new Date(today() + 'T00:00') - new Date(last + 'T00:00')) / 864e5) : 99;
     const past = d.precipitation_sum.slice(wxOff(d) - 14, wxOff(d)).reduce((a, v) => a + (v ?? 0), 0), tm7 = d.temperature_2m_min.slice(wxOff(d) - 7, wxOff(d)).reduce((a, v, j) => a + ((v ?? 0) + (d.temperature_2m_max[wxOff(d) - 7 + j] ?? 0)) / 2, 0) / 7;
     const best = s.reduce((a, b) => b.score > a.score ? b : a), day = x => new Date(x + 'T00:00').toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric' });
@@ -903,33 +907,33 @@ async function showWx(k) {
   } catch (e) { put('<div class="hint">Météo indisponible (connexion ?)</div>', '<span class="vdc">?</span><span class="vdt"><span class="vdl">Potentiel de pousse</span>' + gauge(0) + 'Météo indisponible (connexion ?)</span>'); }
 }
 
-$('#panel').addEventListener('input', e => { const f = e.target.dataset.f; if (!f || !sel) return; (D.cells[sel] ||= blank())[f] = e.target.value; save(); draw(); });
+$('#panel').addEventListener('input', e => { const f = e.target.dataset.f; if (!f || !sel) return; (D.cells[sel] ||= blank())[f] = e.target.value; saveSoon(); if (f === 'name') schedule(); });
 $('#panel').addEventListener('click', e => {
   const gi = e.target.closest('#gal img'); if (gi) { pvId = gi.dataset.id; $('#pvi').src = gi.src; $('#pv').classList.add('open'); return; }
   const t = e.target.closest('[data-tab]'); if (t) { ptab = t.dataset.tab; return setTab(); }
   const b = e.target.closest('[data-act]'); if (!b || !sel) return; const a = b.dataset.act, c = D.cells[sel] ||= blank();
-  if (a === 'delcell') { const snap = JSON.stringify(D), k = sel; delete D.cells[k]; sel = null; save(); renderPanel(); draw(); return toast('Point supprimé', () => { restoreSnap(snap); sel = k; save(); draw(); renderPanel(); }); }
+  if (a === 'delcell') { const snap = snapC(), k = sel; delete D.cells[k]; sel = null; save(); renderPanel(); draw(); return toast('Point supprimé', () => { restoreSnap(snap); sel = k; save(); draw(); renderPanel(); }); }
   if (a === 'go') return goTo(sel);
   if (a === 'quick') return addFind(sel);
   if (a === 'addtoggle') { const f = $('#addv'); if (editI !== null) { renderPanel(); return $('#addv').classList.add('on'); } f.classList.toggle('on'); if (f.classList.contains('on')) $('#vn').focus(); return; }
   if (a === 'edit') { const v = c.v[+b.dataset.i]; if (!v) return; editI = +b.dataset.i; const f = $('#addv'); f.classList.add('on');
     $('#vd').value = v.d; $('#vn').value = v.n; $('#vw').value = v.e ? '' : Math.round(v.w); $('#vt').value = v.t || '';
     f.querySelector('[data-act=add]').textContent = 'Mettre à jour la visite'; f.scrollIntoView({ block: 'nearest' }); $('#vd').focus(); return; }
-  if (a === 'del') { const snap = JSON.stringify(D); c.v.splice(+b.dataset.i, 1); save(); draw(); renderPanel(); return toast('Visite supprimée', () => { restoreSnap(snap); save(); draw(); renderPanel(); }); }
+  if (a === 'del') { const snap = snapC(); c.v.splice(+b.dataset.i, 1); save(); draw(); renderPanel(); return toast('Visite supprimée', () => { restoreSnap(snap); save(); draw(); renderPanel(); }); }
   if (a === 'add') { const d = $('#vd').value || today(); if (d > today()) return toast('La date est dans le futur'); const n = Math.max(0, Math.round(+$('#vn').value || 0)), w = $('#vw').value;
     const nv = { d, n, w: w !== '' ? Math.max(0, +w) : n * D.avg, e: w === '', t: $('#vt').value.trim() };
-    if (editI !== null && c.v[editI]) { const snap = JSON.stringify(D); c.v[editI] = nv; save(); draw(); renderPanel(); return toast('Visite modifiée ✏️', () => { restoreSnap(snap); save(); draw(); renderPanel(); }); }
+    if (editI !== null && c.v[editI]) { const snap = snapC(); c.v[editI] = nv; save(); draw(); renderPanel(); return toast('Visite modifiée ✏️', () => { restoreSnap(snap); save(); draw(); renderPanel(); }); }
     c.v.push(nv); save(); draw(); renderPanel(); collapse(); toast('Visite ajoutée 🍄'); }
 });
 function addFind(k, pos) {
-  const snap = JSON.stringify(D); if (!k) { k = newSpot(pos[0], pos[1]); sel = k; } const c = D.cells[k], t = today(), v = c.v.find(v => v.d === t && !v.t) || c.v.find(v => v.d === t);
+  const snap = snapC(); if (!k) { k = newSpot(pos[0], pos[1]); sel = k; } const c = D.cells[k], t = today(), v = c.v.find(v => v.d === t && !v.t) || c.v.find(v => v.d === t);
   if (v) { v.n++; v.w += D.avg; } else c.v.push({ d: t, n: 1, w: D.avg, e: true, t: '' });
   save(); collapse(); draw(); renderPanel(); try { navigator.vibrate && navigator.vibrate(40); } catch (e) {}
   toast('🍄 +1 · ' + c.v.filter(x => x.d === t).reduce((a, x) => a + x.n, 0) + ' aujourd\'hui sur ce point', () => { restoreSnap(snap); save(); draw(); renderPanel(); });
 }
 
 function addVisit(k, pos) {
-  const snap = JSON.stringify(D); if (!k) { k = newSpot(pos[0], pos[1]); sel = k; } const c = D.cells[k];
+  const snap = snapC(); if (!k) { k = newSpot(pos[0], pos[1]); sel = k; } const c = D.cells[k];
   c.v.push({ d: today(), n: 0, w: 0, e: false, t: '' });
   save(); collapse(); draw(); renderPanel(); try { navigator.vibrate && navigator.vibrate(40); } catch (e) {}
   toast('👣 +1 visite · ' + c.v.length + ' au total sur ce point', () => { restoreSnap(snap); save(); draw(); renderPanel(); });
@@ -1013,7 +1017,7 @@ function rtClose() { RT.on = false; RT.polys = []; RT.wait = null; $('#rt').hidd
 function routeTick() {
   if (RT.wait && me) { const w = RT.wait; RT.wait = null; return w === 'tour' ? startTour() : startRoute(w); }
   if (!RT.on || !me) return; const t = RT.tg[RT.i];
-  if (t && rdist([me.x, me.y], [t.x, t.y]) < 15) { toast('✅ Arrivé : ' + (t.name || 'point ' + (RT.i + 1))); try { navigator.vibrate && navigator.vibrate([60, 40, 60]); } catch (e) {} RT.i++; if (RT.i >= RT.tg.length) { toast('🏁 Tournée terminée'); return rtClose(); } }
+  if (t && rdist([me.x, me.y], [t.x, t.y]) < 15) { toast('✅ Arrivé : ' + (t.name || 'point ' + (RT.i + 1))); try { navigator.vibrate && navigator.vibrate([60, 40, 60]); } catch (e) {} RT.i++; RT.t = 0; if (RT.i >= RT.tg.length) { toast('🏁 Tournée terminée'); return rtClose(); } }
   if (Date.now() - RT.t < 3000) return; RT.t = Date.now(); rtCompute(); rtUi(); schedule();
 }
 function startTour() {
@@ -1080,10 +1084,13 @@ function onPos(p) { setTimeout(() => P.on && pmUpdate(), 0); if (samp) { const [
   recTick(); routeTick();
   schedule();
 }
+var gpsWarn = 0;
 function startLoc() {
   if (!navigator.geolocation) return toast('Géolocalisation indisponible');
   $('#loc').classList.add('on'); toast('Recherche de votre position…');
-  wakeSync(); watch = navigator.geolocation.watchPosition(onPos, err => { stopLoc(); toast(err.code === 1 ? 'Position refusée : ouvrez la page en https:// et autorisez-la' : 'Position indisponible'); }, { enableHighAccuracy: true, maximumAge: 5000, timeout: 20000 });
+  wakeSync(); watch = navigator.geolocation.watchPosition(onPos, err => {
+    if (err.code === 1) { stopLoc(); return toast('Position refusée : ouvrez la page en https:// et autorisez-la'); }
+    if (Date.now() - gpsWarn > 60000) { gpsWarn = Date.now(); toast('📡 Signal GPS faible : la localisation continue de chercher'); } }, { enableHighAccuracy: true, maximumAge: 5000, timeout: 20000 });      // délai dépassé ou signal perdu : on continue d'écouter
 }
 function stopLoc() { if (watch !== null) navigator.geolocation.clearWatch(watch); watch = null; if (RC.on) { RC.on = false; if (P.cur) finishPath(); } wakeSync(); hereK = null; me = null; HD = { ax: null, ay: null, h: null, t: 0 }; pending = false; $('#loc').classList.remove('on'); schedule(); }
 $('#loc').onclick = () => watch === null ? startLoc() : (stopLoc(), toast('Localisation arrêtée'));
@@ -1099,7 +1106,7 @@ $('#rf').onclick = async () => { toast('🔄 Actualisation…'); try { if (navig
 $('#mc').onclick = () => $('#menu').classList.remove('open'); $('#menu').onclick = e => { if (e.target.id === 'menu') $('#menu').classList.remove('open'); };
 $('#imp').onclick = () => $('#fi').click();
 $('#fi').onchange = e => { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { try { importData(JSON.parse(r.result)); $('#menu').classList.remove('open'); } catch (x) { toast('Fichier illisible'); } }; r.readAsText(f); e.target.value = ''; };
-$('#exp').onclick = async () => { const photos = {}; for (const c of Object.values(D.cells)) for (const p of c.ph) { try { const u = await pGet(p.id); if (u) photos[p.id] = u; } catch (e) {} } const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify({ app: 'carnet-cepes', version: 4, grid: 50, avg: D.avg, cells: D.cells, paths: D.paths || [], marks: D.marks || [], cal: D.cal || null, photos })], { type: 'application/json' })); a.download = 'carnet-cepes-' + today() + '.json'; a.click(); toast('💾 Exporté'); };
+$('#exp').onclick = async () => { const photos = {}; for (const c of Object.values(D.cells)) for (const p of c.ph) { try { const u = await pGet(p.id); if (u) photos[p.id] = u; } catch (e) {} } const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify({ app: 'carnet-cepes', version: 4, grid: 50, avg: D.avg, cells: D.cells, paths: D.paths || [], marks: D.marks || [], cal: D.cal || null, photos })], { type: 'application/json' })); a.download = 'carnet-cepes-' + today() + '.json'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 10000); toast('💾 Exporté'); };
 $('#cal').onclick = () => { $('#menu').classList.remove('open'); calibrate(); };
 $('#calx').onclick = () => { D.cal = null; save(); wxCache.clear(); renderPanel(); calLabel(); toast('Indice standard rétabli'); };
 calLabel();
@@ -1170,7 +1177,7 @@ async function scan() {      // télécharge les communes qui couvrent l'écran 
       if (!pts.length) break;
       await Promise.all(pts.slice(0, 12).map(async p => {
         failed.set(p.key, Date.now());
-        try { const [la, lo] = toLL(p.x, p.y), r = await fetch(`https://geo.api.gouv.fr/communes?lat=${la.toFixed(5)}&lon=${lo.toFixed(5)}&fields=nom,code&format=geojson&geometry=contour`);
+        try { const [la, lo] = toLL(p.x, p.y), r = await fetchT(`https://geo.api.gouv.fr/communes?lat=${la.toFixed(5)}&lon=${lo.toFixed(5)}&fields=nom,code&format=geojson&geometry=contour`);
           if (r.ok) (((await r.json()).features) || []).forEach(addCommune); } catch (e) {}
       }));
       schedule();
@@ -1196,9 +1203,15 @@ $('#mn').addEventListener('click', fsLabel); fsLabel();
 document.addEventListener('click', () => { if (fsOn && fsCan && !inFs()) enterFs().catch(() => {}); }, { once: true });
 
 /* ===== Chemins : lignes posées point par point avec le GPS (coordonnées en mètres Mercator) ===== */
+const bbC = new WeakMap();
+function pathBB(p) {      // emprise d'un sentier, recalculée seulement s'il a changé
+  const c = bbC.get(p), n = p.pts.length, l = p.pts[n - 1]; if (c && c.n === n && c.lx === l[0] && c.ly === l[1]) return c.b;
+  let a = Infinity, b = Infinity, x = -Infinity, y = -Infinity; for (const q of p.pts) { if (q[0] < a) a = q[0]; if (q[0] > x) x = q[0]; if (q[1] < b) b = q[1]; if (q[1] > y) y = q[1]; }
+  const bb = [a, b, x, y]; bbC.set(p, { n, lx: l[0], ly: l[1], b: bb }); return bb; }
 function drawPaths(sx, sy) {
-  const ps = D.paths || []; if (!ps.length && !P.start) return;
   const fa = P.on ? 1 : Math.max(0, Math.min(1, Math.log2(80 / V.mpp) / Math.log2(80 / 6)));      // plein à fort zoom (≤ 6 m/px), invisible vers 80 m/px ; toujours plein en mode chemins
+  const W = cv.clientWidth, H = cv.clientHeight, mg = 60 * V.mpp, vx0 = V.cx - W / 2 * V.mpp - mg, vx1 = V.cx + W / 2 * V.mpp + mg, vy0 = V.cy - H / 2 * V.mpp - mg, vy1 = V.cy + H / 2 * V.mpp + mg;
+  const ps = fa > .02 ? (D.paths || []).filter(p => { const b = pathBB(p); return b[2] >= vx0 && b[0] <= vx1 && b[3] >= vy0 && b[1] <= vy1; }) : []; if (!ps.length && !P.start) return;
   g.save(); g.lineCap = 'round'; g.lineJoin = 'round'; g.globalAlpha = fa;
   const cnt = new Map(); ps.forEach(p => p.pts.forEach(([x, y]) => { const k = x + ',' + y; cnt.set(k, (cnt.get(k) || 0) + 1); }));      // sommet partagé = carrefour
   const jn = q => cnt.get(q[0] + ',' + q[1]) > 1;
@@ -1252,7 +1265,7 @@ function commitStart() {      // un départ posé au milieu d'un trait devient u
   const v = junction(p, b.i, P.start); P.start = [v[0], v[1]]; return 1;
 }
 function placePt(me, quiet) {
-  const T = m => { if (!quiet) T(m); };
+  const T = m => { if (!quiet) toast(m); };
   if (!me) { T('Position GPS introuvable : patientez un instant'); if (watch === null) startLoc(); return; }
   const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]), last = P.cur ? P.cur.pts[P.cur.pts.length - 1] : P.start, gp = [me.x, me.y];
   const others = (D.paths || []).filter(p => p !== P.cur), away = (p, i, a) => !a || segProj(a, p.pts[i], p.pts[i + 1]).d > 2;      // ignore le tronçon qu'on quitte
@@ -1286,7 +1299,7 @@ async function addPathPt() {      // mesure pendant 3 s et pose la position moye
   samp = [{ x: me.x, y: me.y, a: me.acc }]; const b = $('#pmp'); let n = 3; b.textContent = '⏳ ' + n + ' s'; toast('⏳ Mesure : ne bougez pas pendant 3 s');
   const iv = setInterval(() => { b.textContent = '⏳ ' + Math.max(0, --n) + ' s'; }, 1000);
   await new Promise(r => setTimeout(r, 3000)); clearInterval(iv);
-  const s = samp; samp = null; b.textContent = '📍 Point';
+  const s = samp; samp = null; b.textContent = '📍 Point'; if (!P.on) return;
   let w = 0, ax = 0, ay = 0; s.forEach(o => { const k = 1 / Math.max(3, o.a) ** 2; w += k; ax += o.x * k; ay += o.y * k; });
   placePt({ x: ax / w, y: ay / w, acc: Math.min(...s.map(o => o.a)) });
   try { navigator.vibrate && navigator.vibrate(40); } catch (e) {}
@@ -1298,8 +1311,8 @@ function undoPathPt() {
 }
 function finishPath() { if (!P.cur && !P.start) return toast('Aucun chemin en cours'); P.cur = null; P.start = null; P.sel = null; P.sa = null; P.adds = []; pmUpdate(); draw(); toast('✔ Chemin terminé'); }
 function delPath() {
-  if (!P.sel) return; const snap = JSON.stringify(D), id = P.sel; D.paths = D.paths.filter(p => p.id !== id); if (P.cur && P.cur.id === id) P.cur = null; P.sel = null; P.start = null; P.sa = null;
-  save(); pmUpdate(); draw(); toast('Chemin supprimé', () => { D.paths = JSON.parse(snap).paths; save(); draw(); renderPanel(); pmUpdate(); });
+  if (!P.sel) return; const snap = JSON.stringify(D.paths || []), id = P.sel; D.paths = D.paths.filter(p => p.id !== id); if (P.cur && P.cur.id === id) P.cur = null; P.sel = null; P.start = null; P.sa = null;
+  save(); pmUpdate(); draw(); toast('Chemin supprimé', () => { D.paths = JSON.parse(snap); save(); draw(); renderPanel(); pmUpdate(); });
 }
 function pathTap(px, py) {      // toucher une ligne : la sélectionne et pose le départ (sur un sommet proche, sinon au milieu du trait = futur carrefour)
   const W = cv.clientWidth, H = cv.clientHeight, sx = x => (x - V.cx) / V.mpp + W / 2, sy = y => H / 2 - (y - V.cy) / V.mpp, wx = x => V.cx + (x - W / 2) * V.mpp, wy = y => V.cy - (y - H / 2) * V.mpp;
@@ -1340,7 +1353,7 @@ async function dlTiles(list, label) {
   const worker = async () => { while (!dlStop) { const it = list.pop(); if (!it) break; const [z, x, y] = it, k = z + '/' + x + '/' + y;
     try { const c = await tget(k);
       if (c) { if (!c.p) await tput(k, c.b, true); kept++; ok++; }      // déjà en mémoire : on l'épingle sans retélécharger
-      else { let b = null; for (let n = 0; n < 2 && !b; n++) { try { const r = await fetch(TURL(z, x, y), { mode: 'cors' }); if (r.ok) b = await r.blob(); } catch (e) {} }
+      else { let b = null; for (let n = 0; n < 2 && !b; n++) { try { const r = await fetchT(TURL(z, x, y), 20000, { mode: 'cors' }); if (r.ok) b = await r.blob(); } catch (e) {} }
         if (!b) fail++; else if (await tput(k, b, true)) { ok++; wfail = 0; } else { fail++; if (++wfail >= 8) { dlStop = true; why = 'stockage plein ou refusé'; } } }
     } catch (e) { fail++; }
     if (++done % 10 === 0 || done === total) upd(); } };
@@ -1389,7 +1402,7 @@ function markAt(px, py) {
   return best;
 }
 function here() { return me ? { x: me.x, y: me.y, where: 'gps' } : { x: V.cx, y: V.cy, where: 'center' }; }
-function mkWhere() { const e = MKE; $('#mkw').textContent = (e.id ? 'Placée le ' + fmtD(e.d) + ' · ' : '') + (e.moved ? (me ? '📍 déplacée à votre position (±' + Math.round(me.acc) + ' m)' : '🎯 déplacée au centre de la carte') : e.id ? 'position inchangée' : e.where === 'tap' ? '\ud83d\udccd Pos\u00e9e l\u00e0 o\u00f9 vous avez touch\u00e9' : e.where === 'gps' ? '📍 À votre position (±' + Math.round(me.acc) + ' m)' : '🎯 Au centre de la carte (activez 📍 pour utiliser votre position)'); }
+function mkWhere() { const e = MKE; $('#mkw').textContent = (e.id ? 'Placée le ' + fmtD(e.d) + ' · ' : '') + (e.moved ? (me ? '📍 déplacée à votre position (±' + Math.round(me.acc) + ' m)' : '🎯 déplacée au centre de la carte') : e.id ? 'position inchangée' : e.where === 'tap' ? '\ud83d\udccd Pos\u00e9e l\u00e0 o\u00f9 vous avez touch\u00e9' : e.where === 'gps' ? '📍 À votre position' + (me ? ' (±' + Math.round(me.acc) + ' m)' : '') : '🎯 Au centre de la carte (activez 📍 pour utiliser votre position)'); }
 function openMk(e) {
   MKE = e; $('#mkt').textContent = e.id ? 'Modifier le repère' : 'Nouveau repère'; $('#mkn').value = e.note || '';
   $('#mkg').innerHTML = Object.keys(MK).map(t => `<button class="mki${t === e.t ? ' on' : ''}" data-t="${t}" aria-label="${MK[t][0]}">${mkSvg(t)}<span>${MK[t][0]}</span></button>`).join('');
@@ -1422,7 +1435,9 @@ function spotAt(px, py) {
 }
 function target() { if (me) { const near = sel && D.cells[sel] && rdist(ctr(sel), [me.x, me.y]) < 40; return near ? [sel, null] : [hereK, [me.x, me.y]]; } return [sel, null]; }
 function longSpot(px, py) {      // appui long sur la carte : pose un point exactement là
-  const r = cv.getBoundingClientRect(), snap = JSON.stringify(D), k = newSpot(V.cx + (px - r.left - r.width / 2) * V.mpp, V.cy - (py - r.top - r.height / 2) * V.mpp);
+  const r = cv.getBoundingClientRect(), ex = spotAt(px - r.left, py - r.top), em = markAt(px - r.left, py - r.top);
+  if (ex) { select(ex); return; } if (em) { openMark(em.id); return; }
+  const snap = snapC(), k = newSpot(V.cx + (px - r.left - r.width / 2) * V.mpp, V.cy - (py - r.top - r.height / 2) * V.mpp);
   save(); try { navigator.vibrate && navigator.vibrate(60); } catch (e) {} select(k); toast('\ud83d\udccd Point pos\u00e9 ici : nommez-le ou ajoutez une visite', () => { restoreSnap(snap); save(); draw(); renderPanel(); });
 }
 function navTxt(k) {
@@ -1431,10 +1446,9 @@ function navTxt(k) {
   const i = Math.round(((Math.atan2(x - me.x, y - me.y) * 180 / Math.PI + 360) % 360) / 45) % 8;
   return '<b>' + (d < 1000 ? Math.round(d) + ' m' : (d / 1000).toFixed(1) + ' km') + '</b> ' + ['\u2191', '\u2197', '\u2192', '\u2198', '\u2193', '\u2199', '\u2190', '\u2196'][i] + ' ' + ['nord', 'nord-est', 'est', 'sud-est', 'sud', 'sud-ouest', 'ouest', 'nord-ouest'][i] + ' (\u00b1' + Math.round(me.acc) + ' m)';
 }
-function navLine(k) { return ''; }
 function updNav() { const e = $('#nvt'); if (e && sel && D.cells[sel]) e.innerHTML = navTxt(sel); }
 /* ===== Tap : 1 = action, 2 = zoom doux à l'endroit touché, 3 = dézoom doux ===== */
-function onTap(e) { const r = cv.getBoundingClientRect(); const pt = spotAt(e.clientX - r.left, e.clientY - r.top), mk = markAt(e.clientX - r.left, e.clientY - r.top); if (RM) { if (mk) openMark(mk.id); else openMk({ id: null, t: mkLast, note: '', x: V.cx + (e.clientX - r.left - r.width / 2) * V.mpp, y: V.cy - (e.clientY - r.top - r.height / 2) * V.mpp, where: 'tap' }); } else if (P.on) pathTap(e.clientX - r.left, e.clientY - r.top); else if (pt && pt !== sel) { select(pt); flyTo(pt); } else if (sel) { sel = null; collapse(); renderPanel(); draw(); } }
+function onTap(e) { const r = cv.getBoundingClientRect(); const pt = spotAt(e.clientX - r.left, e.clientY - r.top), mk = markAt(e.clientX - r.left, e.clientY - r.top); if (RM) { if (mk) openMark(mk.id); else openMk({ id: null, t: mkLast, note: '', x: V.cx + (e.clientX - r.left - r.width / 2) * V.mpp, y: V.cy - (e.clientY - r.top - r.height / 2) * V.mpp, where: 'tap' }); } else if (P.on) pathTap(e.clientX - r.left, e.clientY - r.top); else if (pt && pt !== sel) { select(pt); flyTo(pt); } else if (mk && !pt) openMark(mk.id); else if (sel) { sel = null; collapse(); renderPanel(); draw(); } }
 var TT = { t: 0, n: 0, x: 0, y: 0, timer: 0 };
 function multiTap(e) {
   const now = performance.now(), same = now - TT.t < 330 && Math.hypot(e.clientX - TT.x, e.clientY - TT.y) < 36;
