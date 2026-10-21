@@ -652,8 +652,7 @@ function draw() {
   if (commOn) drawComm(1, sx, sy, W, x0, x1, y0, y1, mpp);
   const ring = (k, col, w) => { const c = D.cells[k]; if (!c || c.x == null) return; g.beginPath(); g.arc(sx(c.x), sy(c.y) - ps / 2, ps * .62 + 3, 0, 7); g.lineWidth = w; g.strokeStyle = col; g.stroke(); };
   if (hereK) { ring(hereK, '#0b2a4a', 5); ring(hereK, '#4aa3ff', 3); } if (sel) { ring(sel, '#2a2018', 5); ring(sel, '#e3c071', 3); }
-  if (me) { const x = sx(me.x), y = sy(me.y), r = Math.max(8, me.acc / mpp); g.fillStyle = 'rgba(74,163,255,.2)'; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill();
-    g.fillStyle = '#4aa3ff'; g.strokeStyle = '#fff'; g.lineWidth = 2; g.beginPath(); g.arc(x, y, 6, 0, 7); g.fill(); g.stroke(); }
+  if (me) drawMe(sx(me.x), sy(me.y), mpp);
   { const real = mpp * Math.cos(toLL(V.cx, V.cy)[0] * Math.PI / 180), m = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000].filter(v => v / real <= 110).pop() || 1, el = $('#sc'); el.textContent = m >= 1000 ? m / 1000 + ' km' : m + ' m'; el.style.minWidth = Math.max(26, m / real) + 'px'; el.style.borderBottom = '3px solid #fff'; el.style.textAlign = 'center'; } if (commOn) scanSoon();
 }
 function fitData() {
@@ -1047,8 +1046,35 @@ $('#rtn').onclick = () => { RT.i++; if (RT.i >= RT.tg.length) return rtClose(); 
 $('#rtg').onclick = () => { const t = RT.tg[RT.i]; if (!t) return; const [la, lo] = toLL(t.x, t.y); window.open(`https://www.google.com/maps/dir/?api=1&destination=${la.toFixed(6)},${lo.toFixed(6)}&travelmode=walking`, '_blank'); };
 
 /* ===== Position ===== */
+/* ===== Direction de marche : comparée à la position précédente (ou cap fourni par le GPS quand on bouge assez vite) ===== */
+var HD = { ax: null, ay: null, h: null, t: 0 };
+function setHd(b) { b = (b + 360) % 360; if (HD.h == null) HD.h = b; else { const d = ((b - HD.h + 540) % 360) - 180; HD.h = (HD.h + d * (Math.abs(d) > 100 ? 1 : .75) + 360) % 360; } HD.t = Date.now(); }      // lissage : évite que la flèche saute au moindre écart
+function trackHd(x, y, acc, gh, gs) {
+  if (gh != null && isFinite(gh) && gs != null && gs > .7) { setHd(gh); HD.ax = x; HD.ay = y; return; }      // en marche franche, le cap du GPS est fiable
+  if (acc > 40) return;      // position trop imprécise pour juger d'une direction
+  if (HD.ax == null) { HD.ax = x; HD.ay = y; return; }
+  const d = rdist([HD.ax, HD.ay], [x, y]);
+  if (d >= Math.max(5, Math.min(acc * .7, 20))) { setHd(Math.atan2(x - HD.ax, y - HD.ay) * 180 / Math.PI); HD.ax = x; HD.ay = y; }      // on ne tranche qu'après un vrai déplacement, pas sur le bruit du GPS
+}
+function drawMe(x, y, mpp) {
+  const r = Math.max(10, me.acc / mpp), age = HD.h == null ? Infinity : Date.now() - HD.t, fresh = age < 45000;
+  g.save();
+  g.beginPath(); g.arc(x, y, r, 0, 7); g.fillStyle = 'rgba(234,165,60,.13)'; g.fill(); g.lineWidth = 1.2; g.strokeStyle = 'rgba(255,210,122,.55)'; g.stroke();      // précision du GPS
+  if (HD.h != null) { const a = HD.h * Math.PI / 180 - Math.PI / 2, sp = .5, R = 58;      // cône de vision dans la direction de marche
+    const gr = g.createRadialGradient(x, y, 8, x, y, R); gr.addColorStop(0, `rgba(255,210,122,${fresh ? .55 : .25})`); gr.addColorStop(1, 'rgba(255,210,122,0)');
+    g.beginPath(); g.moveTo(x, y); g.arc(x, y, R, a - sp, a + sp); g.closePath(); g.fillStyle = gr; g.fill(); }
+  g.beginPath(); g.arc(x, y, 13.5, 0, 7); g.fillStyle = '#0e0b08'; g.fill();      // jeton du joueur : pierre, cerclage laiton
+  g.beginPath(); g.arc(x, y, 12, 0, 7); g.fillStyle = '#d6ab55'; g.fill();
+  g.beginPath(); g.arc(x, y, 10, 0, 7); const st = g.createLinearGradient(x, y - 10, x, y + 10); st.addColorStop(0, '#4d453a'); st.addColorStop(1, '#221d18'); g.fillStyle = st; g.fill();
+  g.translate(x, y);
+  const em = g.createLinearGradient(0, -8, 0, 6); em.addColorStop(0, '#fff0b8'); em.addColorStop(1, '#e8962c');
+  if (HD.h != null) { g.rotate(HD.h * Math.PI / 180); g.globalAlpha = fresh ? 1 : .55;
+    g.beginPath(); g.moveTo(0, -8.2); g.lineTo(6, 6); g.lineTo(0, 2.6); g.lineTo(-6, 6); g.closePath(); g.fillStyle = em; g.fill(); g.lineWidth = 1.4; g.strokeStyle = '#0e0b08'; g.stroke(); }
+  else { g.beginPath(); g.moveTo(0, -5.5); g.lineTo(5, 0); g.lineTo(0, 5.5); g.lineTo(-5, 0); g.closePath(); g.fillStyle = em; g.fill(); g.lineWidth = 1.4; g.strokeStyle = '#0e0b08'; g.stroke(); }      // à l'arrêt, sans direction connue : losange
+  g.restore();
+}
 function onPos(p) { setTimeout(() => P.on && pmUpdate(), 0); if (samp) { const [mx, my] = toM(p.coords.latitude, p.coords.longitude); samp.push({ x: mx, y: my, a: p.coords.accuracy }); }
-  const [x, y] = toM(p.coords.latitude, p.coords.longitude); const first = !me; me = { x, y, acc: p.coords.accuracy }; hereK = nearestSpot(x, y, 15); updNav();
+  const [x, y] = toM(p.coords.latitude, p.coords.longitude); const first = !me; me = { x, y, acc: p.coords.accuracy }; trackHd(x, y, p.coords.accuracy, p.coords.heading, p.coords.speed); hereK = nearestSpot(x, y, 15); updNav();
   if (first) { V.cx = x; V.cy = y; if (V.mpp > 4) V.mpp = 1.5; }
   if (pending) { const p = pending; pending = false; p === 'visit' ? addVisit(hereK, [me.x, me.y]) : addFind(hereK, [me.x, me.y]); }
   recTick(); routeTick();
@@ -1059,7 +1085,7 @@ function startLoc() {
   $('#loc').classList.add('on'); toast('Recherche de votre position…');
   wakeSync(); watch = navigator.geolocation.watchPosition(onPos, err => { stopLoc(); toast(err.code === 1 ? 'Position refusée : ouvrez la page en https:// et autorisez-la' : 'Position indisponible'); }, { enableHighAccuracy: true, maximumAge: 5000, timeout: 20000 });
 }
-function stopLoc() { if (watch !== null) navigator.geolocation.clearWatch(watch); watch = null; if (RC.on) { RC.on = false; if (P.cur) finishPath(); } wakeSync(); hereK = null; me = null; pending = false; $('#loc').classList.remove('on'); schedule(); }
+function stopLoc() { if (watch !== null) navigator.geolocation.clearWatch(watch); watch = null; if (RC.on) { RC.on = false; if (P.cur) finishPath(); } wakeSync(); hereK = null; me = null; HD = { ax: null, ay: null, h: null, t: 0 }; pending = false; $('#loc').classList.remove('on'); schedule(); }
 $('#loc').onclick = () => watch === null ? startLoc() : (stopLoc(), toast('Localisation arrêtée'));
 const askGps = kind => { pending = kind; if (watch === null) startLoc(); else toast('Position pas encore trouvée…'); };
 $('#found').onclick = () => { const [k, pos] = target(); if (k || pos) return addFind(k, pos); askGps('find'); };
