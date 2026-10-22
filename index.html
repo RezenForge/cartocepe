@@ -512,6 +512,8 @@ body{background:
 #pls.open #pll li{animation:rise .3s cubic-bezier(.2,.85,.25,1) both}
 #pll .pli{flex:none;width:36px;height:36px;display:grid;place-items:center;border-radius:4px;background:#0d0b08;border:2px solid #3a332a;color:var(--ember2)}
 #pll .lt{flex:1;min-width:0}#pll .lt b{color:#fff1cf}#pll small{color:var(--mut)}#pll .bd b{font:800 16px var(--num);color:var(--ember2)}
+
+#mkm .dg #mkpk{background:linear-gradient(#2d8fd0,#1a5f93)!important;color:#fff;border-color:#0b2a40;box-shadow:inset 0 2px 0 rgba(255,255,255,.3),inset 0 -3px 0 rgba(0,0,0,.35),0 2px 0 rgba(0,0,0,.45),0 0 12px rgba(25,181,255,.35)!important;font-size:15px}
 </style></head><body>
 <header class="bar win dg"><span class="emb" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="15" fill="#2f3d27" stroke="currentColor" stroke-width="1.2"/><circle cx="16" cy="16" r="12.6" fill="none" stroke="currentColor" stroke-width=".6" opacity=".45"/><g transform="translate(5.2 4.6) scale(.68)"><path d="M12.2 17.5c-1.6 4.2-2.3 8.2-.9 10.6 1 1.6 3 2.1 4.7 2.1s3.7-.5 4.7-2.1c1.4-2.4.7-6.4-.9-10.6z" fill="#f3e6c4" stroke="#2a1a0d" stroke-width="1.6" stroke-linejoin="round"/><path d="M2.8 17.6C2.8 9.2 8.7 3 16 3s13.2 6.2 13.2 14.6c0 1.6-5.2 2.6-13.2 2.6S2.8 19.2 2.8 17.6z" fill="#9a5522" stroke="#2a1a0d" stroke-width="1.6" stroke-linejoin="round"/><path d="M7 11.4c2.2-3.6 5.4-5 9-5" fill="none" stroke="#fff" stroke-opacity=".4" stroke-width="2" stroke-linecap="round"/></g></svg></span>
   <div class="brand"><h1>Cartocèpe</h1><small id="ssn">Carnet d'exploration</small></div>
@@ -526,7 +528,7 @@ body{background:
   <div id="zb"><button class="ib" id="gr" data-ic="grid" aria-label="Afficher ou cacher la grille"></button><button class="ib" id="pt" data-ic="trail" aria-label="Cartographier les sentiers"></button><button class="ib" id="rtb" data-ic="compass" aria-label="Itinéraire vers mes zones"></button><button class="ib" id="lb" data-ic="book" aria-label="Carnet de découvertes"></button><i class="sep"></i><button class="ib" id="fit" data-ic="fit" aria-label="Voir toutes mes zones"></button><button class="ib" id="zo" data-ic="minus" aria-label="Dézoomer"></button><button class="ib" id="zi" data-ic="plus" aria-label="Zoomer"></button></div></div>
 <div id="dock"><button id="found" aria-label="Ajouter un cèpe">+1<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" aria-hidden="true"><path d="M12.2 17.5c-1.6 4.2-2.3 8.2-.9 10.6 1 1.6 3 2.1 4.7 2.1s3.7-.5 4.7-2.1c1.4-2.4.7-6.4-.9-10.6z" fill="#f3e6c4" stroke="#3b2412" stroke-width="1.8" stroke-linejoin="round"/><path d="M2.8 17.6C2.8 9.2 8.7 3 16 3s13.2 6.2 13.2 14.6c0 1.6-5.2 2.6-13.2 2.6S2.8 19.2 2.8 17.6z" fill="#9a5522" stroke="#3b2412" stroke-width="1.8" stroke-linejoin="round"/><path d="M7 11.4c2.2-3.6 5.4-5 9-5" fill="none" stroke="#fff" stroke-opacity=".38" stroke-width="2" stroke-linecap="round"/></svg></button><button id="visit" data-ic="foot" aria-label="Ajouter une visite">+1</button><button id="react" data-ic="flag" aria-label="Poser un repère"></button><button id="grab" aria-label="Réduire ou ouvrir la fiche">▾</button></div>
 <div id="panel" class="win dg"></div>
-<div id="mkm"><div class="win dg"><h2 id="mkt">Nouveau repère</h2><div class="hint" id="mkw" style="padding:0"></div>
+<div id="mkm"><div class="win dg"><h2 id="mkt">Nouveau repère</h2><div class="hint" id="mkw" style="padding:0"></div><button class="btn" id="mkpk" hidden>🅿 Retourner au parking</button>
   <div id="mkg"></div><textarea id="mkn" placeholder="Note : ce que vous avez vu, à retenir…" maxlength="500" style="min-height:76px"></textarea>
   <button class="btn gold" id="mks">Enregistrer</button><button class="btn" id="mkv" hidden></button><button class="btn" id="mkd" hidden style="background:#8b2d22">Supprimer</button><button class="btn" id="mkc">Annuler</button></div></div>
 <div id="menu"><div class="win dg"><h2>Journal d'exploration</h2><div id="jr"></div>
@@ -1078,8 +1080,13 @@ async function showRel(k) {
 /* ===== Météo : indice de pousse des cèpes de Bordeaux, 0-100 (Open-Meteo, gratuit, sans clé) =====
    Uniquement des données météo : précipitations, ET0, températures, humidité relative, point de rosée, vent, nébulosité.
    Série = 24 jours passés + aujourd'hui + 7 jours de prévision (index 0..31). Pour un jour D (passé, présent ou prévu) :
-   1. Humidité du sol = bilan hydrique pondéré sur les 21 jours précédents (pluie − évapotranspiration), pluies de J-7 à J-15
-      pondérées plein pot (le cèpe sort plusieurs jours après la pluie), pluies récentes (J-1 à J-6) et anciennes (J-16 à J-21) à ~40 %.
+   1. Réserve en eau du sol (modèle « seau ») : chaque jour + pluie − évaporation réelle, petite perte en profondeur.
+      L'évaporation ne retire que l'eau présente : les petites pluies répétées s'accumulent au lieu d'être effacées.
+   1 bis. Pluie déclenchante : la pousse est la plus forte 7 à 15 jours après une bonne pluie (≈ 20 mm cumulés).
+      Sans elle, un sol humide garde la moitié du potentiel (les cèpes déjà lancés continuent de sortir).
+   La pluie est moyennée sur ~10 km autour du spot (15 points) : les pluies « passées » d'Open-Meteo sont des prévisions
+   à court terme, pas des mesures, et un modèle ne place pas une averse à mieux que 10-30 km près. Sans ce lissage,
+   deux spots proches pouvaient afficher 0 et 56 à cause du seul bruit du modèle.
    2. Température moyenne des 7 derniers jours : idéal 12-20 °C, pénalisée en dessous et au-dessus ; chaleur (Tmax) et gel pénalisés.
    3. Air : humidité relative, écart température/point de rosée (air sec = pénalité), vent desséchant, ciel dégagé = évaporation.
    Les jours futurs utilisent la pluie/ET0/températures prévues : l'indice des 7 prochains jours anticipe donc l'évolution. */
@@ -1095,14 +1102,18 @@ async function wxFetch(la, lo) {      // la / lo : chaînes (un point ou plusieu
 const wxCache = new Map();
 async function wxFor(la, lo) {
   const k = la.toFixed(2) + ',' + lo.toFixed(2), c = wxCache.get(k); if (c && Date.now() - c.t < 36e5) return c.d;
-  const j = await wxFetch(la.toFixed(3), lo.toFixed(3)), d = j.daily; d.elev = j.elevation; wxCache.set(k, { t: Date.now(), d }); return d;
+  const pts = [[la, lo]]; for (const [r, n] of [[4, 6], [9, 8]]) for (let k = 0; k < n; k++) { const a = k / n * 2 * Math.PI + (r > 5 ? .4 : 0); pts.push([la + r / 111.3 * Math.cos(a), lo + r / (111.3 * Math.cos(la * Math.PI / 180)) * Math.sin(a)]); }      // le spot + 6 points à 4 km + 8 points à 9 km : les modèles ne savent pas placer une averse à mieux que 10-30 km près
+  let j = await wxFetch(pts.map(p => p[0].toFixed(3)).join(','), pts.map(p => p[1].toFixed(3)).join(','));
+  const arr = Array.isArray(j) ? j : [j], d = arr[0].daily; d.elev = arr[0].elevation;
+  if (arr.length > 1 && arr.every(x => x.daily && x.daily.precipitation_sum && x.daily.precipitation_sum.length === d.precipitation_sum.length)) {
+    d.precip_spot = d.precipitation_sum.slice();      // pluie du seul point, pour l'affichage détaillé
+    d.precipitation_sum = d.precipitation_sum.map((_, t) => { let s = 0, w = 0; arr.forEach((x, q) => { const v = x.daily.precipitation_sum[t]; if (v != null) { const k = q === 0 ? 2 : q <= 6 ? 1.5 : 1; s += v * k; w += k; } }); return w ? s / w : null; }); }
+  wxCache.set(k, { t: Date.now(), d }); return d;
 }
 /* Repousse : après une récolte, la case a besoin d'environ 8 jours pour se regarnir.
    Facteur 0,1 le jour même → 1 au bout de 8 jours (linéaire). `last` = date de la dernière visite avec cèpes. */
 const wxOff = d => d.precipitation_sum.length - 8;   // index d'aujourd'hui (8 jours de prévision à la fin)
 const regrow = (date, last) => { if (!last) return 1; const n = Math.round((new Date(date + 'T00:00') - new Date(last + 'T00:00')) / 864e5); return n >= 8 ? 1 : Math.max(.1, .1 + .9 * n / 8); };
-/* Poids d'une pluie tombée n jours avant D : fort entre J-7 et J-15, faible avant et après */
-const wDay = n => n < 7 ? .3 + .2 * (n - 1) / 5 : n <= 15 ? 1 : .5 - .2 * Math.min(5, n - 16) / 5;
 function wxScores(d, last, ff = 0, par = null, from = null, to = null) {      // par = {sat, dt} (calibration) ; from/to = plage d'indices à calculer
   const cal = par || D.cal || {}, SAT = cal.sat || 35, DT = cal.dt || 0;   // ff = part de forêt de la case (0-1) : sous le couvert, moins d'évaporation, vent atténué, chaleur atténuée
   const kE = .5 * (1 - .4 * ff);      // part de l'ET0 réellement perdue par le sol forestier
@@ -1112,10 +1123,12 @@ function wxScores(d, last, ff = 0, par = null, from = null, to = null) {      //
   const dflt = v => P.map(() => v), RH = num('relative_humidity_2m_mean', 75) || dflt(75), TD = num('dew_point_2m_mean', null), WS = num('wind_speed_10m_mean', 8) || dflt(8), CC = num('cloud_cover_mean', 50) || dflt(50);
   const sum = (a, i, j) => { let s = 0; for (let x = i; x <= j; x++) s += a[x]; return s; }, mean = (a, i, j) => sum(a, i, j) / (j - i + 1);
   const Tm = Tn.map((v, i) => (v + Tx[i]) / 2);
-  const out = [];
+  const out = [], RS = new Float64Array(P.length);
+  { let w = 0; for (let t = 0; t < P.length; t++) { w = Math.min(SAT * 2.2, Math.max(0, w * .965 + P[t] - kE * E[t])); RS[t] = w; } }      // réserve du sol, jour après jour
   for (let i = from ?? wxOff(d); i <= (to ?? P.length - 1); i++) {
-    let wr = 0, we = 0, r715 = 0; for (let n = 1; n <= 21; n++) { const w = wDay(n); wr += w * P[i - n]; we += w * kE * E[i - n]; if (n >= 7 && n <= 15) r715 += P[i - n]; }
-    const net = Math.max(0, wr - we), soil = cl(net / SAT) * (wr > 140 ? .9 : 1);                   // 35 mm pondérés ≈ sol bien humide
+    const W = RS[i - 1], r715 = sum(P, i - 15, i - 7);
+    const soil = (1 - Math.exp(-2.3 * W / SAT)) * (W > 1.8 * SAT ? .9 : 1);      // SAT mm de réserve ≈ sol bien humide (90 %) ; courbe douce, 0 seulement si le sol est vraiment sec
+    const trig = .5 + .5 * cl(r715 / 20);      // pluie déclenchante 7 à 15 jours avant
     const tm = mean(Tm, i - 6, i) - 1.5 * ff, tx = mean(Tx, i - 6, i) - 3 * ff, fr = Math.min(...Tn.slice(i - 3, i + 1));
     const tc = tm - DT, tS = tc <= 4 ? 0 : tc < 12 ? (tc - 4) / 8 : tc <= 20 ? 1 : tc < 28 ? (28 - tc) / 8 : 0;   // plateau 12-20 °C
     const hot = tx <= 26 ? 1 : Math.max(0, 1 - (tx - 26) / 8), frost = fr < 0 ? .25 : fr < 2 ? .7 : 1;
@@ -1123,8 +1136,8 @@ function wxScores(d, last, ff = 0, par = null, from = null, to = null) {      //
     const air = .6 + .4 * (.7 * cl((rh - 55) / 25) + .3 * cl(1 - (spread - 3) / 8));                  // air humide, proche de la saturation
     const ws = mean(WS, i - 2, i) * (1 - .5 * ff), wind = 1 - .15 * cl((ws - 15) / 20);              // vent desséchant (km/h)
     const cc = mean(CC, i - 4, i), cloud = .9 + .1 * cl(cc / 70);                                    // ciel couvert = moins d'évaporation
-    const rg = regrow(d.time[i], last), base = 100 * soil * tS * hot * frost * air * wind * cloud;
-    out.push({ date: d.time[i], p: P[i], rg, base: Math.round(base), score: Math.round(base * rg), f: { ff, wr, net, soil, r715, tm, tS, hot, frost, rh, air, ws, wind, cc, cloud } });
+    const rg = regrow(d.time[i], last), base = 100 * soil * trig * tS * hot * frost * air * wind * cloud;
+    out.push({ date: d.time[i], p: P[i], rg, base: Math.round(base), score: Math.round(base * rg), f: { ff, W, soil, r715, trig, tm, tS, hot, frost, rh, air, ws, wind, cc, cloud } });
   }
   return out;
 }
@@ -1177,10 +1190,10 @@ async function showWx(k) {
     const best = s.reduce((a, b) => b.score > a.score ? b : a), day = x => new Date(x + 'T00:00').toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric' });
     const avgS = (i, j) => s.slice(i, j).reduce((a, x) => a + x.score, 0) / Math.max(1, s.slice(i, j).length), dT = avgS(4, 8) - avgS(0, 3), trend = dT >= 8 ? '↗ en hausse' : dT <= -8 ? '↘ en baisse' : '→ stable';
     const ago2 = since <= 0 ? "aujourd'hui" : since === 1 ? 'hier' : 'il y a ' + since + ' j', T = tierOf(best.score), ok = best.score >= 30;
-    const lim = (f => { if (!f) return ''; const sat = (D.cal && D.cal.sat) || 35, L = [[f.soil, `sol trop sec : ${Math.round(f.net)} mm de pluie utile sur 3 semaines (≈ ${sat} mm pour un sol bien humide)`, `sol trop sec (${Math.round(f.net)} mm utiles / ${sat})`], [f.tS, f.tm < 12 ? `trop froid (${f.tm.toFixed(1)} °C en moyenne sur 7 j)` : `trop chaud (${f.tm.toFixed(1)} °C en moyenne sur 7 j)`, f.tm < 12 ? `trop froid (${f.tm.toFixed(1)} °C)` : `trop chaud (${f.tm.toFixed(1)} °C)`], [f.hot, 'fortes chaleurs', 'fortes chaleurs'], [f.frost, 'gelées récentes', 'gelées récentes']].sort((a, b) => a[0] - b[0])[0];
+    const lim = (f => { if (!f) return ''; const sat = (D.cal && D.cal.sat) || 35, L = [[f.soil, `sol trop sec : réserve en eau ${Math.round(f.W)} mm (≈ ${sat} mm pour un sol bien humide)`, `sol trop sec (réserve ${Math.round(f.W)} mm / ${sat})`], [f.trig, `pas encore de pluie déclenchante : ${Math.round(f.r715)} mm il y a 7 à 15 jours (≈ 20 mm idéal) ; les pluies récentes compteront dans quelques jours`, `pluie déclenchante faible (${Math.round(f.r715)} mm à J-7…J-15)`], [f.tS, f.tm < 12 ? `trop froid (${f.tm.toFixed(1)} °C en moyenne sur 7 j)` : `trop chaud (${f.tm.toFixed(1)} °C en moyenne sur 7 j)`, f.tm < 12 ? `trop froid (${f.tm.toFixed(1)} °C)` : `trop chaud (${f.tm.toFixed(1)} °C)`], [f.hot, 'fortes chaleurs', 'fortes chaleurs'], [f.frost, 'gelées récentes', 'gelées récentes']].sort((a, b) => a[0] - b[0])[0];
       return L[0] < .85 ? L : null; })(s[0].f);      // ce qui bride le plus l'indice aujourd'hui
     put(`<div class="wxg">${s.map((x, i) => { const t = tierOf(x.score); return `<div class="wxd${x === best && ok ? ' best' : ''}" title="${t.n}"><small>${i ? new Date(x.date + 'T00:00').toLocaleDateString('fr-FR', { weekday: 'narrow' }) + ' ' + x.date.slice(8) : 'auj.'}</small><b style="color:${t.b}">${x.score}${x.rg < .8 ? '<em class="rg" title="Repousse">↻</em>' : ''}</b><small>${x.p >= 1 ? Math.round(x.p) + ' mm' : '–'}</small><i style="width:${Math.max(4, x.score)}%;background:${t.b}"></i></div>`; }).join('')}</div>
-      ${lim ? `<div class="wxl">Aujourd'hui <b>${s[0].score}</b>/100 · frein principal : ${lim[1]}</div>` : ''}<details class="wxi"><summary>Comment lire l'indice</summary><div class="wxn">Probabilité de fructification (0 à 100) calculée chaque jour : humidité du sol (pluie − évapotranspiration sur 21 jours, pluies de J-7 à J-15 comptées en priorité) × température (idéal 12-20 °C) × chaleur × gel × air humide × vent × ciel couvert. Les 7 jours à venir utilisent les prévisions. Niveaux : Dormant (&lt; 30), Prometteur (30-49), Favorable (50-69), Exceptionnel (70+). ↻ = la zone est encore en repousse après une récolte (~8 j). Pluie 14 j passés : ${Math.round(past)} mm · températures moy. 7 j : ${tm7.toFixed(1)} °C.<br><b>Détail du jour :</b> ${(f => f ? `pluie pondérée ${Math.round(f.wr)} mm (dont ${Math.round(f.r715)} mm à J-7…J-15), utile ${Math.round(f.net)} mm → sol ${Math.round(f.soil * 100)} % · temp. ${f.tm.toFixed(1)} °C → ${Math.round(f.tS * 100)} % · chaleur ${Math.round(f.hot * 100)} % · gel ${Math.round(f.frost * 100)} % · air (HR ${Math.round(f.rh)} %) ${Math.round(f.air * 100)} % · vent ${Math.round(f.ws)} km/h → ${Math.round(f.wind * 100)} % · nuages ${Math.round(f.cc)} % → ${Math.round(f.cloud * 100)} % · repousse ${Math.round(s[0].rg * 100)} %${D.cal ? ` · 🎯 calibré (${D.cal.n} visites)` : ''}${f.ff > 0 ? ` · 🌲 forêt ${Math.round(f.ff * 100)} % (sol plus humide)` : ''}` : '')(s[0].f)}</div></details>`,
+      ${lim ? `<div class="wxl">Aujourd'hui <b>${s[0].score}</b>/100 · frein principal : ${lim[1]}</div>` : ''}<details class="wxi"><summary>Comment lire l'indice</summary><div class="wxn">Probabilité de fructification (0 à 100) calculée chaque jour : réserve en eau du sol (pluie − évaporation, jour après jour) × pluie déclenchante 7 à 15 jours avant × température (idéal 12-20 °C) × chaleur × gel × air humide × vent × ciel couvert. Les 7 jours à venir utilisent les prévisions. Niveaux : Dormant (&lt; 30), Prometteur (30-49), Favorable (50-69), Exceptionnel (70+). ↻ = la zone est encore en repousse après une récolte (~8 j). Pluie 14 j passés (moyenne sur ~10 km, estimation des modèles et non mesure) : ${Math.round(past)} mm${d.precip_spot ? ` · au point exact : ${Math.round(d.precip_spot.slice(wxOff(d) - 14, wxOff(d)).reduce((a, v) => a + (v ?? 0), 0))} mm` : ''} · températures moy. 7 j : ${tm7.toFixed(1)} °C.<br><b>Détail du jour :</b> ${(f => f ? `réserve du sol ${Math.round(f.W)} mm → ${Math.round(f.soil * 100)} % · pluie déclenchante (J-7…J-15) ${Math.round(f.r715)} mm → ${Math.round(f.trig * 100)} % · temp. ${f.tm.toFixed(1)} °C → ${Math.round(f.tS * 100)} % · chaleur ${Math.round(f.hot * 100)} % · gel ${Math.round(f.frost * 100)} % · air (HR ${Math.round(f.rh)} %) ${Math.round(f.air * 100)} % · vent ${Math.round(f.ws)} km/h → ${Math.round(f.wind * 100)} % · nuages ${Math.round(f.cc)} % → ${Math.round(f.cloud * 100)} % · repousse ${Math.round(s[0].rg * 100)} %${D.cal ? ` · 🎯 calibré (${D.cal.n} visites)` : ''}${f.ff > 0 ? ` · 🌲 forêt ${Math.round(f.ff * 100)} % (sol plus humide)` : ''}` : '')(s[0].f)}</div></details>`,
       `<span class="vdc${best.score >= 70 ? ' t3' : ''}" style="--tc:${T.b}">${ok ? best.score : '–'}</span><span class="vdt" style="--tc:${T.b}"><span class="vdl">Potentiel de pousse</span>${gauge(best.score)}<b class="tn">${T.n}</b> · ${ok ? day(best.date) : 'aucun jour favorable cette semaine'} <small>${trend}</small>` + (since <= 8 ? `<br><small>Zone en repousse · récolte ${ago2}</small>` : '') + (lim && s[0].score < 50 ? `<br><small class="lim">Frein : ${lim[2]}</small>` : '') + '</span>');
   } catch (e) { put('<div class="hint">Météo indisponible (connexion ?)</div>', '<span class="vdc">?</span><span class="vdt"><span class="vdl">Potentiel de pousse</span>' + gauge(0) + 'Météo indisponible (connexion ?)</span>'); }
 }
@@ -1268,42 +1281,52 @@ function recToggle() {
 }
 
 /* ===== Itinéraire sur vos chemins : plus court chemin (Dijkstra) depuis votre position jusqu'à vos points ===== */
-function legsFrom(from, tos) {      // pour chaque cible : { d (m), off (m hors chemin), poly, direct }
-  const ps = D.paths || [], key = q => q[0].toFixed(1) + ',' + q[1].toFixed(1), id = new Map(), pts = [], adj = [];
+function legsFrom(from, tos) {      // pour chaque cible : { d (m), off (m hors sentier), poly (partie sur les sentiers), offs (raccords hors sentier), direct }
+  /* Priorité aux sentiers : depuis votre position, on rejoint le sentier le plus intéressant (raccord en pointillés), on le suit,
+     puis on quitte le réseau au plus près de la cible. Le hors-sentier compte triple dans le calcul (à travers bois on marche 2 à 3 fois moins vite) :
+     la ligne droite n'est proposée que si les sentiers font un énorme détour, ou s'il n'y en a aucun à moins de 1,5 km. */
+  const ps = D.paths || [], OFFK = 3, MAXOFF = 1500;
+  const direct = t => { const d = rdist(from, [t.x, t.y]); return { d, off: d, poly: [from, [t.x, t.y]], offs: [[from, [t.x, t.y]]], direct: true }; };
+  if (!ps.length) return tos.map(direct);
+  const key = q => q[0].toFixed(1) + ',' + q[1].toFixed(1), id = new Map(), pts = [], adj = [];
   const nd = q => { const k = key(q); let i = id.get(k); if (i === undefined) { i = pts.length; id.set(k, i); pts.push([q[0], q[1]]); adj.push([]); } return i; };
   const link = (a, b) => { const w = rdist(pts[a], pts[b]); adj[a].push([b, w]); adj[b].push([a, w]); };
   ps.forEach(p => { for (let i = 1; i < p.pts.length; i++) { const a = nd(p.pts[i - 1]), b = nd(p.pts[i]); if (a !== b) link(a, b); } });
-  const snap = z => { let best = null; ps.forEach(p => { for (let i = 1; i < p.pts.length; i++) { const r = segProj(z, p.pts[i - 1], p.pts[i]); if (!best || r.d < best.d) best = { d: r.d, q: r.q, t: r.t, a: p.pts[i - 1], b: p.pts[i], sg: p.id + ':' + i }; } }); return best; };
-  const direct = t => { const d = rdist(from, [t.x, t.y]); return { d, off: d, poly: [from, [t.x, t.y]], direct: true }; };
-  if (!ps.length) return tos.map(direct);
-  const groups = new Map(), vs = [from, ...tos.map(t => [t.x, t.y])].map(z => { const sn = snap(z); if (!sn) return null; const v = { z, sn, n: nd(sn.q), off: rdist(z, sn.q) }; const gr = groups.get(sn.sg) || { a: nd(sn.a), b: nd(sn.b), l: [] }; gr.l.push({ n: v.n, t: sn.t }); groups.set(sn.sg, gr); return v; });
-  groups.forEach(gr => { let prev = gr.a; gr.l.sort((x, y) => x.t - y.t).forEach(e => { if (e.n !== prev && e.n !== gr.b) { link(prev, e.n); prev = e.n; } }); if (prev !== gr.b) link(prev, gr.b); });      // les points d'accroche d'un même tronçon sont chaînés
-  if (!vs[0]) return tos.map(direct);
+  const snapsOf = z => ps.map(p => { let b = null; for (let i = 1; i < p.pts.length; i++) { const r = segProj(z, p.pts[i - 1], p.pts[i]); if (!b || r.d < b.d) b = { d: r.d, q: r.q, t: r.t, a: p.pts[i - 1], b: p.pts[i], sg: p.id + ':' + i }; } return b; })
+    .filter(sn => sn && rdist(z, sn.q) < MAXOFF);      // le point le plus proche de CHAQUE sentier (pas seulement du plus proche)
+  const groups = new Map(), addSnap = sn => { const n = nd(sn.q), gr = groups.get(sn.sg) || { a: nd(sn.a), b: nd(sn.b), l: [] }; gr.l.push({ n, t: sn.t }); groups.set(sn.sg, gr); return n; };
+  const S0 = snapsOf(from).map(sn => ({ n: addSnap(sn), off: rdist(from, sn.q) }));
+  const TT = tos.map(t => snapsOf([t.x, t.y]).map(sn => ({ n: addSnap(sn), off: rdist([t.x, t.y], sn.q) })));
+  groups.forEach(gr => { let prev = gr.a; gr.l.sort((x, y) => x.t - y.t).forEach(e => { if (e.n !== prev && e.n !== gr.b) { link(prev, e.n); prev = e.n; } }); if (prev !== gr.b) link(prev, gr.b); });      // les accroches d'un même tronçon sont chaînées
+  if (!S0.length) return tos.map(direct);
+  const src = pts.length; pts.push([from[0], from[1]]); adj.push(S0.map(x => [x.n, x.off * OFFK]));      // départ virtuel : relié à chaque sentier proche
   const N = pts.length, dist = new Float64Array(N).fill(Infinity), prev = new Int32Array(N).fill(-1), H = [];
   const push = (d, n) => { H.push([d, n]); let i = H.length - 1; while (i > 0) { const p = (i - 1) >> 1; if (H[p][0] <= H[i][0]) break; [H[p], H[i]] = [H[i], H[p]]; i = p; } };
   const pop = () => { const t = H[0], l = H.pop(); if (H.length) { H[0] = l; let i = 0; for (;;) { const a = 2 * i + 1, b = a + 1; let m = i; if (a < H.length && H[a][0] < H[m][0]) m = a; if (b < H.length && H[b][0] < H[m][0]) m = b; if (m === i) break; [H[m], H[i]] = [H[i], H[m]]; i = m; } } return t; };
-  dist[vs[0].n] = 0; push(0, vs[0].n);
+  dist[src] = 0; push(0, src);
   while (H.length) { const [d, u] = pop(); if (d > dist[u]) continue; for (const [v, w] of adj[u]) if (d + w < dist[v]) { dist[v] = d + w; prev[v] = u; push(d + w, v); } }
-  return tos.map((t, j) => { const v = vs[j + 1], dr = direct(t);
-    if (!v || !isFinite(dist[v.n]) || vs[0].off > 400 || v.off > 400) return dr;
-    const chain = []; for (let u = v.n; u !== -1; u = prev[u]) chain.push(pts[u]); chain.reverse();
-    const off = vs[0].off + v.off, d = dist[v.n] + off; if (dr.d < d * .5) return dr;      // si le réseau fait un énorme détour, on indique la ligne droite
-    return { d, off, poly: [from, ...chain, [t.x, t.y]], direct: false }; });
+  return tos.map((t, j) => { const dr = direct(t); let best = null;
+    TT[j].forEach(x => { const c = dist[x.n] + x.off * OFFK; if (isFinite(c) && (!best || c < best.c)) best = { c, x }; });
+    if (!best || dr.d * OFFK <= best.c) return dr;
+    const chain = []; for (let u = best.x.n; u !== src && u !== -1; u = prev[u]) chain.push(pts[u]); chain.reverse();
+    const tg = [t.x, t.y], offA = rdist(from, chain[0]), offB = best.x.off; let net = 0; for (let i = 1; i < chain.length; i++) net += rdist(chain[i - 1], chain[i]);
+    const offs = []; if (offA > 3) offs.push([from, chain[0]]); if (offB > 3) offs.push([chain[chain.length - 1], tg]);
+    return { d: offA + net + offB, off: offA + offB, offA, offB, poly: chain.length > 1 ? chain : [], offs, direct: false }; });
 }
 function rtCompute() {
-  if (!me || !RT.on) return; let cur = [me.x, me.y]; RT.polys = []; RT.ld = []; RT.dir = []; RT.tot = 0; RT.off = 0;
-  RT.tg.slice(RT.i).forEach(t => { const l = legsFrom(cur, [t])[0]; RT.polys.push(l.poly); RT.ld.push(l.d); RT.dir.push(l.direct); RT.tot += l.d; RT.off += l.off; cur = [t.x, t.y]; });
+  if (!me || !RT.on) return; let cur = [me.x, me.y]; RT.polys = []; RT.offs = []; RT.ld = []; RT.dir = []; RT.tot = 0; RT.off = 0; RT.offA = 0;
+  RT.tg.slice(RT.i).forEach((t, i) => { const l = legsFrom(cur, [t])[0]; RT.polys.push(l.direct ? [] : l.poly); RT.offs.push(...l.offs.map(o => [o, i])); RT.ld.push(l.d); RT.dir.push(l.direct); RT.tot += l.d; RT.off += l.off; if (!i) RT.offA = l.offA || 0; cur = [t.x, t.y]; });
 }
 function rtUi() {
   const rest = RT.tg.slice(RT.i), mins = Math.max(1, Math.round(RT.tot / 55)), nm = (t, i) => t.name || 'Point ' + (RT.i + i + 1);
   if (!rest.length) return;
   $('#rtt').innerHTML = rest.length === 1 ? `🧭 <b>${esc(nm(rest[0], 0))}</b> · ${fmtDist(RT.tot)} · ≈ ${mins} min` : `🧭 <b>Tournée</b> · ${rest.length} points · ${fmtDist(RT.tot)} · ≈ ${mins} min`;
-  $('#rts').innerHTML = '<small>' + (rest.length > 1 ? `Prochain : ${esc(nm(rest[0], 0))} · ${fmtDist(RT.ld[0])}${rest[1] ? ' → ' + esc(nm(rest[1], 1)) : ''}${rest.length > 2 ? ' …' : ''}<br>` : '') + (RT.dir[0] ? 'Aucun chemin proche : ligne droite.' : RT.off > 25 ? `Dont ${fmtDist(RT.off)} hors chemin (en pointillés rejoignant le réseau).` : 'Par vos chemins.') + '</small>';
+  $('#rts').innerHTML = '<small>' + (rest.length > 1 ? `Prochain : ${esc(nm(rest[0], 0))} · ${fmtDist(RT.ld[0])}${rest[1] ? ' → ' + esc(nm(rest[1], 1)) : ''}${rest.length > 2 ? ' …' : ''}<br>` : '') + (RT.dir[0] ? 'Aucun sentier utile à proximité : ligne droite à travers bois (pointillés).' : RT.offA > 15 ? `Rejoignez d'abord le sentier à ${fmtDist(RT.offA)} (pointillés), puis suivez le tracé bleu.` : RT.off > 15 ? `Par vos sentiers, puis ${fmtDist(RT.off)} hors sentier jusqu'au point (pointillés).` : 'Par vos sentiers.') + '</small>';
   $('#rtn').hidden = rest.length < 2;
 }
 function startRoute(tg) {
   fxa({ k: 'route', key: 0, dur: 1100 }); RT.on = true; RT.tg = tg; RT.i = 0; RT.t = Date.now(); $('#rt').hidden = false; $('#rtb').classList.add('on'); rtCompute(); rtUi();
-  const all = RT.polys.flat(); if (all.length) { const xs = all.map(q => q[0]), ys = all.map(q => q[1]), W = cv.clientWidth, H = cv.clientHeight;
+  const all = [...RT.polys.flat(), ...(RT.offs || []).flatMap(o => o[0])]; if (all.length) { const xs = all.map(q => q[0]), ys = all.map(q => q[1]), W = cv.clientWidth, H = cv.clientHeight;
     V.cx = (Math.min(...xs) + Math.max(...xs)) / 2; V.cy = (Math.min(...ys) + Math.max(...ys)) / 2; V.mpp = Math.max(1.5, (Math.max(...xs) - Math.min(...xs)) / (W * .8), (Math.max(...ys) - Math.min(...ys)) / (H * .7)); }
   draw();
 }
@@ -1331,12 +1354,13 @@ function goTo(k) {
   startRoute([t]);
 }
 function drawRoute(sx, sy) {
-  if (!RT.on || !RT.polys.length) return; g.save(); g.lineCap = 'round'; g.lineJoin = 'round';
+  if (!RT.on || !(RT.polys.length || (RT.offs || []).length)) return; g.save(); g.lineCap = 'round'; g.lineJoin = 'round';
   const tr = (poly, w, col, dash) => { g.beginPath(); g.setLineDash(dash || []); poly.forEach((q, i) => i ? g.lineTo(sx(q[0]), sy(q[1])) : g.moveTo(sx(q[0]), sy(q[1]))); g.lineWidth = w; g.strokeStyle = col; g.stroke(); };
   const rv = FX.length && fxOf('route', 0), rp = rv ? Math.min(1, Math.max(0, fxP(rv))) : 1;
+  g.globalAlpha = Math.min(1, rp * 2); (RT.offs || []).forEach(([[a, b], i]) => { tr([a, b], 8, 'rgba(0,0,0,.4)', [1, 10]); tr([a, b], 4.5, i ? 'rgba(200,236,255,.8)' : '#d6f1ff', [1, 10]); }); g.globalAlpha = 1;      // raccords hors sentier : pointillés
   if (rp < 1) { const L = RT.polys.reduce((a, p) => a + p.reduce((s, q, i) => i ? s + Math.hypot(sx(q[0]) - sx(p[i - 1][0]), sy(q[1]) - sy(p[i - 1][1])) : 0, 0), 0); let left = L * EZ.out(rp);      // l'itinéraire se trace progressivement
     RT.polys.forEach(p => { const l = p.reduce((s, q, i) => i ? s + Math.hypot(sx(q[0]) - sx(p[i - 1][0]), sy(q[1]) - sy(p[i - 1][1])) : 0, 0), k = Math.max(0, Math.min(l, left)); left -= l; tr(p, 9, 'rgba(0,0,0,.45)', [k, l + 9]); tr(p, 5, '#19b5ff', [k, l + 9]); }); }
-  else RT.polys.forEach((p, i) => { tr(p, 9, 'rgba(0,0,0,.45)'); tr(p, 5, i ? 'rgba(160,225,255,.95)' : '#19b5ff', i ? [9, 8] : null); });
+  else RT.polys.forEach((p, i) => { if (p.length < 2) return; tr(p, 9, 'rgba(0,0,0,.45)'); tr(p, 5, i ? 'rgba(160,225,255,.95)' : '#19b5ff', i ? [9, 8] : null); });
   g.setLineDash([]); g.font = '800 12px system-ui,sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
   RT.tg.slice(RT.i).forEach((t, i) => { const x = sx(t.x), y = sy(t.y); g.beginPath(); g.arc(x, y, 11, 0, 7); g.fillStyle = '#19b5ff'; g.fill(); g.lineWidth = 2.5; g.strokeStyle = '#fff'; g.stroke(); g.fillStyle = '#fff'; g.fillText(String(RT.i + i + 1), x, y + .5); });
   g.restore();
@@ -1607,6 +1631,20 @@ function commitStart() {      // un départ posé au milieu d'un trait devient u
   const b = nearSeg(p, P.start); if (!b || b.d > 3) return 0;
   const v = junction(p, b.i, P.start); P.start = [v[0], v[1]]; return 1;
 }
+/* ===== Parkings : les sentiers s'y accrochent, et « Retourner au parking » trace le plus court chemin ===== */
+const PARK_M = 12;      // un point de sentier posé à moins de 12 m d'un parking s'y attache
+function parkNear(x, y, m = PARK_M) { let best = null, bd = m; (D.marks || []).forEach(k => { if (k.t !== 'park') return; const d = rdist([x, y], [k.x, k.y]); if (d < bd) { bd = d; best = k; } }); return best; }
+function parkNearPx(px, py, S, lim = 24) { let best = null, bd = lim; (D.marks || []).forEach(k => { if (k.t !== 'park') return; const d = Math.hypot(S.sx(k.x) - px, S.sy(k.y) - py); if (d < bd) { bd = d; best = k; } }); return best; }
+function parkAttach(k) {      // nouveau parking (ou déplacé) : les points de sentier proches viennent s'y raccrocher
+  let n = 0; (D.paths || []).forEach(p => p.pts.forEach((v, i) => { if (rdist(v, [k.x, k.y]) < PARK_M && !(v[0] === k.x && v[1] === k.y)) { p.pts[i] = [k.x, k.y]; n++; } }));
+  (D.paths || []).forEach(p => { for (let i = p.pts.length - 1; i > 0; i--) if (p.pts[i][0] === p.pts[i - 1][0] && p.pts[i][1] === p.pts[i - 1][1]) p.pts.splice(i, 1); bbC.delete(p); });
+  D.paths = (D.paths || []).filter(p => p.pts.length >= 2); return n;
+}
+function backToPark(k) {
+  const t = { k: null, x: k.x, y: k.y, name: 'Parking' };
+  if (!me) { RT.wait = [t]; if (watch === null) startLoc(); return toast('🅿 Recherche de votre position… le chemin vers le parking s\'affichera ensuite'); }
+  startRoute([t]); toast('🅿 Retour au parking : ' + fmtDist(RT.tot) + (RT.dir[0] ? ' (ligne droite : aucun sentier utile)' : RT.offA > 15 ? ' · rejoignez d\'abord le sentier à ' + fmtDist(RT.offA) : ' par vos sentiers'));
+}
 function placePt(me, quiet) {
   const T = m => { if (!quiet) toast(m); };
   if (!me) { T('Position GPS introuvable : patientez un instant'); if (watch === null) startLoc(); return; }
@@ -1618,8 +1656,9 @@ function placePt(me, quiet) {
     let sd = Math.min(9, Math.max(5, me.acc));
     others.forEach(p => { for (let i = 0; i + 1 < p.pts.length; i++) { if (!away(p, i, last)) continue; const r = segProj(gp, p.pts[i], p.pts[i + 1]); if (r.d < sd) { sd = r.d; hit = { p, i }; pt = r.q; } } });
   }
+  const pk = P.mag ? parkNear(gp[0], gp[1], Math.max(PARK_M, Math.min(20, me.acc))) : null; if (pk) { pt = [pk.x, pk.y]; vtx = true; hit = null; }      // le parking a la priorité
   if (last && dist(last, pt) < 2.5) return T(`Déplacez-vous avant d'ajouter un point`);
-  let nj = commitStart(), q = rp1(pt);
+  let nj = commitStart(), q = pk ? [pk.x, pk.y] : rp1(pt);
   const from = P.cur ? P.cur.pts[P.cur.pts.length - 1] : P.start, X = [];
   if (hit && from) { const v = junction(hit.p, hit.i, q); q = [v[0], v[1]]; nj++; }
   if (from) others.forEach(p => { for (let i = 0; i + 1 < p.pts.length; i++) {      // traversée : chaque croisement devient un carrefour des deux traits
@@ -1629,7 +1668,7 @@ function placePt(me, quiet) {
   X.sort((a, b) => a.p.id < b.p.id ? -1 : a.p.id > b.p.id ? 1 : b.i - a.i);      // du dernier tronçon au premier : les indices restent valides
   X.forEach(x => { x.v = junction(x.p, x.i, x.q); });
   X.sort((a, b) => a.t - b.t); nj += X.length;
-  const mids = X.map(x => [x.v[0], x.v[1]]), acc = ' (±' + Math.round(me.acc) + ' m)', jt = nj ? ' · 🔀 ' + nj + ' carrefour' + (nj > 1 ? 's' : '') : '';
+  const mids = X.map(x => [x.v[0], x.v[1]]), acc = ' (±' + Math.round(me.acc) + ' m)', jt = (nj ? ' · 🔀 ' + nj + ' carrefour' + (nj > 1 ? 's' : '') : '') + (pk ? ' · 🅿 relié au parking' : '');
   if (P.cur) { P.cur.pts.push(...mids, q); P.adds.push(mids.length + 1); T('📍 Point ' + P.cur.pts.length + acc + jt); }
   else if (P.start) { P.cur = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), d: today(), pts: [P.start, ...mids, q] }; P.adds = [mids.length + 1]; (D.paths ||= []).push(P.cur); P.start = null; P.sel = null; T('🥾 Chemin tracé' + acc + jt); }
   else { P.start = q; P.sa = hit ? hit.p.id : null; T(hit ? '📍 Départ posé sur un trait (carrefour)' + acc + ' : marchez, puis rappuyez' : '📍 Départ posé' + acc + ' : marchez, puis rappuyez'); }
@@ -1696,6 +1735,7 @@ function edUp(e) {
   if (!d.moved) { edMenu(d); draw(); return true; }      // simple toucher : menu du point
   const S = edScr(), q = d.cur; let tgt = null, bd = 14;
   if (P.mag) (D.paths || []).forEach(p => p.pts.forEach((v, i) => { if (d.twins.some(([tp, ti]) => tp === p && ti === i)) return; const dd = Math.hypot(S.sx(v[0]) - S.sx(q[0]), S.sy(v[1]) - S.sy(q[1])); if (dd < bd) { bd = dd; tgt = v; } }));
+  const pkd = P.mag ? parkNearPx(S.sx(q[0]), S.sy(q[1]), S, 22) : null; if (pkd) tgt = [pkd.x, pkd.y];
   const fin = tgt ? [tgt[0], tgt[1]] : rp1(q); d.twins.forEach(([p, i]) => { p.pts[i] = [fin[0], fin[1]]; });
   (D.paths || []).forEach(p => { for (let i = p.pts.length - 1; i > 0; i--) if (edSame(p.pts[i], p.pts[i - 1])) p.pts.splice(i, 1); });      // deux points identiques qui se suivent : un seul
   D.paths = D.paths.filter(p => p.pts.length >= 2);
@@ -1753,7 +1793,9 @@ $('#esdel').onclick = () => {      // supprimer le tronçon : le sentier est cou
 function edDrawTap(px, py) {
   const S = edScr(); let q = rp1([S.wx(px), S.wy(py)]), how = '';
   const own = ED.draw.p, last = own ? own.pts[own.pts.length - 1] : ED.draw.first;
-  if (P.mag) { let bd = 18, v = null; (D.paths || []).forEach(p => p.pts.forEach(t => { if (last && edSame(t, last)) return; const d = Math.hypot(S.sx(t[0]) - px, S.sy(t[1]) - py); if (d < bd) { bd = d; v = t; } }));
+  const pkm = P.mag ? parkNearPx(px, py, S) : null;
+  if (pkm) { q = [pkm.x, pkm.y]; how = ' · 🅿 relié au parking'; }
+  else if (P.mag) { let bd = 18, v = null; (D.paths || []).forEach(p => p.pts.forEach(t => { if (last && edSame(t, last)) return; const d = Math.hypot(S.sx(t[0]) - px, S.sy(t[1]) - py); if (d < bd) { bd = d; v = t; } }));
     if (v) { q = [v[0], v[1]]; how = ' · relié à un point'; }
     else { let sd = 14, hit = null; (D.paths || []).forEach(p => { if (p === own) return; for (let i = 1; i < p.pts.length; i++) { const r = segProj([px, py], [S.sx(p.pts[i - 1][0]), S.sy(p.pts[i - 1][1])], [S.sx(p.pts[i][0]), S.sy(p.pts[i][1])]); if (r.d < sd) { sd = r.d; hit = { p, i, q: rp1([S.wx(r.q[0]), S.wy(r.q[1])]) }; } } });
       if (hit) { const j = junction(hit.p, hit.i - 1, hit.q); q = [j[0], j[1]]; how = ' · carrefour créé'; } } }
@@ -2097,7 +2139,7 @@ function mkWhere() { const e = MKE; $('#mkw').textContent = (e.id ? 'Placée le 
 function openMk(e) {
   MKE = e; $('#mkt').textContent = e.id ? 'Modifier le repère' : 'Nouveau repère'; $('#mkn').value = e.note || '';
   $('#mkg').innerHTML = Object.keys(MK).map(t => `<button class="mki${t === e.t ? ' on' : ''}" data-t="${t}" aria-label="${MK[t][0]}">${mkSvg(t)}<span>${MK[t][0]}</span></button>`).join('');
-  $('#mkd').hidden = !e.id; $('#mkv').hidden = !e.id; $('#mkv').textContent = me ? 'Déplacer à ma position' : 'Déplacer au centre de la carte'; mkWhere(); $('#mkm').classList.add('open');
+  $('#mkpk').hidden = !(e.id && e.t === 'park'); $('#mkd').hidden = !e.id; $('#mkv').hidden = !e.id; $('#mkv').textContent = me ? 'Déplacer à ma position' : 'Déplacer au centre de la carte'; mkWhere(); $('#mkm').classList.add('open');
 }
 const closeMk = () => $('#mkm').classList.remove('open');
 function openMark(id) { const m = (D.marks || []).find(x => x.id === id); if (m) openMk({ ...m }); }
@@ -2109,12 +2151,14 @@ $('#rmg').onclick = () => { if (!me) { if (watch === null) startLoc(); return to
 $('#mkg').onclick = e => { const b = e.target.closest('.mki'); if (!b) return; MKE.t = b.dataset.t; document.querySelectorAll('.mki').forEach(x => x.classList.toggle('on', x === b)); };
 $('#mkv').onclick = () => { Object.assign(MKE, here(), { moved: true }); mkWhere(); };
 $('#mkc').onclick = closeMk; $('#mkm').onclick = e => { if (e.target.id === 'mkm') closeMk(); };
+$('#mkpk').onclick = () => { const k = (D.marks || []).find(x => x.id === MKE.id); if (!k) return; closeMk(); if (RM) setRM(false); if (P.on) $('#pt').click(); backToPark(k); };
 $('#mks').onclick = () => {
   const e = MKE, note = $('#mkn').value.trim().slice(0, 500), snap = JSON.stringify(D.marks || []); D.marks ||= [];
   if (e.id) { const m = D.marks.find(x => x.id === e.id); if (m) { m.t = e.t; m.note = note; m.x = e.x; m.y = e.y; } }
   else { const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6); D.marks.push({ id, x: e.x, y: e.y, t: e.t, note, d: today() }); if (fogReveal(e.x, e.y)) fogSave(); fxa({ k: 'drop', key: id, dur: 750 }); fxRing(e.x, e.y, 'rgba(241,230,201,.8)', 3, 20, 500, 330, 2.5); }
   if (e.id) fxRing(e.x, e.y, MK[e.t][1], 4, 26, 600, 0, 3);
-  mkLast = e.t; save(); closeMk(); draw(); toast(MK[e.t][0] + ' enregistré', () => { D.marks = JSON.parse(snap); save(); draw(); });
+  let att = 0; const psnap = JSON.stringify(D.paths || []); if (e.t === 'park') { const k = D.marks.find(x => x.x === e.x && x.y === e.y && x.t === 'park'); if (k) att = parkAttach(k); }
+  mkLast = e.t; save(); closeMk(); draw(); toast(MK[e.t][0] + ' enregistré' + (att ? ` · ${att} point${att > 1 ? 's' : ''} de sentier rattaché${att > 1 ? 's' : ''}` : ''), () => { D.marks = JSON.parse(snap); D.paths = JSON.parse(psnap); save(); draw(); });
 };
 $('#mkd').onclick = () => { const snap = JSON.stringify(D.marks || []); fxRing(MKE.x, MKE.y, 'rgba(171,159,132,.9)', 6, 30, 550); D.marks = D.marks.filter(x => x.id !== MKE.id); save(); closeMk(); draw(); toast('Repère supprimé', () => { D.marks = JSON.parse(snap); save(); draw(); }); };
 /* ===== Points précis : chaque trouvaille a ses coordonnées exactes (plus de cases) ===== */
